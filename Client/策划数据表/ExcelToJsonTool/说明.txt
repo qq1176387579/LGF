@@ -1,0 +1,24 @@
+1.新建文本文件，拓展名改为.bat（如果使用配套json读取，则在CreateJsonClass.cs中修改批处理名字）
+2.将如下文本复制进上面创建的文件
+
+::在这里设置excel表的目录
+@SET EXCEL_FOLDER=.\
+::这里设置生成的json存放的目录
+@SET JSON_FOLDER=..\Assets\Resources\JsonClass
+::这里设置ExcelToJson.exe的路径
+@SET EXE=.\ExcelToJsonTool\ExcelToJson.exe
+::参数这样固定即可
+@CALL %EXE% --excel %EXCEL_FOLDER% --json %JSON_FOLDER%
+
+3.点击上述创建的批处理，即可将指定目录下的excel表生成json并保存到指定的json目录下
+
+4.表格格式说明：
+1.表头为三行，第一行为字段名，第二行为字段注释，第三行为字段类型
+2.一张表不能有重复行名，重复列名，会有提示，在上面创建的批处理结尾加一行 pause 即可暂停看到提示
+3.只会读取sheet1，且sheet1的名字将作为生成json的名字，所以表格的名字可以中文命名
+
+（4.如果使用配套的json读取方式：
+ 以 “_Config” 结尾的表格为特殊表格，固定四列，
+第一行：FieldName,Des,Type，Value
+第二行 第三行 无特殊要求，别空着就行
+）

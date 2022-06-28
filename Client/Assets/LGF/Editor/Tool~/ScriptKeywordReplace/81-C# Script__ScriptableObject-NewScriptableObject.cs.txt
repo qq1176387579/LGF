@@ -1,0 +1,18 @@
+/***************************************************
+/// 作者:      liuhuan
+/// 创建日期:  #CREATIONDATE#
+/// 功能描述:  
+****************************************************/
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using LGF;
+using LGF.Log;
+
+    #ROOTNAMESPACEBEGIN#
+public class #SCRIPTNAME# : ScriptableObject
+{
+   
+}
+#ROOTNAMESPACEEND#

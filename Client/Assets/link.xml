@@ -1,0 +1,19 @@
+﻿<linker>  
+	
+	<!--ILRuntime 防止被裁剪-->
+	<assembly fullname="Assembly-CSharp" preserve="all"/>
+	<assembly fullname="UnityEngine" preserve="all"/> 
+	
+	
+	<!--<assembly fullname="System" preserve="all"/>-->
+
+	<assembly fullname="protobuf-net" preserve="all"/>
+	<assembly fullname="protobuf-net.Core" preserve="all"/>
+	<assembly fullname="System.Buffers" preserve="all"/>
+	<assembly fullname="System.Collections.Immutable" preserve="all"/>
+	<assembly fullname="System.Memory" preserve="all"/>
+	<assembly fullname="System.Numerics.Vectors" preserve="all"/>
+	<assembly fullname="System.Runtime.CompilerServices.Unsafe" preserve="all"/>
+	<assembly fullname="protobuf-model" preserve="all"/>
+	<assembly fullname="MyProtoModel" preserve="all"/>
+</linker>

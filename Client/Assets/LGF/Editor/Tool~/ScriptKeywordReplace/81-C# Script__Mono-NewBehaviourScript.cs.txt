@@ -1,0 +1,28 @@
+/***************************************************
+/// 作者:      liuhuan
+/// 创建日期:  #CREATIONDATE#
+/// 功能描述:  
+****************************************************/
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using LGF;
+using LGF.Log;
+
+    #ROOTNAMESPACEBEGIN#
+public class #SCRIPTNAME# : MonoBehaviour
+{
+    // Start is called before the first frame update
+    void Start()
+    {
+        #NOTRIM#
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        #NOTRIM#
+    }
+}
+#ROOTNAMESPACEEND#

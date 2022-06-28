@@ -1,0 +1,5 @@
+#在该项目种  不提交到github的文件  稀疏检出的.gitignore 文件
+AppConfig/
+ScriptableObjec/
+
+/*.meta
