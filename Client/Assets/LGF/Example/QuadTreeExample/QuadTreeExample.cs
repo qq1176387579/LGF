@@ -11,6 +11,7 @@ using UnityEngine;
 using System;
 using LGF;
 using LGF.Log;
+using LGF.DataStruct;
 
 namespace LGF.Example
 {

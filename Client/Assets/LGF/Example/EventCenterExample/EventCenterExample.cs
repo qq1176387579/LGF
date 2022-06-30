@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LGF;
 using static LGF.EvtHelper;
-
+using LGF.DataStruct;
 
 namespace LGF.Example
 {

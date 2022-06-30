@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LGF;
 using LGF.Log;
+using LGF.DataStruct;
 
 public class GCTest : MonoBehaviour
 {

@@ -5,13 +5,15 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using LGF.Log;
+using UnityEngine;
 
 namespace LGF.Net
 {
     public static class NetConst
     {
 
-        public const int ServerAnyPort = 45556;
+        //public const int ServerAnyPort = 45556;
 
         /// <summary>
         /// 服务器端口   后面写个算法 随机10范围的ip地址
@@ -125,8 +127,14 @@ namespace LGF.Net
                 address.DebugError("Must be an IPv4 address");
                 return 0;
             }
+#if NOT_UNITY
+            byte[] addressBytes = address.GetAddressBytes();    //有GC
+            return (uint)IPAddress.NetworkToHostOrder(BitConverter.ToInt32(addressBytes, 0));
+#else
+            //unity记得看程序集 程序集不一样 这个值也不一样 铁坑
+            return (uint)address.GetHashCode(); //源码  ip4时GetHashCode就是ip值  
+#endif
 
-            return (uint)address.GetHashCode(); //源码  ip4时GetHashCode就是ip值 
         }
 
 
@@ -225,30 +233,4 @@ namespace LGF.Net
 
 
 
-/// <summary>
-/// 扩展
-/// </summary>
-public static class DebugExtend
-{
-    public static void Debug(this object obj, object str)
-    {
-        //Console.WriteLine(str);
-        UnityEngine.Debug.Log(str);
-    }
-
-    public static void DebugError(this object obj, object str)
-    {
-        //Console.WriteLine(str);
-        UnityEngine.Debug.Log(str);
-    }
-
-     
-    public static void DebugError(this Exception e)
-    {
-        //DebugError(e, e.ToString());
-        UnityEngine.Debug.Log(e.ToString());
-    }
-
-
-}
 

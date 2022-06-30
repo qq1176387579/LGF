@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>LGF.Client_Server</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE;NOT_UNITY</DefineConstants>
+    <NoWarn>1701;1702;8601;8603;8600;8618;8714;8602;</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE;NOT_UNITY</DefineConstants>
+    <NoWarn>1701;1702;8601;8603;8600;8618;8714;8602;</NoWarn>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="..\..\Client\Assets\LGF\Network\**\*.cs">
+			<Link>Network\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+	<!-- <ItemGroup>
+    <Compile Include="..\..\Client\Assets\LGF\Network\*.cs">
+      <Link>Network\%(RecursiveDir)%(FileName)%(Extension)</Link>
+    </Compile>
+  </ItemGroup> -->
+	<ItemGroup>
+		<Compile Include="..\..\Client\Assets\LGF\Tool\Common\**\*.cs">
+			<Link>Tool\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\..\Client\Assets\LGF\Manager\Common\**\*.cs">
+			<Link>Manager\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="..\..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\ThirdParty\KCP\Kcp.csproj" />
+	  <ProjectReference Include="..\..\ThirdParty\protobuf-net\protobuf11-net.csproj" />
+	  <ProjectReference Include="..\..\ThirdParty\UnityEngine\UnityEngine.csproj" />
+	</ItemGroup>
+
+</Project>

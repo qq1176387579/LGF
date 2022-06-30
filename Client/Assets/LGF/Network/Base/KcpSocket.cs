@@ -65,13 +65,14 @@ namespace LGF.Net
     /// <summary>
     /// KcpSocket  线程安全  
     /// </summary>
-    public class KcpSocket 
+    public class KcpSocket : System.IDisposable
     {
         Socket m_Socket;
         IPEndPoint m_ipEndPoint;
         byte[] m_SendBuffer = new byte[NetConst.Socket_SendBufferSize];
         byte[] m_RecvBuffer = new byte[NetConst.Socket_RecvBufferSize];
         Thread thread;
+        bool isRecv = true;
 
         Dictionary<ulong, KcpAgent> m_KcpAgents = new Dictionary<ulong, KcpAgent>();
         List<KcpAgent> m_addKcpAgent = new List<KcpAgent>();     //缓冲代理
@@ -95,15 +96,25 @@ namespace LGF.Net
                 //throw;
             }
 
+            this.Debug(" Bing " + m_Socket.LocalEndPoint.ToString());
             //后续有外部线程 这个可以放外部去 线程过多的话 没必要单独给他一个线程
             thread = new Thread(Thread_Recv) { IsBackground = true };
             thread.Start(); //
-            this.Debug(" Bing " + m_Socket.LocalEndPoint.ToString());
+            isRecv = true;
             return true;
         }
 
 
-     
+        //~KcpSocket()
+        //{
+        //    isRecv = false;
+        //    thread = null;
+        //}
+        public void Dispose()
+        {
+            isRecv = false;
+            thread = null;
+        }
 
 
         /// <summary>
@@ -148,15 +159,18 @@ namespace LGF.Net
         {
             while(true)
             {
-                try
-                {
-                    OnRecv();
-                }
-                catch (Exception e)
-                {
-                    this.Debug(e.ToString());
-                    Thread.Sleep(10);
-                }
+                OnRecv();
+                //try
+                //{
+                //    OnRecv();
+                //}
+                //catch (Exception e)
+                //{
+                //    //unity可以无视第一次线程报错 
+                //    //我关掉异常捕获就没有 报错了  不知道为啥  开启有时候报错  有时候又有
+                //    this.DebugError(e.ToString());   
+                //    Thread.Sleep(10);
+                //}
             }
         }
 
@@ -165,8 +179,9 @@ namespace LGF.Net
         {
             EndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
             int length = m_Socket.ReceiveFrom(m_RecvBuffer, m_RecvBuffer.Length, SocketFlags.None, ref endPoint);
-            GetKcpAgent(endPoint).Input(length);
+            GetKcpAgent(endPoint, false).Input(length);
         }
+
 
 
         /// <summary>
@@ -175,14 +190,13 @@ namespace LGF.Net
         /// <param name="point"></param>
         /// <param name="lockKcpAgents"></param>
         /// <returns></returns>
-        public KcpAgent GetKcpAgent(EndPoint point,bool lockKcpAgents = false)
+        public KcpAgent GetKcpAgent(EndPoint point, bool lockKcpAgents = true)
         {
             //endPoint 如果不是 IPEndPoint 另外处理  当前不处理这种情况  后续处理
             IPEndPoint tmpPoint = point as IPEndPoint;
             KcpAgent kcpAgent = null;
-            ulong uid = SocketHelper.CastIP(tmpPoint.Address);
-            uid = uid << 16 | (ushort)tmpPoint.Port;
-            //this.Debug(key.ToString());
+            ulong uid = (ulong)((ushort)tmpPoint.Address.GetHashCode() << 16 | tmpPoint.Port);  //唯一key值
+
             if (lockKcpAgents)
             {
                 lock (m_KcpAgents)
@@ -192,8 +206,6 @@ namespace LGF.Net
             {
                 m_KcpAgents.TryGetValue(uid, out kcpAgent);
             }
-
-
 
             if (kcpAgent == null)
             {
@@ -217,6 +229,15 @@ namespace LGF.Net
                     }
                 }
             }
+            else
+            {
+                //验证代码 我觉得不可能出现 关掉了
+                //if (!kcpAgent.endPoint.Equals(point))  
+                //{
+                //    this.DebugError($"{point} {kcpAgent.endPoint} 的哈希值相同  {uid}");
+                //}
+            }
+
             return kcpAgent;
         }
 
@@ -230,7 +251,7 @@ namespace LGF.Net
         /// <param name="endPoint"></param>
         public void Send(byte[] buffer, int length, IPEndPoint endPoint)
         {
-            GetKcpAgent(endPoint).Send(buffer, length);
+            GetKcpAgent(endPoint, false).Send(buffer, length);
         }
 
 
@@ -342,7 +363,7 @@ namespace LGF.Net
                 Span<byte> buffBytes = new Span<byte>(m_Socket.m_SendBuffer);
                 buffer.Memory.Span.Slice(0, avalidLength).CopyTo(buffBytes);
                 m_Socket.SockSend(m_Socket.m_SendBuffer, avalidLength, endPoint);
-                this.Debug("  Output ");
+                //this.Debug("  Output ");
                 buffer.Dispose();
             }
 

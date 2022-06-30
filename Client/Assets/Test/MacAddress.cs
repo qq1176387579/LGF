@@ -33,6 +33,7 @@ public class MacAddress : MonoBehaviour
             text.text = a.strParam1;
         });
         AndroidMsgCenter.Instance.SendMsg(AndroidMsgDefine.GetUUID);
+
         //text.text = GetMacAddress();
 #else
         text.text = GetMacAddress();
@@ -42,10 +43,13 @@ public class MacAddress : MonoBehaviour
 
     }
 
+    private void OnDisable()
+    {
+        LHTestClient.Program.kcpSock.Dispose();
+    }
 
 
-  
-   
+
 }
 
 
