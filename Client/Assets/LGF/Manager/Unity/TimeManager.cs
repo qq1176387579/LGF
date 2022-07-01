@@ -95,13 +95,26 @@ namespace LGF
             return m_timer.DelTask(tid);
         }
 
+
+
         /// <summary>
         /// 延迟回调
         /// </summary>
         /// <param name="callback"></param>
         /// <param name="delay"></param>
         /// <returns></returns>
-        public ulong AddTask(Action callback, double delay = 0.00005)
+        public ulong AddTask(Action<ulong> callback, double delay = 0.005)
+        {
+            return m_timer.AddTask(callback, (ulong)(delay * (int)TimeUnit.Second), TimeUnit.Millisecond);
+        }
+
+        /// <summary>
+        /// 延迟回调
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="delay"></param>
+        /// <returns></returns>
+        public ulong AddTask(Action callback, double delay = 0.005)
         {
             return m_timer.AddTask(callback, delay);
         }
@@ -113,6 +126,16 @@ namespace LGF
             return m_timer.AddTask(callback, interval, timeUnit, count, delay);
         }
 
+
+        /// <summary>
+        /// 无GC闭包GC
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="interval"></param>
+        /// <param name="timeUnit"></param>
+        /// <param name="count"></param>
+        /// <param name="delay"></param>
+        /// <returns></returns>
         public ulong AddTask(Action<ulong> callback, ulong interval, TimeUnit timeUnit = TimeUnit.Second, int count = 1, ulong delay = 0)
         {
             return m_timer.AddTask(callback, interval, timeUnit, count, delay);

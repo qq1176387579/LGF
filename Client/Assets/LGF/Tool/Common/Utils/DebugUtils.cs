@@ -44,10 +44,11 @@ namespace LGF.Log
         public static void Debug(this object obj, object str)
         {
 #if NOT_UNITY
+
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(str);
 #else
-            UnityEngine.Debug.Log($"{testCount++}  " + str);
+            UnityEngine.Debug.Log(str);
 #endif
         }
 
@@ -57,7 +58,7 @@ namespace LGF.Log
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(str);
 #else
-            UnityEngine.Debug.LogError($"{testCount++}  " + str );
+            UnityEngine.Debug.LogError( str );
 #endif
         }
 
@@ -69,7 +70,7 @@ namespace LGF.Log
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(e.ToString());
 #else
-            UnityEngine.Debug.LogError($"{testCount++}  "+ DebugUtils.GetExceptionStackInfoToUnity(e));
+            UnityEngine.Debug.LogError(DebugUtils.GetExceptionStackInfoToUnity(e));
 #endif
         }
 
@@ -82,7 +83,8 @@ namespace LGF.Log
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(str);
 #else
-            ThreadDebug.Log(str);
+            //ThreadDebug.Log(str);
+            UnityEngine.Debug.Log(str);
 #endif
         }
 
@@ -92,7 +94,8 @@ namespace LGF.Log
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(str);
 #else
-            ThreadDebug.Log2(str, isAsync);
+            UnityEngine.Debug.LogError(str);    //现在已经是线程安全了
+            //ThreadDebug.Log2(str, isAsync);
 #endif
 
         }

@@ -19,7 +19,7 @@ namespace LHTestClient
         static KcpSocket.KcpAgent kcpAgent;
         public class OnRecvHelper : KcpSocketOnRecvHelper
         {
-            protected override void OnRecv(KcpSocket.KcpAgent kcp, int count)
+            protected override void OnRecv( KcpSocket.KcpAgent kcp, int count)
             {
                 string message = Encoding.UTF8.GetString(bytebuffer, 0, count);
                 kcpSock.Debug(kcp.endPoint.ToString() + "  " + message);
@@ -38,14 +38,14 @@ namespace LHTestClient
                 kcpSock.Debug("------4444---");
             }
 
-            Task.Run(async () =>
-            {
-                while (true)
-                {
-                    kcpSock.OnUpdate(DateTime.UtcNow);
-                    await Task.Delay(10);
-                }
-            });
+            //Task.Run(async () =>
+            //{
+            //    while (true)
+            //    {
+            //        kcpSock.OnUpdate(DateTime.UtcNow);
+            //        await Task.Delay(10);
+            //    }
+            //});
 
             Task.Run(() =>
             {
@@ -88,14 +88,23 @@ namespace LHTestClient
 
             //广播消息
             //EndPoint point = new IPEndPoint(IPAddress.Broadcast, NetConst.ServerPort);  //广播
-       
+
             //kcpSock.Sock.SetBroadcast();    //设置广播
+            Console.InputEncoding = System.Text.Encoding.Unicode;
 
             while (true)
             {
                 string msg = Console.ReadLine();
-                //msg.Debug("send " + msg);
+                msg.Debug("send :" + msg + " count: "+ msg.Length);
+                if (msg == "end")
+                {
+                    msg.Debug("kcpSock.Dispose 1");
+                    kcpSock.Dispose();
+                    msg.Debug("kcpSock.Dispose");
+                    return;
+                }
                 kcpAgent.Send(Encoding.UTF8.GetBytes(msg));
+               
             }
         }
 

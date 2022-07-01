@@ -13,10 +13,11 @@ using LGF.Log;
 
 namespace LGF.Net
 {
-
+    public delegate void KcpOnRecv(KcpSocket.KcpAgent kcpAgent, byte[] bytes, int count);
 
     public class KcpSocketOnRecvHelper : IKcpSocketOnRecv
     {
+        public KcpOnRecv kcpOnRecv;
         protected byte[] bytebuffer = new byte[NetConst.Socket_RecvBufferSize];
         byte[] IKcpSocketOnRecv.bytebuffer => bytebuffer;
 
@@ -34,13 +35,18 @@ namespace LGF.Net
 
             //看需要需不需要新弄个线程用来处理new 的数据 如果需要个到的话
             //弄一个需要弄一个大空间的队列然后在线程里面处理   我觉得这里不需要弄了
-
             OnRecv(kcp, count);
         }
 
-        protected virtual void OnRecv(KcpSocket.KcpAgent kcp, int count)
+        protected virtual void OnRecv(KcpSocket.KcpAgent kcp,int count)
         {
             //反序列化处理
+            kcpOnRecv?.Invoke(kcp, bytebuffer, count);
+        }
+
+        public void Bing(KcpOnRecv OnRecv_)
+        {
+            kcpOnRecv = OnRecv_;
         }
     }
 
@@ -63,25 +69,28 @@ namespace LGF.Net
     }
 
     /// <summary>
-    /// KcpSocket  线程安全  
+    /// KcpSocket  线程安全    后面看你用条件变量写Dispose  阻塞其他线程 现在写得感觉有段乱
     /// </summary>
-    public class KcpSocket : System.IDisposable
+    public class KcpSocket 
     {
         Socket m_Socket;
         IPEndPoint m_ipEndPoint;
         byte[] m_SendBuffer = new byte[NetConst.Socket_SendBufferSize];
         byte[] m_RecvBuffer = new byte[NetConst.Socket_RecvBufferSize];
         Thread thread;
-        bool isRecv = true;
-
+        bool m_disposed = false;
         Dictionary<ulong, KcpAgent> m_KcpAgents = new Dictionary<ulong, KcpAgent>();
         List<KcpAgent> m_addKcpAgent = new List<KcpAgent>();     //缓冲代理
+        Timers.SimpleAsynTimer m_timer; //简单定时器
+
+        public bool IsDisposed => m_disposed;
+
 
         public bool HasBing => m_Socket != null;
         public Socket Sock => m_Socket;
         IKcpSocketOnRecv objRecv;
 
-        public bool Bing(IKcpSocketOnRecv onRecv, int port)
+        public bool Bing(IKcpSocketOnRecv onRecv, int port, uint interval = 10)
         {
             objRecv = onRecv;
             try
@@ -96,41 +105,82 @@ namespace LGF.Net
                 //throw;
             }
 
-            this.Debug(" Bing " + m_Socket.LocalEndPoint.ToString());
+            this.Debug("Bing " + m_Socket.LocalEndPoint.ToString());
+            m_disposed = false;
+
             //后续有外部线程 这个可以放外部去 线程过多的话 没必要单独给他一个线程
             thread = new Thread(Thread_Recv) { IsBackground = true };
             thread.Start(); //
-            isRecv = true;
+
+
+            m_timer = new Timers.SimpleAsynTimer(() =>
+            {
+                OnUpdate(DateTime.UtcNow);  
+            },interval);
+
             return true;
         }
 
 
-        //~KcpSocket()
-        //{
-        //    isRecv = false;
-        //    thread = null;
-        //}
+        /// <summary>
+        /// 线程安全移除
+        /// </summary>
         public void Dispose()
         {
-            isRecv = false;
+            m_disposed = true;
+            //thread.Abort();
             thread = null;
+            lock (m_addKcpAgent)
+            {
+                for (int i = 0; i < m_addKcpAgent.Count; i++)
+                    m_addKcpAgent[i].Dispose();
+
+                m_addKcpAgent.Clear();
+                m_addKcpAgent = null;
+            }
+            m_ipEndPoint = null;
+            m_Socket.Close();
+            m_Socket.Dispose();
+            m_Socket = null;
+
+            m_timer.Disposed(); //阻塞线程
+            m_timer = null;
+            //清理下m_KcpAgents数据   m_timer未阻塞线程话
+            OnUpdate(DateTime.Now);
         }
 
 
         /// <summary>
         /// 更新和发送线程
         /// 后面单独一个线程去处理他  我这里打算用 LGF.Timer 调用他  LGF.Timer 自带线程
+        /// 后面在优化下  
+        /// 搭配LGF.SimpleAsynTimer 应该线程安全
         /// </summary>
         /// <param name="dateTime"></param>
         public void OnUpdate(in DateTime dateTime)   
         {
+            //this.Debug(" OnUpdate11  ");
+            //在这里自己处理 在处理安全点不然要加锁 如果要加锁 就没必要addKcpAgent的方法了
+            if (m_disposed)
+            {
+                if (m_KcpAgents == null) return;
+
+                foreach (var item in m_KcpAgents)
+                    item.Value.Dispose();
+                m_KcpAgents.Clear();
+                m_KcpAgents = null;
+                return;
+            }
+
             //this.Debug(" OnUpdate ");
-            if (m_addKcpAgent.Count > 0)
+            if (m_addKcpAgent?.Count > 0)
             {
                 lock(m_addKcpAgent)
                 {
+                    if (m_disposed) return;
                     lock (m_KcpAgents)  //m_KcpAgents锁
                     {
+                        if (m_disposed) return;
                         for (int i = 0; i < m_addKcpAgent.Count; i++)   //添加
                         {
                             var kcpAgent = m_addKcpAgent[i];
@@ -142,6 +192,7 @@ namespace LGF.Net
                 }
             }
 
+        
 
             foreach (var item in m_KcpAgents)
             {
@@ -157,29 +208,38 @@ namespace LGF.Net
         /// </summary>
         void Thread_Recv()
         {
-            while(true)
+            while(!m_disposed)
             {
-                OnRecv();
-                //try
-                //{
-                //    OnRecv();
-                //}
-                //catch (Exception e)
-                //{
-                //    //unity可以无视第一次线程报错 
-                //    //我关掉异常捕获就没有 报错了  不知道为啥  开启有时候报错  有时候又有
-                //    this.DebugError(e.ToString());   
-                //    Thread.Sleep(10);
-                //}
+                //OnRecv();
+                try
+                {
+                    OnRecv();
+                }
+                catch (Exception e)
+                {
+                    //unity可以无视第一次线程报错 
+                    //我关掉异常捕获就没有 报错了  不知道为啥  开启有时候报错  有时候又有
+                    this.DebugError(e.ToString());
+                    Thread.Sleep(10);
+                }
             }
         }
 
 
         void OnRecv()
         {
+            if (m_Socket == null) return;
+            if (m_Socket.Available <= 0)
+            {
+                Thread.Sleep(10);    //没事情做休息一下
+                return;
+            }
+
             EndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
             int length = m_Socket.ReceiveFrom(m_RecvBuffer, m_RecvBuffer.Length, SocketFlags.None, ref endPoint);
-            GetKcpAgent(endPoint, false).Input(length);
+            //this.Debug($"OnRecv:  {endPoint} {length}");
+            if (m_disposed) return;
+            GetKcpAgent(endPoint, false)?.Input(length);
         }
 
 
@@ -199,18 +259,24 @@ namespace LGF.Net
 
             if (lockKcpAgents)
             {
-                lock (m_KcpAgents)
-                    m_KcpAgents.TryGetValue(uid, out kcpAgent);
+                //不知道为啥之前报错 现在又不报错了先不管了
+                lock (m_KcpAgents)  
+                {
+                    m_KcpAgents?.TryGetValue(uid, out kcpAgent);    //m_KcpAgents Dispose注销时 m_KcpAgents 为null
+                }
+                
             }
             else
             {
-                m_KcpAgents.TryGetValue(uid, out kcpAgent);
+                m_KcpAgents?.TryGetValue(uid, out kcpAgent);
             }
 
             if (kcpAgent == null)
             {
                 lock (m_addKcpAgent)
                 {
+                    if (m_disposed) return null;
+
                     for (int i = 0; i < m_addKcpAgent.Count; i++)   //在添加队列里面
                     {
                         if (m_addKcpAgent[i].endPoint.Equals(point)) //测试过 成立EndPoint 等于判定成立
@@ -222,7 +288,6 @@ namespace LGF.Net
 
                     if (kcpAgent == null)   //添加新的
                     {
-                        this.ThreadDebugInfo("sadasd");
                         this.Debug("添加新的 " + tmpPoint.ToString());
                         kcpAgent = new KcpAgent().Bing(this, uid, point);
                         m_addKcpAgent.Add(kcpAgent);
@@ -237,7 +302,7 @@ namespace LGF.Net
                 //    this.DebugError($"{point} {kcpAgent.endPoint} 的哈希值相同  {uid}");
                 //}
             }
-
+            if (m_disposed) return null;
             return kcpAgent;
         }
 
@@ -251,7 +316,7 @@ namespace LGF.Net
         /// <param name="endPoint"></param>
         public void Send(byte[] buffer, int length, IPEndPoint endPoint)
         {
-            GetKcpAgent(endPoint, false).Send(buffer, length);
+            GetKcpAgent(endPoint, false)?.Send(buffer, length);
         }
 
 
@@ -306,7 +371,6 @@ namespace LGF.Net
             KcpSocket m_Socket;
             UnSafeSegManager.Kcp kcp;
 
-          
 
             internal KcpAgent Bing(KcpSocket socket, ulong uid_, EndPoint endPoint_)
             {
@@ -365,6 +429,15 @@ namespace LGF.Net
                 m_Socket.SockSend(m_Socket.m_SendBuffer, avalidLength, endPoint);
                 //this.Debug("  Output ");
                 buffer.Dispose();
+            }
+
+
+            public void Dispose()
+            {
+                kcp.Dispose();
+                m_Socket = null;
+                endPoint = null;
+                kcp = null;
             }
 
         }

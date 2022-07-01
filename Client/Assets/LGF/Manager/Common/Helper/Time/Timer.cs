@@ -427,7 +427,7 @@ namespace LGF
             }
 
             /// <summary>
-            /// 
+            /// 无闭包GC
             /// </summary>
             /// <returns></returns>
             public ulong AddTask(Action<ulong> callback, ulong interval, TimeUnit timeUnit = TimeUnit.Second, int count = 1, ulong delay = 0)

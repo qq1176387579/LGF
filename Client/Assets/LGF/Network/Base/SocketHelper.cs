@@ -26,6 +26,11 @@ namespace LGF.Net
         public const int ClientPort = 0;
 
         /// <summary>
+        /// 随机端口
+        /// </summary>
+        public const int RandomPort = 0;
+
+        /// <summary>
         /// kcp 的 conv值
         /// </summary>
         public const int KcpConv = 1022;

@@ -15,6 +15,7 @@ using UnityEngine.UI;
 using System.Net;
 using System;
 using System.Threading.Tasks;
+using LGF.Net;
 
 public class MacAddress : MonoBehaviour
 {
@@ -39,12 +40,14 @@ public class MacAddress : MonoBehaviour
         text.text = GetMacAddress();
 #endif
 
-        LHTestClient.Program.Main(null);
 
+        //LHTestServer.Program.Main(null);
+        LHTestClient.Program.Main(null);
     }
 
     private void OnDisable()
     {
+        //LHTestServer.Program.kcpServer.Dispose();
         LHTestClient.Program.kcpSock.Dispose();
     }
 

@@ -17,7 +17,7 @@ namespace LHTestServer
         static KcpSocket.KcpAgent kcpAgent;
         public class OnRecvHelper : KcpSocketOnRecvHelper
         {
-            protected override void OnRecv(KcpSocket.KcpAgent kcp, int count)
+            protected override void OnRecv( KcpSocket.KcpAgent kcp,int count)
             {
                 kcpAgent = kcp;
                 string message = Encoding.UTF8.GetString(bytebuffer, 0, count);
