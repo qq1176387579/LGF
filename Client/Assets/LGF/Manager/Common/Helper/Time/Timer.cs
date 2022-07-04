@@ -14,11 +14,11 @@ namespace LGF
     {
         public enum TimeUnit
         {
-            Millisecond = 1,
-            Second = 1000,
-            Minute = 1000 * 60,
-            Hour = 1000 * 60 * 60,
-            Day = 1000 * 60 * 60 * 24,
+            Millisecond     = 1,
+            Second          = 1000,
+            Minute          = 1000 * 60,
+            Hour            = 1000 * 60 * 60,
+            Day             = 1000 * 60 * 60 * 24,
         }
     }
 
@@ -87,27 +87,28 @@ namespace LGF
 
         public class Timer
         {
-            private readonly ObjectPool<TimeTask> m_timeTaskPool = new ObjectPool<TimeTask>((p) => p.Init(), null);
-            private SortedDictionary<ulong, List<TimeTask>> m_timeTaskQueue = new SortedDictionary<ulong, List<TimeTask>>();  //时间任务队列
-            private Dictionary<ulong, TimeTask> m_timeTaskDic = new Dictionary<ulong, TimeTask>();              //任务索引   
-            private BufferingQueue<TimeTask> m_tmpAddTaskQueue = new BufferingQueue<TimeTask>();                 //添加任务
-            private BufferingQueue<ulong> m_tmpDelTaskQueue = new BufferingQueue<ulong>();                      //删除任务
-            private List<ulong> m_delTimeQueue = new List<ulong>();                                //清理任务队列 
+            private readonly ObjectPool<TimeTask>               m_timeTaskPool          = new ObjectPool<TimeTask>((p)=>p.Init(), null);
+            private SortedDictionary<ulong, List<TimeTask>>     m_timeTaskQueue         = new SortedDictionary<ulong, List<TimeTask>>();  //时间任务队列
+            private Dictionary<ulong, TimeTask>                 m_timeTaskDic           = new Dictionary<ulong, TimeTask>();              //任务索引   
+            private BufferingQueue<TimeTask>                    m_tmpAddTaskQueue       = new BufferingQueue<TimeTask>();                 //添加任务
+            private BufferingQueue<ulong>                       m_tmpDelTaskQueue       = new BufferingQueue<ulong>();                      //删除任务
+            private List<ulong>                                 m_delTimeQueue          = new List<ulong>();                                //清理任务队列 
 
-            private static readonly object m_tidLock = new object();                 //锁
-            private HashSet<ulong> m_tidHash = new HashSet<ulong>();         //id索引
-            private List<ulong> m_tidDelHash = new List<ulong>();            //删除id索引  也有判定该事件是否删除作用
+            private static readonly object                      m_tidLock               = new object();                 //锁
+            private HashSet<ulong>                              m_tidHash               = new HashSet<ulong>();         //id索引
+            private List<ulong>                                 m_tidDelHash            = new List<ulong>();            //删除id索引  也有判定该事件是否删除作用
 
 
-            private ulong m_tid = 0;
-            private ulong m_nowTime { get { return m_timekeeping; } }
-            private ulong m_timekeeping;  //时间
+            private ulong                                       m_tid                   = 0;
+            private ulong                                       m_nowTime               { get { return m_timekeeping; } }       
+            private ulong                                       m_timekeeping;  //时间
             //private System.Timers.Timer                         m_timer;        //定时出bug 2个不同的线程进行调用内部update  需要调用锁 加深拷贝 感觉一个线程就行 没必要用到线程池重复调用
-            private Stopwatch m_stopWatch;
-            private bool m_isHasUpdate;
-            private Action<string> m_taskLog;
-            private Action<Action<int>, int> m_taskHandle;
-            uint m_interval;
+            private Stopwatch                                   m_stopWatch;
+            private bool                                        m_isHasUpdate;
+            private Action<string>                              m_taskLog;
+            private Action<Action<int>, int>                    m_taskHandle;
+            uint                                                m_interval;
+
 
             #region 注册
 
