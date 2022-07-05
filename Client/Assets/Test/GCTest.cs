@@ -65,7 +65,8 @@ public class GCTest : MonoBehaviour
         UnityEngine.Profiling.Profiler.BeginSample("--------list.ForEach---");
         list.ForEach((a) =>
         {
-            int t = a.layer;
+            //int t = a.layer;
+            GCTest s = this;
         });
         UnityEngine.Profiling.Profiler.EndSample();
 

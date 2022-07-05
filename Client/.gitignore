@@ -49,3 +49,4 @@ Assets/StreamingAssets/crashlytics-build.properties
 .vs/
 .vsconfig
 /MemoryCaptures/
+Assets/Scripts/Generated/SteamSerializable

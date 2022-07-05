@@ -8,6 +8,7 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using LGF.Log;
+using LGF;
 
 namespace LHTestServer
 {
@@ -16,19 +17,35 @@ namespace LHTestServer
         static KcpSocket.KcpAgent kcpAgent1;
         static void Main(string[] args)
         {
+            AppEntry.Startup();
             KcpServer kcpServer = new KcpServer();
             kcpServer.Bing(OnRecv, NetConst.ServerPort, 30);    //30间隔
+            Task.Run(sendMsg);
+            
+            while (true)
+            {
+                try
+                {
+                    AppEntry.Update();
+                    AppEntry.LateUpdate();
+                    AppEntry.FixedUpdate();
+                }
+                catch (Exception e)
+                {
+                    e.DebugError();
+                }
+               
 
-            sendMsg();
+                Thread.Sleep(10);
+            }
         }
 
 
-        static void OnRecv(KcpSocket.KcpAgent kcpAgent, byte[] bytes, int count)
+        static void OnRecv(KcpSocket.KcpAgent kcpAgent, LGF.Serializable.LGFStream stream, int count)
         {
-            string message = Encoding.UTF8.GetString(bytes, 0, count);
-            Console.WriteLine(kcpAgent.endPoint.ToString() + "  " + message);
-            kcpAgent.Send(Encoding.UTF8.GetBytes(" 服务器 接收完成 f"));
-            kcpAgent1 = kcpAgent;
+            //string message = Encoding.UTF8.GetString(bytes, 0, count);
+            //Console.WriteLine(kcpAgent.endPoint.ToString() + "  " + message);
+            //kcpAgent.Send(Encoding.UTF8.GetBytes(" 服务器 接收完成 f"));
         }
 
         /// <summary>

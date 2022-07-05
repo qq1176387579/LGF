@@ -25,7 +25,7 @@ namespace LGF.Android
 
 //#if UNITY_ANDROID && USE_ANDROID
 #if UNITY_ANDROID && !UNITY_EDITOR && USE_ANDROID
-            m_GameHelperJavaClass = new AndroidJavaClass(StringPool.Concat(AppConfig.Data.appInfo.PackName, ".GameHelper"));
+            m_GameHelperJavaClass = new AndroidJavaClass(StringPool.Concat(AppConfig.Data.AppInfo.PackName, ".GameHelper"));
 #endif
         }
 

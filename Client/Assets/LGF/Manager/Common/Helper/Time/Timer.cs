@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Runtime.InteropServices;
 using LGF.Log;
-
+using LGF.DataStruct;
 
 namespace LGF
 {
@@ -36,52 +36,6 @@ namespace LGF
          *                   直接在unity 的update执行 LHTimer.update
          * ---------------------------------------------------------------------------
          */
-
-        /// <summary>
-        /// 缓冲队列
-        /// </summary>
-        public class BufferingQueue<T>
-        {
-            private static readonly object _lock = new object();                 //添加锁
-            protected int idx;
-            protected List<T>[] queue = new List<T>[2]
-            {
-            new List<T>(),new List<T>()
-            };
-
-            public int Count { get { return queue[idx].Count; } }   //不需要加锁 就算同时读写idx 也没有程序问题
-
-            public void Add(T info)
-            {
-                lock (_lock)
-                    queue[idx].Add(info);   //这里不能缓存tmp = idx操作  不然他可能在idx^1后进行操作 这样两线程就对同一个list进行操作了
-            }
-
-            public void Add(List<T> infos)
-            {
-                lock (_lock)
-                    for (int i = 0; i < infos.Count; i++)
-                        queue[idx].Add(infos[i]);
-            }
-
-            /// <summary>
-            /// 不安全使用  保证GetList只在单个线程单方法使用并且管理 //不用ListPool  因为list是自动分配空间的会 新的list可能需要重新分配空间
-            /// </summary>
-            /// <returns></returns>
-            public List<T> Get()
-            {
-                int lastidx = idx;
-                int nexidx = idx ^ 1;
-                queue[nexidx].Clear();
-                lock (_lock)
-                    idx = nexidx;
-                return queue[lastidx];
-            }
-
-
-
-
-        }
 
 
 

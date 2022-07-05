@@ -33,14 +33,35 @@
 			<Link>Tool\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
+	
 	<ItemGroup>
 		<Compile Include="..\..\Client\Assets\LGF\Manager\Common\**\*.cs">
 			<Link>Manager\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\..\Client\Assets\Scripts\Generated\SteamSerializable\**\*.cs">
+			<Link>Generated_NetMsg\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
+
+
+	<ItemGroup>
+		<Compile Include="..\..\Client\Assets\LGF\AppEntry.cs">
+			<Link>App\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
+
 	<ItemGroup>
 	  <None Include="..\..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
+
+
+
+	
 	<ItemGroup>
 	  <ProjectReference Include="..\..\ThirdParty\KCP\Kcp.csproj" />
 	  <ProjectReference Include="..\..\ThirdParty\protobuf-net\protobuf11-net.csproj" />

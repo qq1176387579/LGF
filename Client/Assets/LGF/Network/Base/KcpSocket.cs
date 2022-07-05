@@ -9,16 +9,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using LGF.Log;
-
+using LGF.Serializable;
 
 namespace LGF.Net
 {
-    public delegate void KcpOnRecv(KcpSocket.KcpAgent kcpAgent, byte[] bytes, int count);
+    public delegate void KcpOnRecv(KcpSocket.KcpAgent kcpAgent, LGFStream stream, int count);
 
     public class KcpSocketOnRecvHelper : IKcpSocketOnRecv
     {
         public KcpOnRecv kcpOnRecv;
-        protected byte[] bytebuffer = new byte[NetConst.Socket_RecvBufferSize];
+        public LGFStream stream = new LGFStream(NetConst.Socket_RecvBufferSize);
+        protected byte[] bytebuffer => stream.GetBuffer();
         byte[] IKcpSocketOnRecv.bytebuffer => bytebuffer;
 
         void IKcpSocketOnRecv.OnRecv(KcpSocket.KcpAgent kcp, int count)
@@ -29,7 +30,8 @@ namespace LGF.Net
             if (count <= -3)
             {
                 count = -1 * count - 3;
-                bytebuffer = (byte[])System.Array.CreateInstance(typeof(byte), SocketHelper.ceilpow2(count));
+                //bytebuffer = (byte[])System.Array.CreateInstance(typeof(byte), SocketHelper.ceilpow2(count));
+                stream = new LGFStream(count);  //空间不够
                 count = kcp.Recv(bytebuffer);   //重新接收数据
             }
 
@@ -41,7 +43,7 @@ namespace LGF.Net
         protected virtual void OnRecv(KcpSocket.KcpAgent kcp,int count)
         {
             //反序列化处理
-            kcpOnRecv?.Invoke(kcp, bytebuffer, count);
+            kcpOnRecv?.Invoke(kcp, stream, count);
         }
 
         public void Bing(KcpOnRecv OnRecv_)
@@ -239,6 +241,7 @@ namespace LGF.Net
             int length = m_Socket.ReceiveFrom(m_RecvBuffer, m_RecvBuffer.Length, SocketFlags.None, ref endPoint);
             //this.Debug($"OnRecv:  {endPoint} {length}");
             if (m_disposed) return;
+            //这里需要处理一下未知的 EndPoint
             GetKcpAgent(endPoint, false)?.Input(length);
         }
 
@@ -250,7 +253,7 @@ namespace LGF.Net
         /// <param name="point"></param>
         /// <param name="lockKcpAgents"></param>
         /// <returns></returns>
-        public KcpAgent GetKcpAgent(EndPoint point, bool lockKcpAgents = true)
+        public KcpAgent GetKcpAgent(in EndPoint point, bool lockKcpAgents = true)
         {
             //endPoint 如果不是 IPEndPoint 另外处理  当前不处理这种情况  后续处理
             IPEndPoint tmpPoint = point as IPEndPoint;
@@ -370,7 +373,7 @@ namespace LGF.Net
             public EndPoint endPoint; //后面要接收其他的再改EndPoint  现在只接收IPEndPoint
             KcpSocket m_Socket;
             UnSafeSegManager.Kcp kcp;
-
+            //内部提供一个缓冲流 LGF
 
             internal KcpAgent Bing(KcpSocket socket, ulong uid_, EndPoint endPoint_)
             {

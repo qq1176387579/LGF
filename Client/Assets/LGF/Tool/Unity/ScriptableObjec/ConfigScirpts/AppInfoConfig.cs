@@ -14,6 +14,7 @@ namespace LGF.Config
 {
     public class AppInfoConfig : ScriptableObject
     {
+        [Header("安卓打包包名")]
         public string PackName;
     }
 

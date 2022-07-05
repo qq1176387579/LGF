@@ -72,17 +72,17 @@ namespace ProtoTest_1
 
         private void Start()
         {
-            MyClass my = new MyClass();
-            my._nNumber = 0;
-            my._strName = "test";
-            my._lstInfo = new List<string>();
-            my._lstInfo.Add("a");
-            my._lstInfo.Add("b");
-            my._lstInfo.Add("c");
-            my._dictInfo = new Dictionary<int, string>();
-            my._dictInfo.Add(1, "a");
-            my._dictInfo.Add(2, "b");
-            my._dictInfo.Add(3, "c");
+            //MyClass my = new MyClass();
+            //my._nNumber = 0;
+            //my._strName = "test";
+            //my._lstInfo = new List<string>();
+            //my._lstInfo.Add("a");
+            //my._lstInfo.Add("b");
+            //my._lstInfo.Add("c");
+            //my._dictInfo = new Dictionary<int, string>();
+            //my._dictInfo.Add(1, "a");
+            //my._dictInfo.Add(2, "b");
+            //my._dictInfo.Add(3, "c");
 
             //using (FileStream stream = File.OpenWrite("test.dat"))
             //{
@@ -91,20 +91,31 @@ namespace ProtoTest_1
             //}
             //ProtoBuf.Serializer.Serialize<MyClass>(stream, my);
 
-            MyClass mt;
-            using (MemoryStream m1 = new MemoryStream())
-            {
-                ProtoBuf.Serializer.Serialize(m1, my);
-                m1.Position = 0;
-                //mt = (MyClass)ProtoBuf.Serializer.Deserialize(typeof(MyClass), m1);
-                mt = ProtoBuf.Serializer.Deserialize<MyClass>(m1);
-            }
+            //MyClass mt;
+            //using (MemoryStream m1 = new MemoryStream())
+            //{
+            //    ProtoBuf.Serializer.Serialize(m1, my);
+            //    m1.Position = 0;
+            //    //mt = (MyClass)ProtoBuf.Serializer.Deserialize(typeof(MyClass), m1);
+            //    mt = ProtoBuf.Serializer.Deserialize<MyClass>(m1);
+            //}
 
 
+            //NetMsg.C2S_Connect my = new NetMsg.C2S_Connect();
+            //my._nNumber = 100;
+            //NetMsg.C2S_Connect mt;
+            //using (MemoryStream m1 = new MemoryStream())
+            //{
+            //    ProtoBuf.Serializer.Serialize(m1, my);
+            //    m1.Position = 0;
+            //    //mt = (MyClass)ProtoBuf.Serializer.Deserialize(typeof(MyClass), m1);
+            //    mt = ProtoBuf.Serializer.Deserialize<NetMsg.C2S_Connect>(m1);
+            //}
 
 
+            //Debug.LogError(" " + mt._nNumber + " " + mt.msgType);
 
-            text.text = mt._strName;
+            //text.text = mt._strName;
 
             //NSerialize();
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using LGF.Log;
@@ -57,7 +58,10 @@ namespace LGF.Net
 #if UNITY_ANDROID && !UNITY_EDITOR
             //安卓没有这个问题且   安卓用低级操作模式 socket会报错
 #else
-            socket.IOControl((int)SIO_UDP_CONNRESET, new byte[] { Convert.ToByte(false) }, null);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                socket.IOControl((int)SIO_UDP_CONNRESET, new byte[] { Convert.ToByte(false) }, null);
+            }
 #endif
 
         }

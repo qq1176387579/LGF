@@ -48,9 +48,12 @@ public class GCTest2 : MonoBehaviour
         return 0;
     }
 
+    int t = 0;
     // Update is called once per frame
     void Update()
     {
+        
+
         //UnityEngine.Profiling.Profiler.BeginSample("--------1---");
         //var T = new Test();
         //list.Add(T);
@@ -74,14 +77,19 @@ public class GCTest2 : MonoBehaviour
         //e.GetHashCode() 
         //GameEventType.NetStatus;
         //double time = 0;
+        t++;
         UnityEngine.Profiling.Profiler.BeginSample("--------BEGIN-1--");
         for (int i = 0; i < 10000; i++)
         {
             //var now = System.DateTime.Now;
-            int t = GetToInt(GameEventType.NetStatus);
+            GameEventType te = t.ToEnum<GameEventType>();
+            //int t = GetToInt(GameEventType.NetStatus);
            // time += (System.DateTime.Now - now).TotalMilliseconds;
         }
         UnityEngine.Profiling.Profiler.EndSample();
+
+
+
         //UnityEngine.Debug.Log(time);
         //time = 0;
         //UnityEngine.Profiling.Profiler.BeginSample("--------BEGIN-2--");

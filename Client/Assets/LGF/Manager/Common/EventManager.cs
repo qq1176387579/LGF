@@ -1,4 +1,12 @@
-﻿using System;
+﻿/***************************************************
+/// 作者:      
+/// 创建日期:  
+/// 功能描述:  事件系统 线程不安全  请规范使用  需要删除的不要注册到这里
+///            该方法还有很多要优化的地方 且没有异常捕获
+****************************************************/
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +17,7 @@ using LGF.Log;
 
 namespace LGF
 {
+
     /// <summary>
     /// 后面优化下  改为int执行  事件不暴露
     /// </summary>

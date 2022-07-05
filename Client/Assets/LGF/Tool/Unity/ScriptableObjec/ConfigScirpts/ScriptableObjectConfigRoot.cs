@@ -14,7 +14,8 @@ namespace LGF.Config
 {
     public class ScriptableObjectConfigRoot : ScriptableObject
     {
-        public AppInfoConfig appInfo;
+        public AppInfoConfig AppInfo;
+        public GeneratedConfig Generated;
 
     }
 }

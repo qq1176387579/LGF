@@ -24,12 +24,12 @@ namespace LHTestServer
         }
 
 
-        static void OnRecv(KcpSocket.KcpAgent kcpAgent, byte[] bytes, int count)
+        static void OnRecv(KcpSocket.KcpAgent kcpAgent, LGF.Serializable.LGFStream stream, int count)
         {
-            string message = Encoding.UTF8.GetString(bytes, 0, count);
-            kcpAgent.Debug(kcpAgent.endPoint.ToString() + "  " + message);
-            kcpAgent.Send(Encoding.UTF8.GetBytes(" 服务器 接收完成 f"));
-            kcpAgent1 = kcpAgent;
+            //string message = Encoding.UTF8.GetString(bytes, 0, count);
+            //kcpAgent.Debug(kcpAgent.endPoint.ToString() + "  " + message);
+            //kcpAgent.Send(Encoding.UTF8.GetBytes(" 服务器 接收完成 f"));
+            //kcpAgent1 = kcpAgent;
         }
 
         ///// <summary>

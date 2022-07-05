@@ -32,7 +32,8 @@ public class MacAddress : MonoBehaviour
 #if USE_ANDROID
         AndroidMsgCenter.Instance.RegisterOnMsg(AndroidMsgDefine.GetUUIDResp, (a) => {
             text.text = a.strParam1;
-        });
+        }); 
+        //获得唯一标识符
         AndroidMsgCenter.Instance.SendMsg(AndroidMsgDefine.GetUUID);
 
         //text.text = GetMacAddress();
@@ -42,7 +43,7 @@ public class MacAddress : MonoBehaviour
 
 
         //LHTestServer.Program.Main(null);
-        LHTestClient.Program.Main(null);
+        //LHTestClient.Program.Main(null);
     }
 
     private void OnDisable()

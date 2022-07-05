@@ -9,6 +9,7 @@ using LGF.Net;
 using System.Threading;
 using System.Net.Sockets;
 using LGF.Log;
+using UnityEngine;
 
 namespace LHTestClient
 {
@@ -30,6 +31,15 @@ namespace LHTestClient
 
         public static void Main(string[] args)
         {
+            LGF.Serializable.LGFStream stream = new LGF.Serializable.LGFStream(512);
+
+            //var s = S2C_Connect.Get().NSerialize(stream);
+
+            //var connect1 = S2C_Connect.Get().NDeserialize(stream);
+
+
+
+
             OnRecvHelper ff = new OnRecvHelper();
             kcpSock = new LGF.Net.KcpSocket();
 
@@ -53,7 +63,8 @@ namespace LHTestClient
             });
 
 
-            byte[] buffer = new byte[512];
+            //byte[] buffer = new byte[512];
+        
 
             kcpSock.Debug("客户端已经开启");
             //EndPoint point = new IPEndPoint(IPAddress.Broadcast, NetConst.ServerPort);  //广播
@@ -63,9 +74,20 @@ namespace LHTestClient
 
             EndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, NetConst.ServerPort);
             broadcastSock.SendTo(Encoding.UTF8.GetBytes(" asd  "), endPoint);
-            broadcastSock.ReceiveFrom(buffer, ref endPoint);
 
-            EndPoint point = new IPEndPoint((endPoint as IPEndPoint).Address, buffer.bytesToInt(0));  //广播
+            int lenght = broadcastSock.ReceiveFrom(stream.GetBuffer(), ref endPoint);
+            stream.writer.Write(stream.GetBuffer(), 0, lenght);
+            stream.Clear();
+            ////stream.writer();
+            //if (stream.GetNetMsgType() != NetMsgDefine.S2C_Connect)
+            //{
+            //    Debug.LogError("非法操作  " + stream.GetNetMsgType());
+            //    return;
+            //}
+
+            var connect = S2C_Connect.Get().NDeserialize(stream);
+
+            EndPoint point = new IPEndPoint((endPoint as IPEndPoint).Address, connect.port);  //广播
             kcpSock.Debug($"连接服务器成功  {point}");
 
             kcpAgent = kcpSock.GetKcpAgent(point);

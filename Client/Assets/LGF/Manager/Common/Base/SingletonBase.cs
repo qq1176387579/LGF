@@ -25,7 +25,7 @@ namespace LGF
 
         protected SingletonBase() { }
 
-        static public T GetSingleton()
+        public static T GetSingleton()
         {
             return Instance;
         }

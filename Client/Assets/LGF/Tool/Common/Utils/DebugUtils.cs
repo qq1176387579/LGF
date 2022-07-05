@@ -14,33 +14,51 @@ namespace LGF.Log
 #if NOT_UNITY
     public static class Debug
     {
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void Log(string format, params object[] args)
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(string.Format(format, args));
+        }
 
+
+        [System.Diagnostics.Conditional("DEBUG")]
         public static void Log(object message)
         {
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(message.ToString());
         }
 
+        [System.Diagnostics.Conditional("DEBUG")]
         public static void LogWarning(object message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(message.ToString());
         }
-     
-      
+
+        [System.Diagnostics.Conditional("DEBUG")]
         public static void LogWarningFormat(string format, params object[] args)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(string.Format(format, args));
         }
 
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void LogError(object message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message.ToString());
+        }
+
+
     }
 #endif
 
     public static class DebugExtension
     {
-        static int testCount = 0;
+        //static int testCount = 0;
 
+        [System.Diagnostics.Conditional("DEBUG")]
         public static void Debug(this object obj, object str)
         {
 #if NOT_UNITY
@@ -52,6 +70,19 @@ namespace LGF.Log
 #endif
         }
 
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void Debug(this object obj,string str,params object[] param)
+        {
+
+#if NOT_UNITY
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(string.Format(str, param));
+#else
+            UnityEngine.Debug.LogFormat(str, param);
+#endif
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
         public static void DebugError(this object obj, object str)
         {
 #if NOT_UNITY
@@ -62,7 +93,7 @@ namespace LGF.Log
 #endif
         }
 
-
+        [System.Diagnostics.Conditional("DEBUG")]
         public static void DebugError(this System.Exception e)
         {
 

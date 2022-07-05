@@ -11,9 +11,9 @@ using LGF.Log;
 using System.IO;
 using ProtoBuf;
 using ProtoBuf.Meta;
+using System.Text;
 
-
-namespace LGF.Net
+namespace LGF.Serializable
 {
     public class ProtobufHelper
     {
@@ -41,9 +41,9 @@ namespace LGF.Net
         public static byte[] ToByte<T>(T t)
         {
             byte[] buffer = null;
-            using (MemoryStream m = new MemoryStream())
+            using (MemoryStream m = new MemoryStream()) //有GC
             {
-                Serializer.Serialize<T>(m, t);
+                ProtoBuf.Serializer.Serialize<T>(m, t);
                 m.Position = 0;
                 int length = (int)m.Length;
                 buffer = new byte[length];
@@ -62,9 +62,9 @@ namespace LGF.Net
         
         public static int ToByte<T>(T t, byte[] buffer)
         {
-            using (MemoryStream m = new MemoryStream())
+            using (MemoryStream m = new MemoryStream()) //有GC
             {
-                Serializer.Serialize<T>(m, t);
+                ProtoBuf.Serializer.Serialize<T>(m, t);
                 m.Position = 0;
                 int length = (int)m.Length;
                 m.Read(buffer, 0, length);
@@ -82,10 +82,10 @@ namespace LGF.Net
         /// <returns></returns>
         public static T ToObjcet<T>(byte[] buffer)
         {
-            T t; //default(T);
-            using (MemoryStream m = new MemoryStream(buffer))
+            T t; 
+            using (MemoryStream m = new MemoryStream(buffer))   //后面换成写入池
             {
-                t = Serializer.Deserialize<T>(m);
+                t = ProtoBuf.Serializer.Deserialize<T>(m);
             }
             return t;
         }

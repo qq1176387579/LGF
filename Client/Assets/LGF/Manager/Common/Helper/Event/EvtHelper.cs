@@ -23,11 +23,11 @@ namespace LGF
         {
             BEGIN           = -1,
 
-#if !NOT_UNITY
+//#if !NOT_UNITY
             OnUpdate        =  0,
             OnLateUpdate    =  1,
             OnFixedUpdate   =  2,
-#endif
+//#endif
 
             TestExample,
             LENGTH,
@@ -48,12 +48,15 @@ namespace LGF
         protected override void OnNew()
         {
             //------------------------------------------注册----------------------------
-#if !NOT_UNITY
+
             RegisterEventDispatcher<IOnUpdate>(EventsType.OnUpdate);
             RegisterEventDispatcher<IOnLateUpdate>(EventsType.OnLateUpdate);
             RegisterEventDispatcher<IOnFixedUpdate>(EventsType.OnFixedUpdate);
-            EventMonoHelper.GetSingleton();
+#if !NOT_UNITY
+            if (AppEntry.IsStartup)
+                EventMonoHelper.GetSingleton();
 #endif
+
 
             RegisterEventDispatcher<ITestExample>(EventsType.TestExample);
         }
@@ -100,6 +103,10 @@ namespace LGF
                     v.param1 = param_;
                     return v;
                 }
+                public void Clear()
+                {
+                    param1 = default;
+                }
             }
 
             public class DataBase<T1, T2> : EventDataBase<DataBase<T1, T2>>
@@ -112,6 +119,12 @@ namespace LGF
                     v.param1 = param1_;
                     v.param2 = param2_;
                     return v;
+                }
+
+                public void Clear()
+                {
+                    param1 = default;
+                    param2 = default;
                 }
             }
 
@@ -128,9 +141,46 @@ namespace LGF
                     v.param3 = param3_;
                     return v;
                 }
+                public void Clear()
+                {
+                    param1 = default;
+                    param2 = default;
+                    param3 = default;
+                }
+
             }
 
-          
+            public class DataBase<T1, T2, T3, T4> : EventDataBase<DataBase<T1, T2, T3, T4>>
+            {
+                public T1 param1;
+                public T2 param2;
+                public T3 param3;
+                public T4 param4;
+                public static DataBase<T1, T2, T3, T4> Get(T1 param1_, T2 param2_, T3 param3_, T4 param4_)
+                {
+                    var v = Get();
+                    v.param1 = param1_;
+                    v.param2 = param2_;
+                    v.param3 = param3_;
+                    v.param4 = param4_;
+                    return v;
+                }
+
+                public void Clear()
+                {
+                    param1 = default;
+                    param2 = default;
+                    param3 = default;
+                    param4 = default;
+                }
+
+                protected override void OnRelease()
+                {
+                    Clear();
+                }
+            }
+
+
         }
 
 
