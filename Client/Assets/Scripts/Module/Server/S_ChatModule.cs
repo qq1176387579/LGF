@@ -12,19 +12,29 @@ using LGF.Net;
 using UnityEngine;
 
 
-public class S_ChatMgr : SingletonBase<S_ChatMgr>
+/// <summary>
+/// 服务器 chat管理
+/// </summary>
+public class S_ChatModule : S_ModuleBase
 {
+    S2C_TextMsg textMsg = new S2C_TextMsg();
+
+
     public override void Init()
     {
         NetMsgHandlingMgr.Instance.RegisterServerMsg<C2S_TextMsg>(NetMsgDefine.C2S_TextMsg, OnTextMsg);
     }
 
-
-
     private void OnTextMsg(KcpServer.KcpSession arg1, C2S_TextMsg arg2)
     {
         //Debug.Log("");
         //EventManager.Instance.BroadCastEvent(GameEventType.OnUpdate, arg2); //显示到面板中
+
+        textMsg.name = arg1.name; 
+        textMsg.msg = arg2.msg;
+
+        //服务器获得信息
+        Server.Broadcast(textMsg);  //广播信息
     }
 
 

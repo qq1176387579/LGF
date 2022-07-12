@@ -28,6 +28,8 @@ namespace LGF.Net
     public class KcpServer : KcpCSBase
     {
 
+
+
         Dictionary<string, uint> m_uuidMap = new Dictionary<string, uint>();
 
         /// <summary>
@@ -109,10 +111,12 @@ namespace LGF.Net
             }
             else
             {
-                uint guid = KcpSession.GenUniqueID();
+                uint guid = GenSessionUniqueID();
                 m_uuidMap.Add(tmpData.C2S_Connect.uuid, guid);
                 var session = AddSessions(guid, kcp);
                 tmpData.S2C_Connect.uid = guid;   //连接成功
+                session.name = tmpData.C2S_Connect.name;
+
                 sLog.Debug("OnConnect  tmpData.S2C_Connect msgType {0}" , tmpData.S2C_Connect.msgType);
                 session.Send(tmpData.S2C_Connect, false);    //发送数据
             }
@@ -147,10 +151,47 @@ namespace LGF.Net
 
             session.kcpAgent = kcp;
             session.playerID = guid;
-
+            session.server = this;
             return session;
         }
 
+
+
+        /// <summary>
+        /// 广播给所有玩家
+        /// </summary>
+        public void Broadcast<T>(T data, bool IsRecycle = false) where T : ISerializer
+        {
+            if (m_Sessions.Count == 0)
+            {
+                return;
+            }
+
+            LStream stream = null;
+
+            foreach (var item in m_Sessions)
+            {
+                KcpSession session = item.Value;
+                if (stream == null)
+                {
+                    stream = session.GetStream();
+                    data.Serialize(stream);
+                }
+
+                session.Send(stream);
+            }
+
+            if (IsRecycle)
+                data.Release();
+        }
+
+
+
+
+        //暂时先用uint表示guid
+        //后面可以写个回收 回收KcpSession
+        uint allSessionGuid = 1;
+        uint GenSessionUniqueID() => allSessionGuid++;
 
 
         public class KcpSession //: ISession
@@ -159,7 +200,10 @@ namespace LGF.Net
             //byte[] m_SendBuffer = new byte[NetConst.Socket_SendBufferSize]; //发送最大大小
             public uint playerID;
             public KcpSocket.KcpAgent kcpAgent;
+            public string name;
+            public KcpServer server;
 
+            public LStream GetStream() => m_SendStream;
 
             /// <summary>
             /// 发送数据 线程不安全  注意使用的场合  后面看情况加不加锁
@@ -175,10 +219,14 @@ namespace LGF.Net
             }
 
 
-            //暂时先用uint表示guid
-            //后面可以写个回收 回收KcpSession
-            static uint allGuid = 1;
-            public static uint GenUniqueID() => allGuid++;
+            /// <summary>
+            /// 自定义流
+            /// </summary>
+            /// <param name="_stream"></param>
+            public void Send(LStream _stream)
+            {
+                kcpAgent.Send(_stream.GetBuffer(), _stream.Lenght);
+            }
 
         }
 

@@ -62,13 +62,9 @@ namespace LGF.Client
                     continue;
                 }
 
-                if (kcpAgent1 == null)
-                {
-                    sLog.Debug("未连接服务器! ");
-                    continue;
-                } 
-             
-                //kcpAgent1.Send(Encoding.UTF8.GetBytes(msg));
+                sLog.Debug($"非法命令!! --- {msg}");
+
+            
             }
         }
 
@@ -107,6 +103,11 @@ namespace LGF.Client
                 data.Debug($" 连接服务器端成功 当前id: {data.uid}");
             });
 
+            NetMsgHandlingMgr.Instance.RegisterClientMsg(NetMsgDefine.S2C_TextMsg, (S2C_TextMsg data) =>
+            {
+                data.Debug($" call 消息 {data.name} : {data.msg}");
+            });
+
 
             func.Add("get_s", (param) =>
             {
@@ -127,16 +128,12 @@ namespace LGF.Client
             });
 
 
-            //func.Add("connect_s", (param) =>
-            //{
-            //    if (serverList.Count == 0)
-            //    {
-            //        sLog.Error("非法操作  没有该服务器");
-            //        return;
-            //    }
-            //    sLog.Debug("connect_s 连接服务器 " + serverList[0].ToString() + "  客户单名称 :" + param.GetByID(1));
-            //    kcpClient.TryToConnect(param.GetByID(1), serverList[0]);
-            //});
+            func.Add("call_s", (param) =>
+            {
+                var tmp = C2S_TextMsg.Get();
+                tmp.msg = param.GetByID(1);
+                kcpClient.Send(tmp);
+            });
         }
 
 

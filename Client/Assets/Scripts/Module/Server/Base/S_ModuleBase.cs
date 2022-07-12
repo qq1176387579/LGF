@@ -1,7 +1,7 @@
 /***************************************************
 /// 作者:      liuhuan
-/// 创建日期:  2022/7/12 21:11:52
-/// 功能描述:  客户端聊天管理
+/// 创建日期:  2022/7/12 23:31:26
+/// 功能描述:  
 ****************************************************/
 
 using System.Collections;
@@ -10,12 +10,13 @@ using LGF;
 using LGF.Log;
 using LGF.Net;
 
-public class C_ChatMgr : SingletonBase<C_ChatMgr>
+public class S_ModuleBase
 {
+    protected S_ModuleMgr s_ModuleMgr = S_ModuleMgr.Instance;
+    protected KcpServer Server => s_ModuleMgr.Server;
 
-    public override void Init()
+    public virtual void Init()
     {
-        
 
     }
 

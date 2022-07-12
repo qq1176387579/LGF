@@ -19,9 +19,12 @@ public class ModuleMgr : SingletonBase<ModuleMgr>
     /// </summary>
     public override void Init()
     {
-        C_ModuleMgr.Instance.Init();    
+        //没连接 服务器前 是单机游戏
 
-        S_ModuleMgr.Instance.Init();    
+        //先关闭 不处理 后面看情况处理
+        //C_ModuleMgr.Instance.Init();    
+
+        //S_ModuleMgr.Instance.Init();    
     }
 
 

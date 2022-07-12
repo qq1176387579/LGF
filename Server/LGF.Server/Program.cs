@@ -18,8 +18,7 @@ namespace LHTestServer
         static void Main(string[] args)
         {
             LGFEntry.Startup();
-            KcpServer kcpServer = new KcpServer();
-            kcpServer.Bing(NetConst.ServerPort, 30);    //30间隔
+            S_ModuleMgr.Instance.Init();
             Task.Run(sendMsg);
             
             while (true)
