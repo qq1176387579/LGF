@@ -3,6 +3,7 @@
 /// 创建日期:  2022/6/25 20:28:03
 /// 功能描述:  Protobuf 帮助类
 ****************************************************/
+#if HAS_PROTOBUF
 
 using System.Collections;
 using System.Collections.Generic;
@@ -142,4 +143,4 @@ namespace LGF.Serializable
 
 }
 
-
+#endif

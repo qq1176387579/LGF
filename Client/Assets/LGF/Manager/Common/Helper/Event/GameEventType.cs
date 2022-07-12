@@ -41,7 +41,7 @@ namespace LGF
         /// <summary>
         /// 得到服务器 端口信息
         /// </summary>
-        Net_S2C_Connect,  //获得
+        Net_GetServersInfo,  //获得服务器信息
 
         #endregion
     }

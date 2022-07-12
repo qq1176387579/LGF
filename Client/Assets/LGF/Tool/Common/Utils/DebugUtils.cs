@@ -14,8 +14,10 @@ namespace LGF.Log
 #if NOT_UNITY
     public static class Debug
     {
+
+
         [System.Diagnostics.Conditional("DEBUG")]
-        public static void Log(string format, params object[] args)
+        public static void LogFormat(string format, params object[] args)
         {
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(string.Format(format, args));
@@ -50,6 +52,12 @@ namespace LGF.Log
             Console.WriteLine(message.ToString());
         }
 
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void LogErrorFormat(string format, params object[] args)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(string.Format(format, args));
+        }
 
     }
 #endif

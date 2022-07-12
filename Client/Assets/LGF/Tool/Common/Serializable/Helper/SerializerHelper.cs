@@ -28,31 +28,36 @@ namespace LGF.Serializable
         public static byte[] bytebuffer = new byte[1024];   //后面写个池子 现在图方便
 
 
-        public static void Read_Int32(this LGF.Serializable.LGFStream stream,ref int _out)
+        public static void Read_UInt32(this LGF.Serializable.LStream stream, ref uint _out)
+        {
+            _out = stream.read.ReadUInt32();
+        }
+
+        public static void Read_Int32(this LGF.Serializable.LStream stream,ref int _out)
         {
             _out = stream.read.ReadInt32();
         }
 
 
-        public static void Read_Int64(this LGF.Serializable.LGFStream stream, ref long _out)
+        public static void Read_Int64(this LGF.Serializable.LStream stream, ref long _out)
         {
             _out = stream.read.ReadInt64();
         }
 
-        public static void Read_Boolean(this LGF.Serializable.LGFStream stream, ref bool _out)
+        public static void Read_Boolean(this LGF.Serializable.LStream stream, ref bool _out)
         {
             _out = stream.read.ReadBoolean();
         }
 
         //安卓 下列方法有问题无法调用 会报错
-        //public static void Read_Enum<T>(this LGF.Serializable.LGFStream stream, ref T _out) where T : struct, Enum
+        //public static void Read_Enum<T>(this LGF.Serializable.LStream stream, ref T _out) where T : struct, Enum
         //{
         //    _out = stream.read.ReadInt32().ToEnum<T>();
         //}
 
 
 
-        public static void Read_String(this LGF.Serializable.LGFStream stream, ref string _out)
+        public static void Read_String(this LGF.Serializable.LStream stream, ref string _out)
         {
             //多线程加锁
             int Length = stream.read.ReadUInt16();
@@ -72,26 +77,30 @@ namespace LGF.Serializable
             //Debug.Log(_out);
         }
 
-     
 
 
 
-        public static void Write_Int32(this LGF.Serializable.LGFStream stream, in int val)
+        public static void Write_UInt32(this LGF.Serializable.LStream stream, in uint val)
         {
             stream.writer.Write(val);
         }
 
-        public static void Write_Int64(this LGF.Serializable.LGFStream stream, in long val)
+        public static void Write_Int32(this LGF.Serializable.LStream stream, in int val)
         {
             stream.writer.Write(val);
         }
 
-        public static void Write_Boolean(this LGF.Serializable.LGFStream stream, in bool val)
+        public static void Write_Int64(this LGF.Serializable.LStream stream, in long val)
         {
             stream.writer.Write(val);
         }
 
-        //public static void Write_Enum<T>(this LGF.Serializable.LGFStream stream, in T val) where T : struct, Enum
+        public static void Write_Boolean(this LGF.Serializable.LStream stream, in bool val)
+        {
+            stream.writer.Write(val);
+        }
+
+        //public static void Write_Enum<T>(this LGF.Serializable.LStream stream, in T val) where T : struct, Enum
         //{
         //    stream.writer.Write(val.ToInt());
         //}
@@ -101,13 +110,13 @@ namespace LGF.Serializable
 
 
 
-        public static void Write_String(this LGF.Serializable.LGFStream stream, in string val)
+        public static void Write_String(this LGF.Serializable.LStream stream, in string val)
         {
             lock (bytebuffer)
             {
                 var buffer = bytebuffer;
                 //多线程加锁
-                int Length = Encoding.UTF8.GetBytes(val, 0, val.Length, buffer, 0);
+                int Length = val == null ? 0 : Encoding.UTF8.GetBytes(val, 0, val.Length, buffer, 0);
                 //Debug.LogError("Length" + Length);
                 stream.writer.Write((ushort)Length);
                 stream.writer.Write(buffer, 0, Length);
@@ -303,7 +312,7 @@ using LGF.Serializable;
 
 public partial class <className> 
 {
-    public override void Serialize(LGF.Serializable.LGFStream stream)
+    public override void Serialize(LGF.Serializable.LStream stream)
     {
         stream.OnStackBegin();
 
@@ -311,12 +320,24 @@ public partial class <className>
         stream.OnStackEnd();
     }
 
-    public override void Deserialize(LGF.Serializable.LGFStream stream)
+    public override void Deserialize(LGF.Serializable.LStream stream)
     {
         stream.OnStackBegin();
 
 <streamRead>
         stream.OnStackEnd();
+    }
+
+    public override <className> NDeserialize(LStream stream)
+    {
+        Deserialize(stream);
+        return this;
+    }
+
+    public override <className> NSerialize(LStream stream)
+    {
+        Serialize(stream);
+        return this;
     }
 }
 
@@ -325,7 +346,7 @@ public static class <className>Extend
     /// <summary>
     /// 小心死循环 一般没有不要自己引用自己  不然死循环
     /// </summary>
-    public static void Read_<className>(this LGF.Serializable.LGFStream stream, ref <className> val)
+    public static void Read_<className>(this LGF.Serializable.LStream stream, ref <className> val)
     {
         bool s = stream.read.ReadBoolean(); //判断是否有数据
         val?.Release(); //回收
@@ -339,7 +360,7 @@ public static class <className>Extend
     }
 
 
-    public static void Write_<className>(this LGF.Serializable.LGFStream stream, in <className> val)
+    public static void Write_<className>(this LGF.Serializable.LStream stream, in <className> val)
     {
         if (val == null)
         {
@@ -479,7 +500,7 @@ namespace LGF.Serializable
 
 
         static string WriteListContext = @"
-        public static void Write_List_<MemberType>(this LGF.Serializable.LGFStream stream, in List<<MemberType>> list)
+        public static void Write_List_<MemberType>(this LGF.Serializable.LStream stream, in List<<MemberType>> list)
         {
             int Length = list == null ? 0 : list.Count;
             stream.writer.Write(Length);
@@ -492,7 +513,7 @@ namespace LGF.Serializable
 
 
         static string ReadListContext = @"
-        public static void Read_List_<MemberType>(this LGF.Serializable.LGFStream stream,ref List<<MemberType>> list)
+        public static void Read_List_<MemberType>(this LGF.Serializable.LStream stream,ref List<<MemberType>> list)
         {
             int Length = stream.read.ReadInt32();
             <listClear>
@@ -543,7 +564,7 @@ namespace LGF.Serializable
 
 
         static string WriteDicContext = @"
-        public static void Write_Dictionary_<MemberType>_<MemberType1>(this LGF.Serializable.LGFStream stream, in Dictionary<<MemberType>,<MemberType1>> dic)
+        public static void Write_Dictionary_<MemberType>_<MemberType1>(this LGF.Serializable.LStream stream, in Dictionary<<MemberType>,<MemberType1>> dic)
         {
             int Length = dic == null ? 0 : dic.Count;
             stream.writer.Write(Length);
@@ -560,7 +581,7 @@ namespace LGF.Serializable
 
 
         static string ReadDicContext = @"
-       public static void Read_Dictionary_<MemberType>_<MemberType1>(this LGF.Serializable.LGFStream stream, ref Dictionary<<MemberType>, <MemberType1>> dic)
+       public static void Read_Dictionary_<MemberType>_<MemberType1>(this LGF.Serializable.LStream stream, ref Dictionary<<MemberType>, <MemberType1>> dic)
         {
            int Length = stream.read.ReadInt32();
 
@@ -597,13 +618,13 @@ namespace LGF.Serializable
         }
 
         static string ReadEnmuContext = @"
-        public static void Write_<MemberType>(this LGF.Serializable.LGFStream stream, in <MemberType> val) 
+        public static void Write_<MemberType>(this LGF.Serializable.LStream stream, in <MemberType> val) 
         {
             stream.writer.Write((int)val);
         }";
 
         static string WriteEnmuContext = @"
-        public static void Read_<MemberType>(this LGF.Serializable.LGFStream stream, ref <MemberType> _out)
+        public static void Read_<MemberType>(this LGF.Serializable.LStream stream, ref <MemberType> _out)
         {
              _out  = (<MemberType>)stream.read.ReadInt32();
         }";

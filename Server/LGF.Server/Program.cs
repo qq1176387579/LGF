@@ -19,7 +19,7 @@ namespace LHTestServer
         {
             AppEntry.Startup();
             KcpServer kcpServer = new KcpServer();
-            kcpServer.Bing(OnRecv, NetConst.ServerPort, 30);    //30间隔
+            kcpServer.Bing(NetConst.ServerPort, 30);    //30间隔
             Task.Run(sendMsg);
             
             while (true)
@@ -41,12 +41,7 @@ namespace LHTestServer
         }
 
 
-        static void OnRecv(KcpSocket.KcpAgent kcpAgent, LGF.Serializable.LGFStream stream, int count)
-        {
-            //string message = Encoding.UTF8.GetString(bytes, 0, count);
-            //Console.WriteLine(kcpAgent.endPoint.ToString() + "  " + message);
-            //kcpAgent.Send(Encoding.UTF8.GetBytes(" 服务器 接收完成 f"));
-        }
+      
 
         /// <summary>
         /// 向特定ip的主机的端口发送数据报

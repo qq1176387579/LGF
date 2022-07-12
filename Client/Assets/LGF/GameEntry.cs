@@ -18,11 +18,13 @@ namespace LGF
         {
             Common.DontDestroyOnLoad(this);   
         }
+        
 
         private void Start()
         {
             AppEntry.Startup();
         }
+
 
         private void Update()
         {

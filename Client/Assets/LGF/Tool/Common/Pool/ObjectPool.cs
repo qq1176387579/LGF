@@ -47,7 +47,7 @@ namespace LGF
         public void Release(T element)
         {
             if (m_Stack.Count > 0 && ReferenceEquals(m_Stack.Peek(), element))
-                this.DebugError("Internal error. Trying to destroy object that is already released to pool.");
+                this.DebugError($"Internal error. Trying to destroy object that is already released to pool. type: {typeof(T)}");
             m_ActionOnRelease?.Invoke(element);
             lock (m_Stack)
                 m_Stack.Push(element);

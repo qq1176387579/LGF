@@ -18,13 +18,14 @@ namespace LHTestServer
         public static void Main(string[] args)
         {
             kcpServer = new KcpServer();
-            kcpServer.Bing(OnRecv, NetConst.ServerPort, 30);    //30间隔
+            //弃用
+            //kcpServer.Bing(OnRecv, NetConst.ServerPort, 30);    //30间隔
 
             //sendMsg();
         }
 
 
-        static void OnRecv(KcpSocket.KcpAgent kcpAgent, LGF.Serializable.LGFStream stream, int count)
+        static void OnRecv(KcpSocket.KcpAgent kcpAgent, LGF.Serializable.LStream stream, int count)
         {
             //string message = Encoding.UTF8.GetString(bytes, 0, count);
             //kcpAgent.Debug(kcpAgent.endPoint.ToString() + "  " + message);

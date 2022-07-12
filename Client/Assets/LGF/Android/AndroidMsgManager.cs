@@ -2,19 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
+
+#if USE_ANDROID
 using LitJson;
+#endif
+
 using System;
 
 namespace LGF.Android
 {
     /// <summary>
-    /// 安卓消息
+    /// 安卓消息  需要开启 USE_ANDROID 才能使用
     /// </summary>
     public partial class AndroidMsgManager : MonoSingleton<AndroidMsgManager>
     {
         public void Init()
         {
             AndroidMsgCenter.Instance.Init();
+            
             //Debug.LogError(AppConfig.Data.appInfo.PackName);
 #if UNITY_EDITOR
             if (!Application.isPlaying)
@@ -152,6 +157,18 @@ namespace LGF.Android
             }
         }
 
+
+#if USE_ANDROID
+
+        /// <summary>
+        /// 2022-07-07 22:11:32.452 8916-8965/com.defaultcompany.myframework E/Unity: MacAddress Update  
+        /// E/Unity: --------ff---
+        /// E/Unity:  msg 100002 0  30f399e6-204a-4d0f-97ee-a826613620f6
+        /// E/Unity: --------ff---
+        /// E/Unity:  msg 100002 0  30f399e6-204a-4d0f-97ee-a826613620f6
+        /// 只会在update之后调用
+        /// </summary>
+        /// <param name="param"></param>
         void OnMessage(string param)
         {
             JsonData jd = JsonMapper.ToObject(param);
@@ -164,7 +181,12 @@ namespace LGF.Android
             msg.strParam2 = (string)jd["strParam2"];
             msg.strParam3 = (string)jd["strParam3"];
             msgQueue.Enqueue(msg);
+            //Debug.LogError("--------ff---");
         }
+
+#endif
+
+
 
     }
 

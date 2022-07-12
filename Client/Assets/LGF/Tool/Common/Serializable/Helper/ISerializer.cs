@@ -16,9 +16,11 @@ namespace LGF.Serializable
     /// </summary>
     public interface ISerializer
     {
-        void Serialize(LGF.Serializable.LGFStream stream);
-        void Deserialize(LGF.Serializable.LGFStream stream);
+        void Serialize(LGF.Serializable.LStream stream);
+        void Deserialize(LGF.Serializable.LStream stream);
 
+        //回收
+        void Release();
     }
 
 }

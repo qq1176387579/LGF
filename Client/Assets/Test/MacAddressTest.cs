@@ -17,7 +17,10 @@ using System;
 using System.Threading.Tasks;
 using LGF.Net;
 
-public class MacAddress : MonoBehaviour
+/// <summary>
+/// MacAddressTest 初始化
+/// </summary>
+public class MacAddressTest : MonoBehaviour
 {
     public Text text;
     private void Awake()
@@ -30,11 +33,11 @@ public class MacAddress : MonoBehaviour
     {
         Debug.LogError("MacAddress Start");
 #if USE_ANDROID
-        AndroidMsgCenter.Instance.RegisterOnMsg(AndroidMsgDefine.GetUUIDResp, (a) => {
+        AndroidMsgCenter.RegisterOnMsg(AndroidMsgDefine.GetUUIDResp, (a) => {
             text.text = a.strParam1;
         }); 
         //获得唯一标识符
-        AndroidMsgCenter.Instance.SendMsg(AndroidMsgDefine.GetUUID);
+        AndroidMsgCenter.SendMsg(AndroidMsgDefine.GetUUID);
 
         //text.text = GetMacAddress();
 #else
@@ -42,16 +45,15 @@ public class MacAddress : MonoBehaviour
 #endif
 
 
-        //LHTestServer.Program.Main(null);
-        //LHTestClient.Program.Main(null);
     }
 
     private void OnDisable()
     {
-        //LHTestServer.Program.kcpServer.Dispose();
         LHTestClient.Program.kcpSock.Dispose();
     }
 
+
+ 
 
 
 }

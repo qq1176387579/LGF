@@ -17,6 +17,7 @@ namespace LHTestServer
         static KcpSocket.KcpAgent kcpAgent;
         public class OnRecvHelper : KcpSocketOnRecvHelper
         {
+            //弃用
             protected override void OnRecv( KcpSocket.KcpAgent kcp,int count)
             {
                 kcpAgent = kcp;

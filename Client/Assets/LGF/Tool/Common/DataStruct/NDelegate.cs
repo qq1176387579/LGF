@@ -15,20 +15,30 @@ using System.Collections;
 using System.Collections.Generic;
 using LGF;
 using LGF.Log;
-
+using UnityEngine;
 
 
 namespace LGF.DataStruct
 {
     public interface IDelegateBase
     {
+        /// <summary>
+        /// 调用后自动回收
+        /// </summary>
         void Invoke();
+
+        /// <summary>
+        /// 调用后不回收
+        /// </summary>
+        void Invoke2();
+
         void Release();
     }
 
     public interface IDelegateBase<T>
     {
         void Invoke(T param);
+        void Invoke2(T param);
         void Release();
     }
 
@@ -50,11 +60,22 @@ namespace LGF.DataStruct
 
             public void Invoke()
             {
+                if (IsRelease())
+                {
+                    Debug.Log("非法操作 已经 Release 了");
+                    return;
+                }
                 tmp.param1.Invoke();
                 Release();  //测试回收
             }
 
-            protected override void OnRelease() => tmp.Clear();
+            public void Invoke2()
+            {
+                tmp.param1.Invoke();
+            }
+
+            protected override void OnRelease() { base.OnRelease(); tmp.Clear(); }
+               
         }
 
 
@@ -73,11 +94,21 @@ namespace LGF.DataStruct
 
             public void Invoke()
             {
+                if (IsRelease())
+                {
+                    Debug.Log("非法操作 已经 Release 了");
+                    return;
+                }
                 tmp.param1.Invoke(tmp.param2);
                 Release();  //测试回收
             }
 
-            protected override void OnRelease() => tmp.Clear();
+            public void Invoke2()
+            {
+                tmp.param1.Invoke(tmp.param2);
+            }
+
+            protected override void OnRelease() { base.OnRelease(); tmp.Clear(); }
         }
 
 
@@ -97,11 +128,22 @@ namespace LGF.DataStruct
 
             public void Invoke()
             {
+                if (IsRelease())
+                {
+                    Debug.Log("非法操作 已经 Release 了");
+                    return;
+                }
+                
                 tmp.param1.Invoke(tmp.param2, tmp.param3);
                 Release();  //测试回收
             }
 
-            protected override void OnRelease() => tmp.Clear();
+            public void Invoke2()
+            {
+                tmp.param1.Invoke(tmp.param2, tmp.param3);
+            }
+
+            protected override void OnRelease() { base.OnRelease(); tmp.Clear(); }
         }
 
 
@@ -124,11 +166,21 @@ namespace LGF.DataStruct
 
             public void Invoke()
             {
+                if (IsRelease())
+                {
+                    Debug.Log("非法操作 已经 Release 了");
+                    return;
+                }
                 tmp.param1.Invoke(tmp.param2, tmp.param3, tmp.param4);
                 Release();  //测试回收
             }
 
-            protected override void OnRelease() => tmp.Clear();
+            public void Invoke2()
+            {
+                tmp.param1.Invoke(tmp.param2, tmp.param3, tmp.param4);
+            }
+
+            protected override void OnRelease() { base.OnRelease(); tmp.Clear(); }
 
         }
 
@@ -157,11 +209,21 @@ namespace LGF.DataStruct
 
             public void Invoke(T param)
             {
+                if (IsRelease())
+                {
+                    Debug.Log("非法操作 已经 Release 了");
+                    return;
+                }
                 tmp.param1.Invoke(param, tmp.param2, tmp.param3, tmp.param4);
                 Release();  //测试回收
             }
 
-            protected override void OnRelease() => tmp.Clear();
+            public void Invoke2(T param)
+            {
+                tmp.param1.Invoke(param, tmp.param2, tmp.param3, tmp.param4);
+            }
+
+            protected override void OnRelease() { base.OnRelease(); tmp.Clear(); }
         }
     }
     #endregion

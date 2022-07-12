@@ -19,6 +19,31 @@ using UnityEngine;
 
 namespace LGF.Net
 {
+
+    public class RecvHelper : KcpSocketOnRecvHelper
+    {
+        //protected override void OnRecv(in KcpSocket.KcpAgent kcp,in int count)
+        //{
+        //    string message = Encoding.UTF8.GetString(bytebuffer, 0, count);
+        //    Console.WriteLine(kcp.endPoint.ToString() + "  " + message);
+        //    kcp.Send(Encoding.UTF8.GetBytes(" 服务器 接收完成 f"));
+        //}
+    }
+
+    /// <summary>
+    /// 客户端服务端 通用数据
+    /// 客户端 S2C 用来读取    服务端 S2C 用来发送
+    /// </summary>
+    public class KcpCSBaseTmpData
+    {
+        public N_C2S_GetAllServersInfo n_C2S_GetAllServersInfo = new N_C2S_GetAllServersInfo();
+        public N_S2C_GetAllServersInfo n_S2C_GetAllServersInfo = new N_S2C_GetAllServersInfo();
+
+        public S2C_Connect S2C_Connect = new S2C_Connect();  //临时数据
+        public C2S_Connect C2S_Connect = new C2S_Connect(); //临时数据
+    }
+
+
     public class KcpCSBase
     {
         public virtual bool IsClient { get=> true; }
@@ -30,13 +55,21 @@ namespace LGF.Net
         public bool IsDisposed => m_disposed;
 
         public int LocalPort { get; set; }
+        public INetMsgHandling NetMsgHandling { get=> m_NetMsgHandlingMgr; }
+
+        INetMsgHandling m_NetMsgHandlingMgr = NetMsgHandlingMgr.Instance;
 
 
         /// <summary>
         /// 专门用于连接的Socket kcp 接收广播协议会出问题  发送广播的kcp会接收不到三次握手的回来的数据
         /// </summary>
         protected Socket m_ConnectSock;
-        protected LGFStream m_Stream = new LGFStream(512);  //流
+        /// <summary>
+        /// 处理udp的流
+        /// </summary>
+        protected LStream m_UdpStream = new LStream(512);  //流 推送和接收都是同一个流
+
+        public KcpCSBaseTmpData tmpData = new KcpCSBaseTmpData();
 
         /// <summary>
         /// 正常间隔时间 走配置 客户端是33fps 可以通过服务器通知配置 但是没必要
@@ -44,7 +77,7 @@ namespace LGF.Net
         /// <param name="OnRecv"></param>
         /// <param name="port"> 0 客户端随机绑定就行   </param>
         /// <param name="interval"></param>
-        public virtual void Bing(KcpOnRecv OnRecv, int port = 0, uint interval = 10)  //间隔时间
+        public virtual void Bing(RecvHelper recvHelper, int port = 0, uint interval = 10)  //间隔时间
         {
             if (m_kcpSocket != null)
             {
@@ -65,8 +98,9 @@ namespace LGF.Net
             }
 
             m_disposed = false;
-            m_recvHelper = new RecvHelper();
-            m_recvHelper.Bing(OnRecv);
+            m_recvHelper = recvHelper;
+            //m_recvHelper = new RecvHelper();
+            //m_recvHelper.Bing(OnRecv);
             m_kcpSocket = new KcpSocket();
             if (!m_kcpSocket.Bing(m_recvHelper, LGF.Net.NetConst.RandomPort, interval))
             {
@@ -81,14 +115,12 @@ namespace LGF.Net
         }
 
 
-
-
-
         /// <summary>
         /// 监听 连接端口
         /// </summary>
-        public virtual void Listener()
+        public void Listener()
         {
+            EndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
             Task.Run(() =>
             {
                 while (!m_disposed)
@@ -96,17 +128,17 @@ namespace LGF.Net
                     try
                     {
                         if (m_ConnectSock == null) return;
+                        OnListener();   //用来处理外部发送信息的
+
                         if (m_ConnectSock.Available <= 0)
                         {
                             Thread.Sleep(1000);    //没事情做休息一下
                             continue;
                         }
 
-                        EndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
 
                         int length = 0;
-                        lock (m_ConnectSock)
-                            length = m_ConnectSock.ReceiveFrom(m_Stream.GetBuffer(), ref endPoint);   //监听端口
+                        length = m_ConnectSock.ReceiveFrom(m_UdpStream.GetBuffer(), ref endPoint);   //监听端口
 
                         if (length < NetMsgHelper.INT32_SIZE)
                         {
@@ -116,7 +148,7 @@ namespace LGF.Net
                         }
 
                         if (m_disposed) return;
-                        NetMsgMgr.Instance.OnCSNetMsg(this, endPoint, m_Stream);
+                        m_NetMsgHandlingMgr.OnCSNetMsg(this, endPoint, m_UdpStream);
                     }
                     catch (Exception e)
                     {
@@ -129,35 +161,39 @@ namespace LGF.Net
         }
 
 
-
-        public virtual void Send(LGFStream stream, in EndPoint point)
+        protected virtual void OnListener()
         {
-            lock (m_ConnectSock)
-                m_ConnectSock.SendTo(stream.GetBuffer(), stream.Lenght, SocketFlags.None, point);    //继续返回给刚刚发送过来的
-        }
 
-
-        public virtual void Send(ISerializer serializer, in EndPoint point)
-        {
-            serializer.Serialize(m_Stream);
-            lock(m_ConnectSock)
-                m_ConnectSock.SendTo(m_Stream.GetBuffer(), m_Stream.Lenght, SocketFlags.None, point);    //继续返回给刚刚发送过来的
         }
 
 
 
 
 
-        public class RecvHelper : KcpSocketOnRecvHelper
-        {
-            //protected override void OnRecv(in KcpSocket.KcpAgent kcp,in int count)
-            //{
-            //    string message = Encoding.UTF8.GetString(bytebuffer, 0, count);
-            //    Console.WriteLine(kcp.endPoint.ToString() + "  " + message);
 
-            //    kcp.Send(Encoding.UTF8.GetBytes(" 服务器 接收完成 f"));
-            //}
+        /// <summary>
+        /// 线程不安全   需要确保是同一个线程
+        /// 在 OnListener 处理是线程安全的
+        /// 发送udp数据  
+        /// </summary>
+        /// <param name="serializer"></param>
+        /// <param name="point"></param>
+        public virtual void SendTo(ISerializer serializer, in EndPoint point)
+        {
+            serializer.Serialize(m_UdpStream);
+            m_ConnectSock.SendTo(m_UdpStream.GetBuffer(), m_UdpStream.Lenght, SocketFlags.None, point);    //继续返回给刚刚发送过来的
         }
+
+        /// <summary>
+        /// 线程不安全   需要确保是同一个线程
+        /// </summary>
+         protected virtual void SendTo(LStream stream, int lenght, in EndPoint point)
+        {
+            m_ConnectSock.SendTo(stream.GetBuffer(), lenght, SocketFlags.None, point);    //继续返回给刚刚发送过来的
+        }
+
+
+
 
 
         public KcpSocket.KcpAgent GetKcpAgent(in EndPoint point)
@@ -175,6 +211,7 @@ namespace LGF.Net
             m_ConnectSock = null;
             m_kcpSocket = null;
             m_recvHelper = null;
+            tmpData = null;
         }
 
     }

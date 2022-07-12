@@ -25,12 +25,12 @@ namespace LGF.Android
         /// <summary>
         /// SDK 注册回调    先这样简单写 
         /// </summary>
-        public void RegisterOnMsg(AndroidMsgDefine type, Action<SDKMsg> action)
+        public static void RegisterOnMsg(AndroidMsgDefine type, Action<SDKMsg> action)
         {
             _Instance.RegisterOnMsgEx(type, action);
         }
 
-        public void RegisterOnMsgEx(AndroidMsgDefine type, Action<SDKMsg> action)
+        void RegisterOnMsgEx(AndroidMsgDefine type, Action<SDKMsg> action)
         {
             if (!OnMsgEvent.ContainsKey(type))
             {
@@ -55,7 +55,7 @@ namespace LGF.Android
         }
 
         ///  以后有时间优先流程 感觉传2个数组就行
-        public void SendMsg(AndroidMsgDefine msgid, int iParam1 = 0, int iParam2 = 0, int iParam3 = 0, int iParam4 = 0, string strParam1 = "", string strParam2 = "", string strParam3 = "", string strParam4 = "")
+        public static void SendMsg(AndroidMsgDefine msgid, int iParam1 = 0, int iParam2 = 0, int iParam3 = 0, int iParam4 = 0, string strParam1 = "", string strParam2 = "", string strParam3 = "", string strParam4 = "")
         {
             AndroidMsgManager.Instance.SendUnityMessage((int)msgid, iParam1, iParam2, iParam3, iParam4, strParam1, strParam2, strParam3, strParam4);
         }

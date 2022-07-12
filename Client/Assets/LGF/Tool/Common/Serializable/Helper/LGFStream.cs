@@ -13,7 +13,7 @@ using System;
 
 namespace LGF.Serializable
 {
-    public class LGFStream
+    public class LStream
     {
         int stack = 0;
 
@@ -22,15 +22,25 @@ namespace LGF.Serializable
         public BinaryReader read;
         public int Lenght { get; private set; }
 
+        const int tmpBytsCount = 1024;
+        static byte[] tmpByts = new byte[tmpBytsCount]; //用来填充数据的 不然 MemoryStream的ID位置有问题
 
-        public LGFStream(MemoryStream stream_)
+        public LStream(MemoryStream stream_)
         {
             stream = stream_;
             writer = new BinaryWriter(stream);
             read = new BinaryReader(stream);
         }
 
-        public LGFStream(int count = 0) : this(new MemoryStream(count)) { }
+        public LStream(int count = 0) : this(new MemoryStream(count)) {
+            int count1 = count;
+            while (count1 > 0)
+            {
+                stream.Write(tmpByts, 0, count1 > tmpBytsCount ? tmpBytsCount : count1);
+                count1 -= tmpBytsCount;
+            }
+            Clear();
+        }
 
 
         public byte[] GetBuffer()
@@ -80,6 +90,7 @@ namespace LGF.Serializable
 
         /// <summary>
         /// 获得网络消息类型 并重置位置
+        /// 后面看情况改成扩展方法
         /// </summary>
         /// <returns></returns>
         public NetMsgDefine GetNetMsgType()
@@ -94,7 +105,24 @@ namespace LGF.Serializable
                 e.DebugError();
                 return NetMsgDefine.Empty;  //非法操作
             }
-           
+            Reset();
+            return val;
+        }
+
+
+        public uint GetUid()
+        {
+            uint val = 0;
+            stream.Position = 4;
+            try
+            {
+                val = read.ReadUInt32();
+            }
+            catch (Exception e)
+            {
+                e.DebugError();
+                return 0;  //非法操作
+            }
             Reset();
             return val;
         }

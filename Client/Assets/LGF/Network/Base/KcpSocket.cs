@@ -13,12 +13,12 @@ using LGF.Serializable;
 
 namespace LGF.Net
 {
-    public delegate void KcpOnRecv(KcpSocket.KcpAgent kcpAgent, LGFStream stream, int count);
+    public delegate void KcpOnRecv(KcpSocket.KcpAgent kcpAgent, LStream stream, int count);
 
     public class KcpSocketOnRecvHelper : IKcpSocketOnRecv
     {
         public KcpOnRecv kcpOnRecv;
-        public LGFStream stream = new LGFStream(NetConst.Socket_RecvBufferSize);
+        public LStream stream = new LStream(NetConst.Socket_RecvBufferSize);
         protected byte[] bytebuffer => stream.GetBuffer();
         byte[] IKcpSocketOnRecv.bytebuffer => bytebuffer;
 
@@ -31,7 +31,7 @@ namespace LGF.Net
             {
                 count = -1 * count - 3;
                 //bytebuffer = (byte[])System.Array.CreateInstance(typeof(byte), SocketHelper.ceilpow2(count));
-                stream = new LGFStream(count);  //空间不够
+                stream = new LStream(count);  //空间不够
                 count = kcp.Recv(bytebuffer);   //重新接收数据
             }
 
@@ -42,14 +42,10 @@ namespace LGF.Net
 
         protected virtual void OnRecv(KcpSocket.KcpAgent kcp,int count)
         {
-            //反序列化处理
-            kcpOnRecv?.Invoke(kcp, stream, count);
+            
         }
 
-        public void Bing(KcpOnRecv OnRecv_)
-        {
-            kcpOnRecv = OnRecv_;
-        }
+       
     }
 
 
@@ -291,7 +287,7 @@ namespace LGF.Net
 
                     if (kcpAgent == null)   //添加新的
                     {
-                        this.Debug("添加新的 " + tmpPoint.ToString());
+                        this.Debug("添加新的 kcpAgent : " + tmpPoint.ToString());
                         kcpAgent = new KcpAgent().Bing(this, uid, point);
                         m_addKcpAgent.Add(kcpAgent);
                     }
@@ -323,20 +319,6 @@ namespace LGF.Net
         }
 
 
-
-
-        ///// 后面封装下 换成id
-        ///// </summary>
-        ///// <param name="buffer"></param>
-        ///// <param name="endPoint"></param>
-        ///// <returns></returns>
-        //public int Recv(byte[] buffer, IPEndPoint endPoint)
-        //{
-        //    return GetKcpAgent(endPoint).Recv(buffer);
-        //}
-
-
-
         /// <summary>
         /// socket 直接发送
         /// </summary>
@@ -366,6 +348,7 @@ namespace LGF.Net
 
         /// <summary>
         /// KCP 代理  一个socket接收 可能有多个代理
+        /// 后面需要写个心跳检查连接时间
         /// </summary>
         public class KcpAgent : IKcpCallback
         {
@@ -430,7 +413,7 @@ namespace LGF.Net
                 Span<byte> buffBytes = new Span<byte>(m_Socket.m_SendBuffer);
                 buffer.Memory.Span.Slice(0, avalidLength).CopyTo(buffBytes);
                 m_Socket.SockSend(m_Socket.m_SendBuffer, avalidLength, endPoint);
-                //this.Debug("  Output ");
+                this.Debug(">>  Output avalidLength{0}", avalidLength);
                 buffer.Dispose();
             }
 

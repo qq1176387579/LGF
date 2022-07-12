@@ -11,6 +11,7 @@ using System.Net.Sockets;
 using LGF.Log;
 using UnityEngine;
 
+//弃用 老版本用来测试数据的
 namespace LHTestClient
 {
     public class Program
@@ -31,7 +32,7 @@ namespace LHTestClient
 
         public static void Main(string[] args)
         {
-            LGF.Serializable.LGFStream stream = new LGF.Serializable.LGFStream(512);
+            LGF.Serializable.LStream stream = new LGF.Serializable.LStream(512);
 
             //var s = S2C_Connect.Get().NSerialize(stream);
 
@@ -66,33 +67,27 @@ namespace LHTestClient
             //byte[] buffer = new byte[512];
         
 
-            kcpSock.Debug("客户端已经开启");
-            //EndPoint point = new IPEndPoint(IPAddress.Broadcast, NetConst.ServerPort);  //广播
-            Socket broadcastSock = SocketHelper.UdpBind(IPAddress.Any, 0);
-            kcpSock.Debug("-----4444---");
-            broadcastSock.SetBroadcast();
+            //kcpSock.Debug("客户端已经开启");
+            ////EndPoint point = new IPEndPoint(IPAddress.Broadcast, NetConst.ServerPort);  //广播
+            //Socket broadcastSock = SocketHelper.UdpBind(IPAddress.Any, 0);
+            //kcpSock.Debug("-----4444---");
+            //broadcastSock.SetBroadcast();
 
-            EndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, NetConst.ServerPort);
-            broadcastSock.SendTo(Encoding.UTF8.GetBytes(" asd  "), endPoint);
+            //EndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, NetConst.ServerPort);
+            //broadcastSock.SendTo(Encoding.UTF8.GetBytes(" asd  "), endPoint);
 
-            int lenght = broadcastSock.ReceiveFrom(stream.GetBuffer(), ref endPoint);
-            stream.writer.Write(stream.GetBuffer(), 0, lenght);
-            stream.Clear();
-            ////stream.writer();
-            //if (stream.GetNetMsgType() != NetMsgDefine.S2C_Connect)
-            //{
-            //    Debug.LogError("非法操作  " + stream.GetNetMsgType());
-            //    return;
-            //}
+            //int lenght = broadcastSock.ReceiveFrom(stream.GetBuffer(), ref endPoint);
+            //stream.writer.Write(stream.GetBuffer(), 0, lenght);
+            //stream.Clear();
 
-            var connect = S2C_Connect.Get().NDeserialize(stream);
+            //var connect = S2C_Connect.Get().NDeserialize(stream);
 
-            EndPoint point = new IPEndPoint((endPoint as IPEndPoint).Address, connect.port);  //广播
-            kcpSock.Debug($"连接服务器成功  {point}");
+            //EndPoint point = new IPEndPoint((endPoint as IPEndPoint).Address, connect.port);  //广播
+            //kcpSock.Debug($"连接服务器成功  {point}");
 
-            kcpAgent = kcpSock.GetKcpAgent(point);
+            //kcpAgent = kcpSock.GetKcpAgent(point);
 
-            kcpAgent.Send(Encoding.UTF8.GetBytes(" 测试 一下效果 "));
+            //kcpAgent.Send(Encoding.UTF8.GetBytes(" 测试 一下效果 "));
 #if NOT_UNITY
             while (true)
             {

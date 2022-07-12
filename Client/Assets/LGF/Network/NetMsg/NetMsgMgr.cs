@@ -17,21 +17,23 @@ namespace LGF.Net
 
     public interface INetMsgHandling
     {
-        public void OnCSNetMsg(KcpCSBase csBase, in EndPoint point, LGFStream stream);
-        public void OnKcpNetMsg(KcpSocket.KcpAgent agent, LGFStream stream);
+        public void OnCSNetMsg(KcpCSBase csBase, in EndPoint point, LStream stream);
+        //public void OnKcpNetMsg(ISession agent, LStream stream);
+        public void OnServerMsg(KcpServer server, NetMsgDefine type, uint sessionID, LStream _stream);
+
+        public void OnClientMsg(KcpClient client, NetMsgDefine type, LStream _stream);
     }
 
     /// <summary>
     /// 网络消息管理器
+    /// 绑定AppEntry
     /// </summary>
-    public class NetMsgMgr : SingletonBase<NetMsgMgr>, INetMsgHandling
+    public class NetMsgMgr : SingletonBase<NetMsgMgr>
     {
-        INetMsgHandling m_MsgHandling;
         NBufferingQueue<IDelegateBase> queue = new NBufferingQueue<IDelegateBase>();
         protected override void OnNew()
         {
-            EventManager.Instance.AddListener(GameEventType.OnUpdate, OnUpdate);    //
-            m_MsgHandling = NetMsgHandlingMgr.Instance;
+            AppEntry.RegisterOnUpdate(OnUpdate);
 
             queue.OnClear((a) => a.Release());
         }
@@ -46,28 +48,31 @@ namespace LGF.Net
             var list = queue.Get();
             foreach (var item in list)
             {
-                item.Invoke();
+                item.Invoke2();
             }
         }
 
 
-        /// <summary>
-        /// kcp消息处理 
-        /// </summary>
-        public void OnKcpNetMsg(KcpSocket.KcpAgent agent, LGFStream stream)
-        {
-            m_MsgHandling.OnKcpNetMsg(agent, stream);
-        }
+        ///// <summary>
+        ///// kcp消息处理 
+        ///// </summary>
+        //public void OnKcpNetMsg(ISession agent, LStream stream)
+        //{
+        //    m_MsgHandling.OnKcpNetMsg(agent, stream);
+        //}
 
-        /// <summary>
-        /// 消息处理cs处理  接收数据
-        /// </summary>
-        public void OnCSNetMsg(KcpCSBase csBase,in EndPoint point, LGFStream stream)
-        {
-            m_MsgHandling.OnCSNetMsg(csBase, point, stream);
-        }
+        ///// <summary>
+        ///// 消息处理cs处理  接收数据
+        ///// </summary>
+        //public void OnCSNetMsg(KcpCSBase csBase,in EndPoint point, LStream stream)
+        //{
+        //    m_MsgHandling.OnCSNetMsg(csBase, point, stream);
+        //}
 
 
+        #region QueueOnMainThread  主线程处理数据
+
+  
         /// <summary>
         /// 添加到主线程
         /// </summary>
@@ -96,7 +101,7 @@ namespace LGF.Net
         /// <summary>
         /// 添加到主线程
         /// </summary>
-        public static void QueueOnMainThreadt<T1, T2>(System.Action<T1, T2> evt, in T1 param2, in T2 param3)
+        public static void QueueOnMainThread<T1, T2>(System.Action<T1, T2> evt, in T1 param2, in T2 param3)
         {
             Instance.queue.Add(NDelegate.Get(evt, param2, param3));
         }
@@ -105,11 +110,57 @@ namespace LGF.Net
         /// <summary>
         /// 添加到主线程
         /// </summary>
-        public static void QueueOnMainThreadt<T1, T2, T3>(System.Action<T1, T2, T3> evt, in T1 param2, in T2 param3, in T3 param4)
+        public static void QueueOnMainThread<T1, T2, T3>(System.Action<T1, T2, T3> evt, in T1 param2, in T2 param3, in T3 param4)
         {
             Instance.queue.Add(NDelegate.Get(evt, param2, param3, param4));
         }
 
+
+
+        /// <summary>
+        /// 添加到主线程
+        /// </summary>
+        public static void QueueOnMainThreadt(IDelegateBase evt)
+        {
+            Instance.queue.Add(evt);
+        }
+
+
+
+
+        /// <summary>
+        /// 添加到主线程
+        /// </summary>
+        public void QueueOnMainThreadt(System.Action evt)
+        {
+            Instance.queue.Add(NDelegate.Get(evt));
+        }
+
+        /// <summary>
+        /// 添加到主线程
+        /// </summary>
+        public void QueueOnMainThreadt<T1>(System.Action<T1> evt, in T1 param2)
+        {
+            Instance.queue.Add(NDelegate.Get(evt, param2));
+        }
+
+        /// <summary>
+        /// 添加到主线程
+        /// </summary>
+        public void QueueOnMainThreadt<T1, T2>(System.Action<T1, T2> evt, in T1 param2, in T2 param3)
+        {
+            Instance.queue.Add(NDelegate.Get(evt, param2, param3));
+        }
+
+
+        /// <summary>
+        /// 添加到主线程
+        /// </summary>
+        public void QueueOnMainThreadt<T1, T2, T3>(System.Action<T1, T2, T3> evt, in T1 param2, in T2 param3, in T3 param4)
+        {
+            queue.Add(NDelegate.Get(evt, param2, param3, param4));
+        }
+        #endregion
     }
 
 }
