@@ -20,7 +20,7 @@ namespace LGF.Client
         static List<EndPoint> serverList = new List<EndPoint>();    //服务器列表
         static void Main(string[] args)
         {
-            AppEntry.Startup();
+            LGFEntry.Startup();
             kcpClient = new KcpClient();
             kcpClient.Bing(NetConst.RandomPort, 15);    //15间隔
             Task.Run(sendMsg);
@@ -31,12 +31,13 @@ namespace LGF.Client
             {
                 try
                 {
-                    AppEntry.Update();
-                    AppEntry.LateUpdate();
-                    AppEntry.FixedUpdate();
+                    LGFEntry.Update();
+                    LGFEntry.LateUpdate();
+                    LGFEntry.FixedUpdate();
                 }
                 catch (Exception e)
                 {
+                    
                     e.DebugError();
                 }
 
@@ -44,47 +45,7 @@ namespace LGF.Client
             }
         }
 
-        static void Init()
-        {
-            func = new Dictionary<string, Action<string[]>>();
-            //在其他线程里面 非主线程
-            EventManager.Instance.AddListener<EndPoint>(GameEventType.Net_GetServersInfo, (point) =>
-            {
-                Program.serverList.Add(point);
-                Debug.LogFormat("Program 获得服务器信息 {0}", point);
-
-                //自动连接 连接第一个服务器
-                //if (kcpAgent1 == null)
-                //{
-                //    kcpAgent1 = kcpClient.GetKcpAgent(point);   //获得成功
-                //}
-            });
-
-
-            NetMsgHandlingMgr.Instance.RegisterClientMsg(NetMsgDefine.S2C_Connect, (S2C_Connect data) =>
-            {
-                data.Debug($" 连接服务器端成功 当前id: {data.uid}");
-            });
-
-
-            func.Add("get_s", (param) =>
-            {
-                Debug.Log("get_s 获得服务器信息");
-                kcpClient.GetAllServerInfo();
-            });
-
-
-            func.Add("connect_s", (param) =>
-            {
-                if (serverList.Count == 0)
-                {
-                    Debug.LogError("非法操作  没有该服务器");
-                    return;
-                }
-                Debug.Log("connect_s 连接服务器 " + serverList[0].ToString() +"  客户单名称 :" + param.GetByID(1));
-                kcpClient.TryToConnect(param.GetByID(1), serverList[0]);
-            });
-        }
+      
 
         /// <summary>
         /// 向特定ip的主机的端口发送数据报
@@ -103,7 +64,7 @@ namespace LGF.Client
 
                 if (kcpAgent1 == null)
                 {
-                    Debug.Log("未连接服务器! ");
+                    sLog.Debug("未连接服务器! ");
                     continue;
                 } 
              
@@ -123,9 +84,60 @@ namespace LGF.Client
             return false;
         }
 
-        
+
+        static void Init()
+        {
+            func = new Dictionary<string, Action<string[]>>();
+            //在其他线程里面 非主线程
+            EventManager.Instance.AddListener<EndPoint>(GameEventType.Net_GetServersInfo, (point) =>
+            {
+                Program.serverList.Add(point);
+                sLog.Debug("Program 获得服务器信息 {0}", point);
+
+                //自动连接 连接第一个服务器
+                //if (kcpAgent1 == null)
+                //{
+                //    kcpAgent1 = kcpClient.GetKcpAgent(point);   //获得成功
+                //}
+            });
 
 
+            NetMsgHandlingMgr.Instance.RegisterClientMsg(NetMsgDefine.S2C_Connect, (S2C_Connect data) =>
+            {
+                data.Debug($" 连接服务器端成功 当前id: {data.uid}");
+            });
+
+
+            func.Add("get_s", (param) =>
+            {
+                sLog.Debug("get_s 获得服务器信息");
+                kcpClient.GetAllServerInfo();
+            });
+
+
+            func.Add("connect_s", (param) =>
+            {
+                if (serverList.Count == 0)
+                {
+                    sLog.Error("非法操作  没有该服务器");
+                    return;
+                }
+                sLog.Debug("connect_s 连接服务器 " + serverList[0].ToString() + "  客户单名称 :" + param.GetByID(1));
+                kcpClient.TryToConnect(param.GetByID(1), serverList[0]);
+            });
+
+
+            //func.Add("connect_s", (param) =>
+            //{
+            //    if (serverList.Count == 0)
+            //    {
+            //        sLog.Error("非法操作  没有该服务器");
+            //        return;
+            //    }
+            //    sLog.Debug("connect_s 连接服务器 " + serverList[0].ToString() + "  客户单名称 :" + param.GetByID(1));
+            //    kcpClient.TryToConnect(param.GetByID(1), serverList[0]);
+            //});
+        }
 
 
     }

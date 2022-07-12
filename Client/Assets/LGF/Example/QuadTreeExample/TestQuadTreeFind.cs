@@ -74,7 +74,7 @@ namespace LGF.Example
             for (int i = 0; i < list2.Count; i++)
                 (list2[i] as TestQuadTreePos).SetColor();
 
-            //Debug.Log($" {count1}  {count1_1} |  {count2}");
+            //sLog.Debug($" {count1}  {count1_1} |  {count2}");
             if (count1 != count2)
             {
                 transform.debugError($"----error------{count1}  {count1_1} |  {count2}---");

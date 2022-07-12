@@ -54,7 +54,7 @@ namespace LGF.Net
         {
             if (!isGetAllServerInfo) return;
             isGetAllServerInfo = false;
-            Debug.Log(">>>> GetAllServerInfo");
+            sLog.Debug(">>>> GetAllServerInfo");
 
             EndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, NetConst.ServerPort);
             m_UdpStream.Clear();
@@ -79,7 +79,7 @@ namespace LGF.Net
             {
                 if (m_ServerKcpAgent != null)
                 {
-                    Debug.LogError("非法操作 你有正在连接的服务器!!!");
+                    sLog.Error("非法操作 你有正在连接的服务器!!!");
                     return;
                 }
 
@@ -96,7 +96,7 @@ namespace LGF.Net
                 }
                 else
                 {
-                    Debug.LogError("未初始化 MacAddressUtils UUID");
+                    sLog.Error("未初始化 MacAddressUtils UUID");
                     return;
                 }
 
@@ -118,7 +118,7 @@ namespace LGF.Net
                 //base.OnRecv(kcp, count);
                 if (count < 8)
                 {
-                    Debug.LogError("接收到一个未知的信息 count: " + count);
+                    sLog.Error("接收到一个未知的信息 count: " + count);
                     return;
                 }
 

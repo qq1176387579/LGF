@@ -27,13 +27,15 @@ namespace LGF.Net
     /// <summary>
     /// 网络消息管理器
     /// 绑定AppEntry
+    /// 
+    /// QueueOnMainThread 主线程函数
     /// </summary>
     public class NetMsgMgr : SingletonBase<NetMsgMgr>
     {
         NBufferingQueue<IDelegateBase> queue = new NBufferingQueue<IDelegateBase>();
         protected override void OnNew()
         {
-            AppEntry.RegisterOnUpdate(OnUpdate);
+            LGFEntry.RegisterOnUpdate(OnUpdate);
 
             queue.OnClear((a) => a.Release());
         }

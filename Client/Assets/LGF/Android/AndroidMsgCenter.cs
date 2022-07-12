@@ -66,7 +66,7 @@ namespace LGF.Android
         /// <param name="msg"></param>
         private void OnSDKMsg(SDKMsg msg)
         {
-            Debug.LogError(" msg " + msg.iMsgId + " " + msg.iPararm1 + "  " + msg.strParam1);
+            Log.sLog.Error(" msg " + msg.iMsgId + " " + msg.iPararm1 + "  " + msg.strParam1);
             if (OnMsgEvent.TryGetValue((AndroidMsgDefine)msg.iMsgId, out Action<SDKMsg> onSDKMsg))
             {
                 onSDKMsg?.Invoke(msg);

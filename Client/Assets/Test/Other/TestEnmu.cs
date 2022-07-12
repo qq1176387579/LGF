@@ -56,7 +56,7 @@ namespace Test
                 time += (System.DateTime.Now - now).TotalMilliseconds;
             }
 
-            UnityEngine.Debug.Log(time);
+            UnityEngine.Debug.LogError(time);
             time = 0;
             for (int i = 0; i < 1000000; i++)
             {
@@ -66,8 +66,8 @@ namespace Test
        
                 time += (System.DateTime.Now - now).TotalMilliseconds;
             }
-            UnityEngine.Debug.Log(time);
-            UnityEngine.Debug.Log("---------");
+            UnityEngine.Debug.LogError(time);
+            UnityEngine.Debug.LogError("---------");
 
         }
     }

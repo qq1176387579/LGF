@@ -59,7 +59,7 @@ namespace LGF
             //private System.Timers.Timer                         m_timer;        //定时出bug 2个不同的线程进行调用内部update  需要调用锁 加深拷贝 感觉一个线程就行 没必要用到线程池重复调用
             private Stopwatch                                   m_stopWatch;
             private bool                                        m_isHasUpdate;
-            private Action<string>                              m_taskLog;
+            //private Action<string>                              m_taskLog;
             private Action<Action<int>, int>                    m_taskHandle;
             uint                                                m_interval;
 
@@ -96,10 +96,10 @@ namespace LGF
 
             }
 
-            public void SetLog(Action<string> log)
-            {
-                m_taskLog = log;
-            }
+            //public void SetLog(Action<string> log)
+            //{
+            //    m_taskLog = log;
+            //}
             public void SetHandle(Action<Action<int>, int> handle)
             {
                 m_taskHandle = handle;
@@ -327,14 +327,7 @@ namespace LGF
 
             private void LogInfo(string info)
             {
-                if (m_taskLog != null)
-                {
-                    m_taskLog(info);
-                }
-                else
-                {
-                    Console.WriteLine(info);
-                }
+                this.DebugError(info);
             }
 
             /// <summary>

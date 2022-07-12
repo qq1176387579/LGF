@@ -146,7 +146,7 @@ namespace LGF
             }
             else
             {
-                Debug.LogWarningFormat("此事件类型还未添加{0},请仔细检查!", eType.ToString());
+                sLog.Warning("此事件类型还未添加{0},请仔细检查!", eType.ToString());
             }
             return isSucessed;
 
@@ -169,18 +169,18 @@ namespace LGF
                     {
                         //如果是 就移除掉!
                         m_eventDic[eType].Remove(ac);
-                        //Debug.Log("移除成功!");
+                        //sLog.Debug("移除成功!");
                     }
                 }
                 isSucessed = true;
             }
             else
             {
-                Debug.LogWarningFormat("此事件类型还未添加{0},请仔细检查!", eType.ToString());
+                sLog.Warning("此事件类型还未添加{0},请仔细检查!", eType.ToString());
             }
             if (isSucessed == false)
             {
-                Debug.LogWarningFormat("要删除的委托对象不存在!{0},{1}", eType.ToString(), ac.ToString());
+                sLog.Warning("要删除的委托对象不存在!{0},{1}", eType.ToString(), ac.ToString());
             }
             return isSucessed;
         }
@@ -203,23 +203,23 @@ namespace LGF
                     {
                         //如果是 就移除掉!
                         m_eventDic[eType].Remove(ac);
-                        //Debug.Log("移除成功!");
+                        //sLog.Debug("移除成功!");
                         break;
                     }
                     else
                     {
-                        Debug.Log("不是同一个对象!");
+                        sLog.Debug("不是同一个对象!");
                     }
                 }
                 isSucessed = true;
             }
             else
             {
-                Debug.LogWarningFormat("此事件类型还未添加{0},请仔细检查!", eType.ToString());
+                sLog.Warning("此事件类型还未添加{0},请仔细检查!", eType.ToString());
             }
             if (isSucessed == false)
             {
-                Debug.LogWarningFormat("要删除的委托对象不存在!{0},{1}", eType.ToString(), ac.ToString());
+                sLog.Warning("要删除的委托对象不存在!{0},{1}", eType.ToString(), ac.ToString());
             }
             return isSucessed;
         }
@@ -242,11 +242,11 @@ namespace LGF
             }
             else
             {
-                Debug.LogWarningFormat("此事件类型还未添加{0},请仔细检查!", eType.ToString());
+                sLog.Warning("此事件类型还未添加{0},请仔细检查!", eType.ToString());
             }
             if (isSucessed == false)
             {
-                Debug.LogWarningFormat("要删除的委托对象不存在!{0},{1}", eType.ToString(), ac.ToString());
+                sLog.Warning("要删除的委托对象不存在!{0},{1}", eType.ToString(), ac.ToString());
             }
             return isSucessed;
         }
@@ -269,11 +269,11 @@ namespace LGF
             }
             else
             {
-                Debug.LogWarningFormat("此事件类型还未添加{0},请仔细检查!", eType.ToString());
+                sLog.Warning("此事件类型还未添加{0},请仔细检查!", eType.ToString());
             }
             if (isSucessed == false)
             {
-                Debug.LogWarningFormat("要删除的委托对象不存在!{0},{1}", eType.ToString(), ac.ToString());
+                sLog.Warning("要删除的委托对象不存在!{0},{1}", eType.ToString(), ac.ToString());
             }
             return isSucessed;
         }
@@ -296,11 +296,11 @@ namespace LGF
             }
             else
             {
-                Debug.LogWarningFormat("此事件类型还未添加{0},请仔细检查!", eType.ToString());
+                sLog.Warning("此事件类型还未添加{0},请仔细检查!", eType.ToString());
             }
             if (isSucessed == false)
             {
-                Debug.LogWarningFormat("要删除的委托对象不存在!{0},{1}", eType.ToString(), ac.ToString());
+                sLog.Warning("要删除的委托对象不存在!{0},{1}", eType.ToString(), ac.ToString());
             }
             return isSucessed;
         }

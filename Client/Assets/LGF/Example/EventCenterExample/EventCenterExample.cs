@@ -5,6 +5,7 @@ using UnityEngine;
 using LGF;
 using static LGF.EvtHelper;
 using LGF.DataStruct;
+using LGF.Log;
 
 namespace LGF.Example
 {
@@ -76,26 +77,26 @@ namespace LGF.Example
             //下列写法 debug 删除是无GC的
             data.ToParam<int>((param1) =>
             {
-                 //Debug.LogError(param1);  //这里不能用isdebug  会有捕获GC
+                 //sLog.Error(param1);  //这里不能用isdebug  会有捕获GC
             });
 
             data.ToThisParam<EventCenterExample, int>((_this, param1) =>
             {
                 _this.t = param1;
-                //Debug.LogError(param1);
+                //sLog.Error(param1);
             }, this);
 
-            if (isDebug) Debug.LogError(t);
+            if (isDebug) sLog.Error(t);
 
             if (data is Event.TestExample ss)
             {
-                if (isDebug) Debug.LogError(ss.t);
+                if (isDebug) sLog.Error(ss.t);
             }
 
             if (data == null)
             {
-                if (isDebug) Debug.LogError("Test.TestGameEventTypes.TestExample");
-                //Debug.LogError("Test.TestGameEventTypes.TestExample");
+                if (isDebug) sLog.Error("Test.TestGameEventTypes.TestExample");
+                //sLog.Error("Test.TestGameEventTypes.TestExample");
             }
 
         }
@@ -103,8 +104,8 @@ namespace LGF.Example
 
         void IEntityIndex<Test.ITestNewEventCenter>.OnEvent(IEventDataBase ev)
         {
-            if (isDebug) Debug.LogError("----Test.ITestNewEventCenter-----");
-            //Debug.LogError("----Test.ITestNewEventCenter-----");
+            if (isDebug) sLog.Error("----Test.ITestNewEventCenter-----");
+            //sLog.Error("----Test.ITestNewEventCenter-----");
         }
 
 

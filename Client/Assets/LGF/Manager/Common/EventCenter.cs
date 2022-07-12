@@ -32,7 +32,7 @@ namespace LGF
 
             if (events[type] != null)
             {
-                this.Debug("重复注册");
+                Log.sLog.Error("重复注册");
                 return;
             }
 

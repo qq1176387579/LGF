@@ -169,15 +169,15 @@ namespace LGF.Serializable
             s.dict1.Add("33", s7);
             s.dict1.Add("44", s8);
 
-            Debug.Log(s);
+            sLog.Debug(s);
 
 
             LGF.Serializable.LGFStream stream = new LGF.Serializable.LGFStream();
             s.Serialize(stream);
             sttt s1 = sttt.Get();
-            Debug.Log(s1);
+            sLog.Debug(s1);
             s1.Deserialize(stream);
-            Debug.Log(s1);
+            sLog.Debug(s1);
 
 #endif
 

@@ -18,17 +18,17 @@ namespace LGF.Example
 
         protected override void OnUpdate()
         {
-            Debug.LogError("----TestMono2Base--OnUpdate----");
+            sLog.Error("----TestMono2Base--OnUpdate----");
         }
 
         protected override void OnLateUpdate()
         {
-            Debug.LogError("----TestMono2Base--OnLateUpdate----");
+            sLog.Error("----TestMono2Base--OnLateUpdate----");
         }
 
         protected override void OnFixedUpdate()
         {
-            Debug.LogError("----TestMono2Base--OnFixedUpdate----");
+            sLog.Error("----TestMono2Base--OnFixedUpdate----");
         }
 
     }

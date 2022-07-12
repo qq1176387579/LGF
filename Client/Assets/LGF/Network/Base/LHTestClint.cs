@@ -44,10 +44,10 @@ namespace LHTestClient
             OnRecvHelper ff = new OnRecvHelper();
             kcpSock = new LGF.Net.KcpSocket();
 
-            if (!kcpSock.Bing(ff, LGF.Net.NetConst.ClientPort))
-            {
-                kcpSock.Debug("------4444---");
-            }
+            //if (!kcpSock.Bing(ff, LGF.Net.NetConst.ClientPort))
+            //{
+            //    kcpSock.Log("------4444---");
+            //}
 
             //Task.Run(async () =>
             //{
@@ -67,10 +67,10 @@ namespace LHTestClient
             //byte[] buffer = new byte[512];
         
 
-            //kcpSock.Debug("客户端已经开启");
+            //kcpSock.Log("客户端已经开启");
             ////EndPoint point = new IPEndPoint(IPAddress.Broadcast, NetConst.ServerPort);  //广播
             //Socket broadcastSock = SocketHelper.UdpBind(IPAddress.Any, 0);
-            //kcpSock.Debug("-----4444---");
+            //kcpSock.Log("-----4444---");
             //broadcastSock.SetBroadcast();
 
             //EndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, NetConst.ServerPort);
@@ -83,7 +83,7 @@ namespace LHTestClient
             //var connect = S2C_Connect.Get().NDeserialize(stream);
 
             //EndPoint point = new IPEndPoint((endPoint as IPEndPoint).Address, connect.port);  //广播
-            //kcpSock.Debug($"连接服务器成功  {point}");
+            //kcpSock.Log($"连接服务器成功  {point}");
 
             //kcpAgent = kcpSock.GetKcpAgent(point);
 
@@ -109,20 +109,20 @@ namespace LHTestClient
             //kcpSock.Sock.SetBroadcast();    //设置广播
             Console.InputEncoding = System.Text.Encoding.Unicode;
 
-            while (true)
-            {
-                string msg = Console.ReadLine();
-                msg.Debug("send :" + msg + " count: "+ msg.Length);
-                if (msg == "end")
-                {
-                    msg.Debug("kcpSock.Dispose 1");
-                    kcpSock.Dispose();
-                    msg.Debug("kcpSock.Dispose");
-                    return;
-                }
-                kcpAgent.Send(Encoding.UTF8.GetBytes(msg));
+            //while (true)
+            //{
+            //    //string msg = Console.ReadLine();
+            //    //msg.Log("send :" + msg + " count: "+ msg.Length);
+            //    //if (msg == "end")
+            //    //{
+            //    //    msg.Log("kcpSock.Dispose 1");
+            //    //    kcpSock.Dispose();
+            //    //    msg.Log("kcpSock.Dispose");
+            //    //    return;
+            //    //}
+            //    //kcpAgent.Send(Encoding.UTF8.GetBytes(msg));
                
-            }
+            //}
         }
 
 

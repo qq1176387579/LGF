@@ -368,23 +368,23 @@ namespace LGF.DataStruct
                     }
 
                     //this.DebugError("------------出错----start----压线了------");
-                    //Debug.Log($" x: {pos.x} y: {pos.y}");
+                    //sLog.Debug($" x: {pos.x} y: {pos.y}");
                     #region 注释
                     //for (int i = 0; i < next.Length; i++)
                     //{
-                    //    Debug.Log(next[i].rect.ToString() + "   CanInsert: " + next[i].CanInsert(pos) + $"\n {next[i].rect.xMin} <= {pos.x} && {next[i].rect.yMin} <= {pos.y} && {next[i].rect.xMax} >= {pos.x} && {next[i].rect.yMax} >= {pos.y}  ");
+                    //    sLog.Debug(next[i].rect.ToString() + "   CanInsert: " + next[i].CanInsert(pos) + $"\n {next[i].rect.xMin} <= {pos.x} && {next[i].rect.yMin} <= {pos.y} && {next[i].rect.xMax} >= {pos.x} && {next[i].rect.yMax} >= {pos.y}  ");
                     //}
-                    //Debug.Log(rect.ToString() + "   CanInsert: " + CanInsert(pos) + $"\n {rect.xMin} <= {pos.x} && {rect.yMin} <= {pos.y} && {rect.xMax} >= {pos.x} && {rect.yMax} >= {pos.y}  ");
+                    //sLog.Debug(rect.ToString() + "   CanInsert: " + CanInsert(pos) + $"\n {rect.xMin} <= {pos.x} && {rect.yMin} <= {pos.y} && {rect.xMax} >= {pos.x} && {rect.yMax} >= {pos.y}  ");
 
                     //var _next = parent.next;
                     //for (int i = 0; i < _next.Length; i++)
                     //{
-                    //    Debug.Log(_next[i].rect.ToString() + "   CanInsert: " + _next[i].CanInsert(pos) + $"\n {_next[i].rect.xMin} <= {pos.x} && {_next[i].rect.yMin} <= {pos.y} && {_next[i].rect.xMax} >= {pos.x} && {_next[i].rect.yMax} >= {pos.y}  ");
+                    //    sLog.Debug(_next[i].rect.ToString() + "   CanInsert: " + _next[i].CanInsert(pos) + $"\n {_next[i].rect.xMin} <= {pos.x} && {_next[i].rect.yMin} <= {pos.y} && {_next[i].rect.xMax} >= {pos.x} && {_next[i].rect.yMax} >= {pos.y}  ");
                     //}
                     //this.DebugError("------------出错----end----------");
                     #endregion
                     Add(pos);
-                    //Debug.Log("  pos.idx " + pos.idx);
+                    //sLog.Debug("  pos.idx " + pos.idx);
                     return;
                 }
 

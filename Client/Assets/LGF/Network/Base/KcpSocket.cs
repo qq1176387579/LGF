@@ -98,7 +98,7 @@ namespace LGF.Net
             }
             catch (Exception e)
             {
-                this.Debug(e.ToString());
+                this.DebugError(e.ToString());
                 return false;
                 //throw;
             }

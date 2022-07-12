@@ -5,6 +5,7 @@ using System;
 using UnityEngine.Events;
 using System.Diagnostics;
 using LGF.Timers;
+using LGF.Log;
 
 namespace LGF
 {
@@ -42,7 +43,6 @@ namespace LGF
         private void Awake()
         {
             m_netTimeStampSec = 0;
-            m_timer.SetLog(UnityEngine.Debug.LogError);
 
             //基础值
             TimeSpan ts = DateTime.UtcNow - InitDateTime;
@@ -278,13 +278,13 @@ namespace LGF
 
         public void Stopwatch_LogError(string str)
         {
-            AddTask(()=> UnityEngine.Debug.LogError(str));
+            AddTask(()=> sLog.Error(str));
         }
 
 
         public void Stopwatch_Log(string str)
         {
-            AddTask(() => UnityEngine.Debug.Log(str));
+            AddTask(() => sLog.Debug(str));
         }
 
         #endregion

@@ -68,11 +68,11 @@ namespace LGF.Net
 
             protected override void OnRecv(KcpSocket.KcpAgent kcp, int count)
             {
-                //Debug.Log("------OnRecv-------");
+                //sLog.Debug("------OnRecv-------");
                 //base.OnRecv(kcp, count);
                 if (count < 8)
                 {
-                    Debug.LogError("接收到一个未知的信息 count: " + count);
+                    sLog.Error("接收到一个未知的信息 count: " + count);
                     return;
                 }
 
@@ -105,7 +105,7 @@ namespace LGF.Net
             {
                 //表示已经存在了 需要去处理下 比如断网重连  我这里不做处理 
                 
-                Debug.LogError(" uuid 已经存在 当前不处理 同一个guid 登录的情况");
+                sLog.Error(" uuid 已经存在 当前不处理 同一个guid 登录的情况");
             }
             else
             {
@@ -113,7 +113,7 @@ namespace LGF.Net
                 m_uuidMap.Add(tmpData.C2S_Connect.uuid, guid);
                 var session = AddSessions(guid, kcp);
                 tmpData.S2C_Connect.uid = guid;   //连接成功
-                Debug.LogFormat("OnConnect  tmpData.S2C_Connect msgType {0}" , tmpData.S2C_Connect.msgType);
+                sLog.Debug("OnConnect  tmpData.S2C_Connect msgType {0}" , tmpData.S2C_Connect.msgType);
                 session.Send(tmpData.S2C_Connect, false);    //发送数据
             }
         }

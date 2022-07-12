@@ -35,7 +35,7 @@ public static class ColorExtend
         if (colorStr.Length < 7) colorStr += "FF";
         long colorInt = long.Parse(colorStr, System.Globalization.NumberStyles.AllowHexSpecifier);
 
-        //   Debug.Log("colorInt"+colorInt);
+        //   sLog.Debug("colorInt"+colorInt);
         return IntToColor(colorInt);
     }
 
@@ -49,7 +49,7 @@ public static class ColorExtend
         g >>= 16;
         long r = 0xFF000000 & colorInt;
         r >>= 24;
-        //   Debug.Log("R:" + r + " G:" + g + " B:" + b + " A:" + a);
+        //   sLog.Debug("R:" + r + " G:" + g + " B:" + b + " A:" + a);
         return new Color((float)r / basenum, (float)g / basenum, (float)b / basenum, (float)a / basenum);
 
     }

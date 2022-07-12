@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Dynamic;
 using SingletonHelperNamespace;
+using LGF.Log;
 
 namespace SingletonHelperNamespace
 {
@@ -45,7 +46,7 @@ namespace LGF
                     //判断是否多余一个的数量
                     if (FindObjectsOfType<T>().Length > 1)
                     {
-                        Debug.LogError(typeof(T).Name + "该单例类的数量大于1");
+                        sLog.Error(typeof(T).Name + "该单例类的数量大于1");
                         return _instance;
                     }
 

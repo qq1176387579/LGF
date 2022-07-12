@@ -209,7 +209,7 @@ namespace LGF
             if (list == null)
                 return;
 
-            //Debug.LogError("-----12---");
+            //sLog.Error("-----12---");
             //Array.ForEach(list, func);
             for (int i = 0; i < list.Length; i++)
             {

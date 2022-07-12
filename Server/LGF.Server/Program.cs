@@ -17,7 +17,7 @@ namespace LHTestServer
         static KcpSocket.KcpAgent kcpAgent1;
         static void Main(string[] args)
         {
-            AppEntry.Startup();
+            LGFEntry.Startup();
             KcpServer kcpServer = new KcpServer();
             kcpServer.Bing(NetConst.ServerPort, 30);    //30间隔
             Task.Run(sendMsg);
@@ -26,9 +26,9 @@ namespace LHTestServer
             {
                 try
                 {
-                    AppEntry.Update();
-                    AppEntry.LateUpdate();
-                    AppEntry.FixedUpdate();
+                    LGFEntry.Update();
+                    LGFEntry.LateUpdate();
+                    LGFEntry.FixedUpdate();
                 }
                 catch (Exception e)
                 {

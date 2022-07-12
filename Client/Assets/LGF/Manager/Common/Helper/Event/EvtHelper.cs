@@ -53,7 +53,7 @@ namespace LGF
             RegisterEventDispatcher<IOnLateUpdate>(EventsType.OnLateUpdate);
             RegisterEventDispatcher<IOnFixedUpdate>(EventsType.OnFixedUpdate);
 #if !NOT_UNITY
-            if (AppEntry.IsStartup)
+            if (LGFEntry.IsStartup)
                 EventMonoHelper.GetSingleton();
 #endif
 

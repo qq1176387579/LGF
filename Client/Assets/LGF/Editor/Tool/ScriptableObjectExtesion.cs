@@ -50,7 +50,7 @@ namespace LGF.Editor
                         Debug.Assert(valid, $"创建失败：选择了错误的类型 → {type}");
                         return !valid;
                     }
-                    Debug.LogError($"创建失败: 请避免选择静态类型和没写继承关系的patial类型 → {ms.name}");
+                    sLog.Error($"创建失败: 请避免选择静态类型和没写继承关系的patial类型 → {ms.name}");
                 }
                 return true;
             };

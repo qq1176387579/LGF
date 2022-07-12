@@ -19,12 +19,12 @@ public class TestString : MonoBehaviour
         string t = new string(chars);
         string t2 = new string(chars, 0, 2);
 
-        Debug.LogError(t);
-        Debug.LogError(t2);
+        sLog.Error(t);
+        sLog.Error(t2);
 
         chars[1] = '是';
-        Debug.LogError(t);
-        Debug.LogError(t2);
+        sLog.Error(t);
+        sLog.Error(t2);
         
 
     }

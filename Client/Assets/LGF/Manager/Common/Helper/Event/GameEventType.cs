@@ -44,6 +44,19 @@ namespace LGF
         Net_GetServersInfo,  //获得服务器信息
 
         #endregion
+
+        #region c_Module  客户端模块
+        c_TextMsg,
+
+
+        #endregion
+
+
+        #region s_Module  服务端模块
+        s_TextMsg,
+
+
+        #endregion
     }
 
 }

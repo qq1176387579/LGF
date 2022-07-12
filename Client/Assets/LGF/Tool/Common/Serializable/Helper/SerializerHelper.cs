@@ -61,7 +61,7 @@ namespace LGF.Serializable
         {
             //多线程加锁
             int Length = stream.read.ReadUInt16();
-            //Debug.LogError("Length" + Length);
+            //sLog.Error("Length" + Length);
             if (Length== 0)
             {
                 _out = "";
@@ -74,7 +74,7 @@ namespace LGF.Serializable
                 _out = Encoding.UTF8.GetString(buffer, 0, Length);
             }
            
-            //Debug.Log(_out);
+            //sLog.Debug(_out);
         }
 
 
@@ -117,7 +117,7 @@ namespace LGF.Serializable
                 var buffer = bytebuffer;
                 //多线程加锁
                 int Length = val == null ? 0 : Encoding.UTF8.GetBytes(val, 0, val.Length, buffer, 0);
-                //Debug.LogError("Length" + Length);
+                //sLog.Error("Length" + Length);
                 stream.writer.Write((ushort)Length);
                 stream.writer.Write(buffer, 0, Length);
             }
@@ -149,7 +149,7 @@ namespace LGF.Serializable
                     if (s != null)
                     {
                         s.type = item;
-                        //Debug.LogError(item.Name);
+                        //sLog.Error(item.Name);
                         contracts.Add(s);
                     }
                 }
@@ -168,7 +168,7 @@ namespace LGF.Serializable
           
             if (contracts.Count == 0)
             {
-                Debug.Log("没有要生成的目标");
+                sLog.Debug("没有要生成的目标");
             }
             else
             {
@@ -186,7 +186,7 @@ namespace LGF.Serializable
 
             foreach (var field in fields1)
             {
-                //Debug.LogError("name :" + field.Name + "   PropertyType : " + field.FieldType.Name );  //打印
+                //sLog.Error("name :" + field.Name + "   PropertyType : " + field.FieldType.Name );  //打印
                 var tmp = field.GetCustomAttribute<SteamMember>();
                 if (tmp != null)
                 {
@@ -194,14 +194,14 @@ namespace LGF.Serializable
                     tmp.name = field.Name;
                     //tmp.FieldTypeName = GetTypeName(field.FieldType);//.Name;
                     tmp.fieldInfo = field;
-                    //Debug.Log(tmp.Tag);  //打印
+                    //sLog.Debug(tmp.Tag);  //打印
                 }
 
                 //if (field.FieldType.GenericTypeArguments != null && field.FieldType.GenericTypeArguments.Length > 0)
                 //{
                 //    for (int i = 0; i < field.FieldType.GenericTypeArguments.Length; i++)
                 //    {
-                //        Debug.LogError("name :" + field.FieldType.GenericTypeArguments[i]);  //打印
+                //        sLog.Error("name :" + field.FieldType.GenericTypeArguments[i]);  //打印
                 //    }
                 //}
             }
@@ -287,18 +287,18 @@ namespace LGF.Serializable
             readString.Release();
 
 
-            //Debug.Log(classStr);
+            //sLog.Debug(classStr);
 
 
             string GeneratedPath = AppConfig.Data.Generated.SteamSerializablePath;   //流序列化地址
 
             FileUtils.DirectoryCreate(GeneratedPath);   //创建文件夹
-            //Debug.LogError(GeneratedPath);
+            //sLog.Error(GeneratedPath);
 
             string filePath = GeneratedPath + fileName;
             FileUtils.FileDelete(filePath);
 
-            //Debug.Log(filePath);
+            //sLog.Debug(filePath);
 
             File.AppendAllText(filePath, classStr);
         }
@@ -385,7 +385,7 @@ public static class <className>Extend
         static void GenerateFileReference()
         {
             string filePath = GeneratedPath + "SteamSerializerByLGF.asmref";
-            //Debug.Log("----------4444----");
+            //sLog.Debug("----------4444----");
             FileUtils.FileDelete(filePath);
             File.Copy(AppConfig.Data.Generated.SteamSerializableCpyeAsmrefPath, filePath);
             
@@ -423,7 +423,7 @@ public static class <className>Extend
                         }
                         else
                         {
-                            Debug.LogError($" 没有 keyword: {keyword} 的实现方式 请先实现他");
+                            sLog.Error($" 没有 keyword: {keyword} 的实现方式 请先实现他");
                         }
                         break;
                 }
@@ -441,7 +441,7 @@ public static class <className>Extend
             rsb.Release();
             FileUtils.FileDelete(filePath);
 
-            //Debug.Log(filePath);
+            //sLog.Debug(filePath);
 
             File.AppendAllText(filePath, classHelperStr);
 

@@ -28,17 +28,17 @@ namespace LGF.Example
             for (int i = 0; i < a.Length; i++)
             {
                 s.push(a[i]);
-                s.Debug();
+                s.Log();
 
                 if (i % 3 == 0 && i != 0)
                 {
                     s.pop();
-                    s.Debug();
+                    s.Log();
                 }
             }
 
             List<int> list = new List<int>();
-            //Debug.LogError(int.IComparer())
+            //sLog.Error(int.IComparer())
             list.AddRange(a);
             list.Sort((a, b) => { return PP(a, b) ? -1 : 1; });
             string str = "";
@@ -47,7 +47,7 @@ namespace LGF.Example
                 str += " " + list[i];
             }
 
-            Debug.LogError(str);
+            sLog.Error(str);
 
 
             priority_queue<Test2> test2sss = new priority_queue<Test2>();
@@ -56,9 +56,9 @@ namespace LGF.Example
             test2sss.push(new Test2 { a = 1 });
             test2sss.push(new Test2 { a = 2 });
 
-            test2sss.Debug();
+            test2sss.Log();
             test2sss.pop();
-            test2sss.Debug();
+            test2sss.Log();
             //new priority_queue<int>((a,b) => { return a.CompareTo(b); });
             //priority_queue<int> priority_Queue = new priority_queue<int>();
         }

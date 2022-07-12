@@ -20,7 +20,7 @@ namespace LGF.Android
         {
             AndroidMsgCenter.Instance.Init();
             
-            //Debug.LogError(AppConfig.Data.appInfo.PackName);
+            //sLog.Error(AppConfig.Data.appInfo.PackName);
 #if UNITY_EDITOR
             if (!Application.isPlaying)
             {
@@ -94,7 +94,7 @@ namespace LGF.Android
         /// </summary>
         public void SendUnityMessage(int iMsgId, int iParam1 = 0, int iParam2 = 0, int iParam3 = 0, int iParam4 = 0, string strParam1 = "", string strParam2 = "", string strParam3 = "", string strParam4 = "")
         {
-            Debug.Log("-----iMsgId--------" + iMsgId);
+            Log.sLog.Debug("-----iMsgId--------" + iMsgId);
             SDKMsg msg = new SDKMsg();
             msg.iMsgId = iMsgId + 100000;
 
@@ -181,7 +181,7 @@ namespace LGF.Android
             msg.strParam2 = (string)jd["strParam2"];
             msg.strParam3 = (string)jd["strParam3"];
             msgQueue.Enqueue(msg);
-            //Debug.LogError("--------ff---");
+            //sLog.Error("--------ff---");
         }
 
 #endif

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using LGF.Log;
 
 /// <summary>
 ///互相依赖才能不报错 神奇的 鸡生蛋 蛋生鸡  = =  
@@ -219,11 +220,7 @@ namespace LGF
         /// <param name="content"></param>
         public void DeLog(string content)
         {
-#if NOT_UNITY
-            Console.WriteLine(content);
-#else
-            UnityEngine.Debug.LogError(content);
-#endif
+            this.DebugError(content);
         }
     }
 

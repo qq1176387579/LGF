@@ -137,7 +137,7 @@ namespace LGF.DataStruct
         }
 
 
-        public void Debug()
+        public void Log()
         {
             var strb = StringPool.GetStringBuilder();
             for (int i = 0; i < list.Count; i++)
@@ -145,7 +145,7 @@ namespace LGF.DataStruct
                 strb.Append(" ");
                 strb.Append(list[i]);
             }
-            this.Debug(strb.ToString());
+            sLog.Debug(strb.ToString());
             strb.Release();
         }
 

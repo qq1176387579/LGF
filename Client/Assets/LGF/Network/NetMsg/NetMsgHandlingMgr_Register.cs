@@ -13,13 +13,13 @@ using UnityEngine;
 
 namespace LGF.Net
 {
+    //后面自己写脚本自动化处理
     public partial class NetMsgHandlingMgr
     {
 
         #region 服务器
 
- 
-        //后面通过partial 来处理这个脚本 放在这里写起来不方便
+        
         void InvokeServerMsgEx(NetMsgDefine type, KcpServer.KcpSession session, LStream _stream)
         {
             switch (type)
@@ -27,7 +27,7 @@ namespace LGF.Net
                 case NetMsgDefine.C2S_TextMsg: InvokeServerMsg<C2S_TextMsg>(type, session, _stream); break;
                 //case NetMsgDefine.C2S_TextMsg: InvokeServerMsg<C2S_TextMsg>(type, session, _stream); break;   //后续的要在这里注册 添加新的模块或者事件
                 default:
-                    Debug.LogError("Server 未注册该事件 或者 流程出错 请检查!!   " + type);
+                    sLog.Error("Server 未注册该事件 或者 流程出错 请检查!!   " + type);
                     break;
             }
         }
@@ -50,7 +50,7 @@ namespace LGF.Net
                 case NetMsgDefine.S2C_TextMsg:
                     InvokeClientMsg<S2C_TextMsg>(type, _stream); break;
                 default:
-                    Debug.LogError("Client 未注册该事件 或者 流程出错 请检查!!   " + type);
+                    sLog.Error("Client 未注册该事件 或者 流程出错 请检查!!   " + type);
                     break;
             }
         }

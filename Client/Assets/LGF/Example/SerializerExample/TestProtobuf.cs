@@ -113,7 +113,7 @@ namespace ProtoTest_1
             //}
 
 
-            //Debug.LogError(" " + mt._nNumber + " " + mt.msgType);
+            //sLog.Error(" " + mt._nNumber + " " + mt.msgType);
 
             //text.text = mt._strName;
 

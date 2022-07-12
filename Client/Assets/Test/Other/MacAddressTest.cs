@@ -31,7 +31,7 @@ public class MacAddressTest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.LogError("MacAddress Start");
+        sLog.Error("MacAddress Start");
 #if USE_ANDROID
         AndroidMsgCenter.RegisterOnMsg(AndroidMsgDefine.GetUUIDResp, (a) => {
             text.text = a.strParam1;

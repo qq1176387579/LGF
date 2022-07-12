@@ -11,56 +11,88 @@ using UnityEngine;
 
 namespace LGF.Log
 {
-#if NOT_UNITY
-    public static class Debug
+
+    public static class sLog
     {
 
 
         [System.Diagnostics.Conditional("DEBUG")]
-        public static void LogFormat(string format, params object[] args)
+        public static void Debug(string format, params object[] args)
         {
+#if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(string.Format(format, args));
+#else
+            UnityEngine.Debug.LogFormat(format, args);
+#endif
         }
 
 
         [System.Diagnostics.Conditional("DEBUG")]
-        public static void Log(object message)
+        public static void Debug(object message)
         {
+#if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(message.ToString());
+#else
+            UnityEngine.Debug.Log(message);
+#endif
+
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
-        public static void LogWarning(object message)
+        public static void Warning(object message)
         {
+#if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(message.ToString());
+#else
+            UnityEngine.Debug.LogWarning(message);
+#endif
+
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
-        public static void LogWarningFormat(string format, params object[] args)
+        public static void Warning(string format, params object[] args)
         {
+#if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(string.Format(format, args));
+#else
+            UnityEngine.Debug.LogWarningFormat(format, args);
+#endif
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
-        public static void LogError(object message)
+        public static void Error(string message)
         {
+            Error((object)message);
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void Error(object message)
+        {
+#if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message.ToString());
+#else
+            UnityEngine.Debug.LogError(message);
+#endif 
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
-        public static void LogErrorFormat(string format, params object[] args)
+        public static void Error(string format, params object[] args)
         {
+#if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(string.Format(format, args));
+#else
+            UnityEngine.Debug.LogErrorFormat(format, args);
+#endif
         }
 
     }
-#endif
+
 
     public static class DebugExtension
     {
@@ -69,48 +101,26 @@ namespace LGF.Log
         [System.Diagnostics.Conditional("DEBUG")]
         public static void Debug(this object obj, object str)
         {
-#if NOT_UNITY
-
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(str);
-#else
-            UnityEngine.Debug.Log(str);
-#endif
+            LGF.Log.sLog.Debug(str);
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
         public static void Debug(this object obj,string str,params object[] param)
         {
 
-#if NOT_UNITY
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(string.Format(str, param));
-#else
-            UnityEngine.Debug.LogFormat(str, param);
-#endif
+            LGF.Log.sLog.Debug(str, param);
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
         public static void DebugError(this object obj, object str)
         {
-#if NOT_UNITY
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(str);
-#else
-            UnityEngine.Debug.LogError( str );
-#endif
+            LGF.Log.sLog.Error(str);
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
         public static void DebugError(this System.Exception e)
         {
-
-#if NOT_UNITY
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(e.ToString());
-#else
-            UnityEngine.Debug.LogError(DebugUtils.GetExceptionStackInfoToUnity(e));
-#endif
+            LGF.Log.sLog.Error(DebugUtils.GetExceptionStackInfoToUnity(e));
         }
 
 
@@ -122,7 +132,7 @@ namespace LGF.Log
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(str);
 #else
-            //ThreadDebug.Log(str);
+            //ThreadDebug.Log(str)
             UnityEngine.Debug.Log(str);
 #endif
         }

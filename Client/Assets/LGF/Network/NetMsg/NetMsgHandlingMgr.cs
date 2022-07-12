@@ -54,7 +54,7 @@ namespace LGF.Net
         {
             if (m_NetEvent.ContainsKey(type))
             {
-                Debug.LogWarningFormat("重复注册 请检查一下 {0}", type);
+                sLog.Warning("重复注册 请检查一下 {0}", type);
                 return;
             }
             m_NetEvent.Add(type, action);
@@ -69,20 +69,21 @@ namespace LGF.Net
             m_NetEvent.TryGetValue(type, out System.Delegate delega);
             if (delega == null)
             {
-                Debug.LogWarningFormat("未注册该事件 !! {0}", type);
+                sLog.Warning("未注册该事件 !! {0}", type);
                 return;
             }
 
             System.Action<T> action = delega as System.Action<T>;
             if (action == null)
             {
-                Debug.LogErrorFormat("事件出错 传输数据不对 {0}", typeof(T));
+                sLog.Error("事件出错 传输数据不对 {0}", typeof(T));
                 return;
             }
 
             netMsgMgr.QueueOnMainThreadt((_action, _data) =>
             {
-                _action.Invoke(data);
+                _action.Invoke(_data);
+                _data.Release();//自动回收
             }, action, data);
         }
 
@@ -97,12 +98,14 @@ namespace LGF.Net
 
         /// <summary>
         /// 注册服务器消息
+        /// 注意 泛型回调完成的时候 会自动回收
+        /// 请自己做好处理
         /// </summary>
         public void RegisterServerMsg<T>(NetMsgDefine type, System.Action<KcpServer.KcpSession,T> action) where T : C2S_BASE<T>, new()
         {
             if (m_NetEvent.ContainsKey(type))
             {
-                Debug.LogWarningFormat("重复注册 请检查一下 {0}", type);
+                sLog.Warning("重复注册 请检查一下 {0}", type);
                 return; 
             }
             m_NetEvent.Add(type, action);
@@ -117,20 +120,22 @@ namespace LGF.Net
             m_NetEvent.TryGetValue( type,out System.Delegate delega);
             if (delega == null)
             {
-                Debug.LogWarningFormat("未注册该事件 !! {0}", type);
+                sLog.Warning("未注册该事件 !! {0}", type);
                 return;
             }
 
             System.Action<KcpServer.KcpSession, T> action = delega as System.Action<KcpServer.KcpSession, T>;
             if (action == null)
             {
-                Debug.LogErrorFormat("事件出错 传输数据不对 {0}", typeof(T));
+                sLog.Error("事件出错 传输数据不对 {0}", typeof(T));
                 return;
             }
 
-            netMsgMgr.QueueOnMainThreadt((_action, _session, _data) => {
-                _action.Invoke(session, data);
-            }, action, session,data);
+            netMsgMgr.QueueOnMainThreadt((_action, _session, _data) =>
+            {
+                _action.Invoke(_session, _data);
+                _data.Release();    //自动回收
+            }, action, session, data);
         }
 
 
@@ -179,7 +184,7 @@ namespace LGF.Net
                         int port = csBase.tmpData.n_S2C_GetAllServersInfo.port;
                         EndPoint endPoint = new IPEndPoint((point as IPEndPoint).Address, port);
 
-                        Debug.Log("获得服务器信息  " + endPoint.ToString());
+                        sLog.Debug("获得服务器信息  " + endPoint.ToString());
 
                         //主线程执行
                         netMsgMgr.QueueOnMainThreadt((_endPoint) =>

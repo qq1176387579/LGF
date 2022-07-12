@@ -49,7 +49,7 @@
 
 
 	<ItemGroup>
-		<Compile Include="..\..\Client\Assets\LGF\AppEntry.cs">
+		<Compile Include="..\..\Client\Assets\LGF\LGFEntry.cs">
 			<Link>App\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>

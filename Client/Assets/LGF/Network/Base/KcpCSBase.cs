@@ -82,7 +82,7 @@ namespace LGF.Net
             if (m_kcpSocket != null)
             {
                 m_disposed = true;
-                m_kcpSocket.Debug("该协议号已经绑定了!!");
+                this.Debug("该协议号已经绑定了!!");
                 return;
             }
 
@@ -142,7 +142,7 @@ namespace LGF.Net
 
                         if (length < NetMsgHelper.INT32_SIZE)
                         {
-                            Debug.LogError("非法消息!");
+                            sLog.Error("非法消息!");
                             Thread.Sleep(100);
                             continue;
                         }

@@ -427,7 +427,7 @@
             <para>Default: LogBehaviour.ErrorsOnly</para></summary>
         </member>
         <member name="F:DG.Tweening.DOTween.onWillLog">
-            <summary>Used to intercept DOTween's logs. If this method isn't NULL, DOTween will call it before writing a log via Unity's own Debug log methods.<para/>
+            <summary>Used to intercept DOTween's logs. If this method isn't NULL, DOTween will call it before writing a log via Unity's own Log log methods.<para/>
             Return TRUE if you want DOTween to proceed with the log, FALSE otherwise.<para/>
             This method must return a <code>bool</code> and accept two parameters:<para/>
             - <code>LogType</code>: the type of Unity log that DOTween is trying to log<para/>
@@ -2888,7 +2888,7 @@
         </member>
         <member name="F:DG.Tweening.Tween.debugTargetId">
             <summary>
-            Set by SetTarget if DOTween's Debug Mode is on (see DOTween Utility Panel -> "Store GameObject's ID" debug option
+            Set by SetTarget if DOTween's Log Mode is on (see DOTween Utility Panel -> "Store GameObject's ID" debug option
             </summary>
         </member>
         <member name="P:DG.Tweening.Tween.active">

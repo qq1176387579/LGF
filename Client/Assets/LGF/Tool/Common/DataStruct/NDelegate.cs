@@ -62,7 +62,7 @@ namespace LGF.DataStruct
             {
                 if (IsRelease())
                 {
-                    Debug.Log("非法操作 已经 Release 了");
+                    sLog.Debug("非法操作 已经 Release 了");
                     return;
                 }
                 tmp.param1.Invoke();
@@ -96,7 +96,7 @@ namespace LGF.DataStruct
             {
                 if (IsRelease())
                 {
-                    Debug.Log("非法操作 已经 Release 了");
+                    sLog.Debug("非法操作 已经 Release 了");
                     return;
                 }
                 tmp.param1.Invoke(tmp.param2);
@@ -130,7 +130,7 @@ namespace LGF.DataStruct
             {
                 if (IsRelease())
                 {
-                    Debug.Log("非法操作 已经 Release 了");
+                    sLog.Debug("非法操作 已经 Release 了");
                     return;
                 }
                 
@@ -168,7 +168,7 @@ namespace LGF.DataStruct
             {
                 if (IsRelease())
                 {
-                    Debug.Log("非法操作 已经 Release 了");
+                    sLog.Debug("非法操作 已经 Release 了");
                     return;
                 }
                 tmp.param1.Invoke(tmp.param2, tmp.param3, tmp.param4);
@@ -211,7 +211,7 @@ namespace LGF.DataStruct
             {
                 if (IsRelease())
                 {
-                    Debug.Log("非法操作 已经 Release 了");
+                    sLog.Debug("非法操作 已经 Release 了");
                     return;
                 }
                 tmp.param1.Invoke(param, tmp.param2, tmp.param3, tmp.param4);

@@ -8,11 +8,12 @@ using System.Collections;
 using System.Collections.Generic;
 using LGF;
 using LGF.Log;
+using UnityEngine;
 
 
 namespace LGF
 {
-    public static class AppEntry
+    public static class LGFEntry
     {
         public static bool IsStartup = false;
 
@@ -33,8 +34,6 @@ namespace LGF
             Android.AndroidMsgManager.Instance.Init();
 #endif
             Util.MacAddressUtils.Instance.Init();   //初始化唯一标识符
-
-
 
         }
 
