@@ -74,7 +74,7 @@ namespace LGF
             return releaseCount >= 1;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             Release();    //回收过不回收
         }

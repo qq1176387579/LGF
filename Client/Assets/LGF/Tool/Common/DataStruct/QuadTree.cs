@@ -6,9 +6,9 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using LGF;
 using LGF.Log;
-using UnityEngine;
 
 
 
@@ -47,7 +47,62 @@ using UnityEngine;
 namespace LGF.DataStruct
 {
 
+    
+    /// <summary>
+    /// 设置进一步封装
+    /// </summary>
+    [System.Serializable]
+    public class QuadTreeSetting
+    {
+        public Rect WorldSize = new Rect(-500, -500, 1000, 1000);
+        //每层最大数量
+        public int BodiesPerNode = 4;
+        //最大拆分梳理
+        public int MaxSplits = 10;
+        public int drowHeight = 0;
+        public bool OpenDrow = true;       //划线
 
+        [System.NonSerialized]
+        public QuadTree tree;
+
+        public QuadTree GetQuadTree()
+        {
+            if (tree == null)
+            {
+                tree = new QuadTree(WorldSize, MaxSplits, BodiesPerNode);
+                tree.BingSetting(this);
+            }
+
+            return tree;
+        }
+
+        public void OnDrawGizmos()
+        {
+            if (!OpenDrow) return;
+
+            tree?.OnDrawGizmos(drowHeight);
+            if (!Application.isPlaying)
+            {
+                Gizmos.color = Color.cyan;
+                Rect rect = WorldSize;
+                Vector3 p1 = new Vector3(rect.x, drowHeight, rect.y);
+                Vector3 p2 = new Vector3(rect.xMax, drowHeight, rect.y);
+                Vector3 p3 = new Vector3(rect.xMax, drowHeight, rect.yMax);
+                Vector3 p4 = new Vector3(rect.x, drowHeight, rect.yMax);
+
+                Gizmos.DrawLine(p1, p2);
+                Gizmos.DrawLine(p2, p3);
+                Gizmos.DrawLine(p3, p4);
+                Gizmos.DrawLine(p4, p1);
+            }
+        }
+    }
+
+
+
+    /// <summary>
+    /// 后面有时间写个泛型的
+    /// </summary>
     public class QuadTree
     {
         public interface IPos : Deque2<IPos>.INode //IList2Idx<IPos>
@@ -59,6 +114,8 @@ namespace LGF.DataStruct
 
         public Node root;   //跟节点
         public QuadTreeConfig config;
+        public QuadTreeSetting setting;
+
         /// <summary>
         /// 维护层级  
         /// 
@@ -87,12 +144,15 @@ namespace LGF.DataStruct
                 maintainLayer[i] = new List2<Node>();
         }
 
-#if !NOT_UNITY
-        public void OnDrawGizmos()
+        public void BingSetting(QuadTreeSetting setting_)
         {
-            root.OnDrawGizmos();
+            setting = setting_;
         }
-#endif
+
+        public void OnDrawGizmos(in float height = 0.1f)
+        {
+            root.OnDrawGizmos(height);
+        }
 
 
         public void Insert(IPos pos)
@@ -107,9 +167,8 @@ namespace LGF.DataStruct
         }
 
 
-        public void OnMove2<T>(List<T> list) where T : IPos
+        public void OnMove2<T>(List2<T> list) where T : IPos ,IList2Idx<T>
         {
-
 
             for (int i = list.Count - 1; i >= 0; i--)
             {
@@ -117,6 +176,23 @@ namespace LGF.DataStruct
                 list[i].node.Remove2(list[i], tmplist);  //移除
             }
 
+            OnMove2Ex();
+        }
+
+
+        public void OnMove2<T>(List<T> list) where T : IPos
+        {
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                if (list[i].node == null) continue;
+                list[i].node.Remove2(list[i], tmplist);  //移除
+            }
+
+            OnMove2Ex();
+        }
+
+        void OnMove2Ex()
+        {
             //在添加  插入
             for (int i = tmplist.Count - 1; i >= 0; i--)
             {
@@ -128,11 +204,19 @@ namespace LGF.DataStruct
             {
                 maintainLayer[i].Clear((a) => a.CheckSplit2());
             }
+        }
 
+        public void FindRect<T,T2>(in Rect rect_, List<T> list, System.Func<T,T2, bool> fun ,in T2 obj) where T : class, IPos 
+        {
+            root.FindRect(rect_, list, fun, obj);
         }
 
 
-        public void FindRect(Rect rect_, List<Deque2<IPos>> list)
+
+        /// <summary>
+        /// 搜索  存放Deque2<IPos> 用起来其实不方便
+        /// </summary>
+        public void FindRect(in Rect rect_, List<Deque2<IPos>> list)
         {
             root.FindRect(rect_, list);
         }
@@ -141,7 +225,7 @@ namespace LGF.DataStruct
         {
             if (node.NeedMaintain)
             {
-                this.DebugError("非法操作");
+                Debug.LogError("非法操作");
                 //在维护队列中不操作
                 return;
             }
@@ -167,6 +251,11 @@ namespace LGF.DataStruct
         {
 
             public bool NeedMaintain => ((IList2Idx<Node>)this).idx != 0;   //需要维护
+
+            public void Remove2(IPos treePos)
+            {
+                Remove2(treePos, tree.tmplist); //缓冲到维护的队列里面
+            }
 
             /// <summary>
             /// 移除自己
@@ -276,7 +365,7 @@ namespace LGF.DataStruct
             {
                 if (IsSplit)
                 {
-                    this.DebugError("非法操作");
+                    Debug.LogError("非法操作");
                     return;
                 }
 
@@ -301,7 +390,7 @@ namespace LGF.DataStruct
             {
                 if (!IsSplit)
                 {
-                    this.DebugError("非法操作");
+                    Debug.LogError("非法操作");
                     return;
                 }
 
@@ -348,7 +437,12 @@ namespace LGF.DataStruct
             public void Insert(IPos pos)
             {
                 if (!CanInsert(pos))
+                {
+                    Debug.LogError("------------无法添加------" + rect.ToString() + $"  pos {pos.x},{pos.y} " );
+                    
                     return;
+                }
+                   
 
                 InsertEx(pos);
             }
@@ -367,24 +461,24 @@ namespace LGF.DataStruct
                         }
                     }
 
-                    //this.DebugError("------------出错----start----压线了------");
-                    //sLog.Debug($" x: {pos.x} y: {pos.y}");
+                    Debug.LogError("------------出错----start----压线了------" + layer);
+                    //Debug.Log($" x: {pos.x} y: {pos.y}");
                     #region 注释
                     //for (int i = 0; i < next.Length; i++)
                     //{
-                    //    sLog.Debug(next[i].rect.ToString() + "   CanInsert: " + next[i].CanInsert(pos) + $"\n {next[i].rect.xMin} <= {pos.x} && {next[i].rect.yMin} <= {pos.y} && {next[i].rect.xMax} >= {pos.x} && {next[i].rect.yMax} >= {pos.y}  ");
+                    //    Debug.Log(next[i].rect.ToString() + "   CanInsert: " + next[i].CanInsert(pos) + $"\n {next[i].rect.xMin} <= {pos.x} && {next[i].rect.yMin} <= {pos.y} && {next[i].rect.xMax} >= {pos.x} && {next[i].rect.yMax} >= {pos.y}  ");
                     //}
-                    //sLog.Debug(rect.ToString() + "   CanInsert: " + CanInsert(pos) + $"\n {rect.xMin} <= {pos.x} && {rect.yMin} <= {pos.y} && {rect.xMax} >= {pos.x} && {rect.yMax} >= {pos.y}  ");
+                    //Debug.Log(rect.ToString() + "   CanInsert: " + CanInsert(pos) + $"\n {rect.xMin} <= {pos.x} && {rect.yMin} <= {pos.y} && {rect.xMax} >= {pos.x} && {rect.yMax} >= {pos.y}  ");
 
                     //var _next = parent.next;
                     //for (int i = 0; i < _next.Length; i++)
                     //{
-                    //    sLog.Debug(_next[i].rect.ToString() + "   CanInsert: " + _next[i].CanInsert(pos) + $"\n {_next[i].rect.xMin} <= {pos.x} && {_next[i].rect.yMin} <= {pos.y} && {_next[i].rect.xMax} >= {pos.x} && {_next[i].rect.yMax} >= {pos.y}  ");
+                    //    Debug.Log(_next[i].rect.ToString() + "   CanInsert: " + _next[i].CanInsert(pos) + $"\n {_next[i].rect.xMin} <= {pos.x} && {_next[i].rect.yMin} <= {pos.y} && {_next[i].rect.xMax} >= {pos.x} && {_next[i].rect.yMax} >= {pos.y}  ");
                     //}
-                    //this.DebugError("------------出错----end----------");
+                    //Debug.LogError("------------出错----end----------");
                     #endregion
                     Add(pos);
-                    //sLog.Debug("  pos.idx " + pos.idx);
+                    //Debug.Log("  pos.idx " + pos.idx);
                     return;
                 }
 
@@ -412,6 +506,7 @@ namespace LGF.DataStruct
             {
                 deque.push_back(pos);
                 pos.node = this;
+                //Debug.LogError("-----------添加成功------layer : " + layer);
             }
 
 
@@ -420,11 +515,11 @@ namespace LGF.DataStruct
             /// </summary>
             /// <param name="rect"></param>
             /// <returns></returns>
-            public void FindRect(Rect rect_, List<Deque2<IPos>> list)
+            public void FindRect(in Rect rect_, List<Deque2<IPos>> list)
             {
                 //return Math.max(curRect.x,tarRect.x) <= Math.min(curRect.right ,tarRect.right) 算法1
                 //other.xMax > xMin && other.xMin < xMax 算法2
-                if (!rect_.Overlaps(rect)) //重叠
+                if (!rect_.Overlaps(rect)) //重叠  后面自己实现一个 unity的无法用到特性 in
                 {
                     return;
                 }
@@ -444,6 +539,48 @@ namespace LGF.DataStruct
 
 
             /// <summary>
+            /// 搜索
+            /// </summary>
+            /// <param name="rect"></param>
+            /// <returns></returns>
+            public void FindRect<T, T2>(in Rect rect_, List<T> list, System.Func<T, T2, bool> fun,in T2 data) where T : class, IPos
+            {
+                //return Math.max(curRect.x,tarRect.x) <= Math.min(curRect.right ,tarRect.right) 算法1
+                //other.xMax > xMin && other.xMin < xMax 算法2
+                if (!rect_.Overlaps(rect)) //重叠
+                {
+                    return;
+                }
+
+                if (IsSplit)
+                {
+                    for (int i = 0; i < next.Length; i++)
+                    {
+                        next[i].FindRect(rect_, list, fun, data);
+                    }
+                    return;
+                }
+
+                if (deque.Count > 0)
+                {
+                    deque.foreach_root((pos, _list, _fun, _data) =>
+                    {
+                        T _pos = pos as T;
+                        if (_pos == null)
+                            return;
+
+                        if (_fun == null || _fun.Invoke(_pos, _data)) 
+                        {
+                            _list.Add(_pos);
+                        }
+                    }, list, fun, data);
+                }
+                   
+            }
+
+
+
+            /// <summary>
             /// 移动了坐标 检查下是否需要更新
             /// </summary>
             /// <param name="treePos"></param>
@@ -451,7 +588,7 @@ namespace LGF.DataStruct
             {
                 if (treePos.node == null || !IsRoot)   //非法操作
                 {
-                    this.DebugError("OnMove 非法操作  treePos 不在树内");
+                    Debug.LogError("OnMove 非法操作  treePos 不在树内");
                     return;
                 }
 
@@ -506,8 +643,8 @@ namespace LGF.DataStruct
                     parent.CheckSplit();    //检查父节点
             }
 
-#if !NOT_UNITY
-            public void OnDrawGizmos()
+
+            public void OnDrawGizmos(in float height = 0.1f)
             {
                 if (!QuadTreeHelper.IsOpenOnDrawGizmos) return;
 
@@ -515,16 +652,16 @@ namespace LGF.DataStruct
                 {
                     for (int i = 0; i < next.Length; i++)
                     {
-                        next[i].OnDrawGizmos();
+                        next[i].OnDrawGizmos(height);
                     }
                 }
 
                 Gizmos.color = Color.cyan * ((7f + config.maxLayer - layer) / (7 + config.maxLayer));
 
-                Vector3 p1 = new Vector3(rect.x, 0.1f, rect.y);
-                Vector3 p2 = new Vector3(rect.xMax, 0.1f, rect.y);
-                Vector3 p3 = new Vector3(rect.xMax, 0.1f, rect.yMax);
-                Vector3 p4 = new Vector3(rect.x, 0.1f, rect.yMax);
+                Vector3 p1 = new Vector3(rect.x, height, rect.y);
+                Vector3 p2 = new Vector3(rect.xMax, height, rect.y);
+                Vector3 p3 = new Vector3(rect.xMax, height, rect.yMax);
+                Vector3 p4 = new Vector3(rect.x, height, rect.yMax);
 
                 Gizmos.DrawLine(p1, p2);
                 Gizmos.DrawLine(p2, p3);
@@ -532,7 +669,6 @@ namespace LGF.DataStruct
                 Gizmos.DrawLine(p4, p1);
 
             }
-#endif
 
             void IAdd<IPos>.Add(IPos val)
             {
@@ -564,8 +700,161 @@ namespace LGF.DataStruct
     public static class QuadTreeHelper
     {
         public static bool IsOpenOnDrawGizmos = true;
+        //public const Draw
 
     }
 
 }
+
+
+
+
+#region 案例2多线程调用
+
+#if 案例2多线程调用
+
+/// <summary>
+/// 单位的 四叉树
+/// </summary>
+public class UnitQuadTreePos : Poolable<UnitQuadTreePos>, QuadTree.IPos , IList2Idx<UnitQuadTreePos>
+{
+    static CustomSampler sampler = CustomSampler.Create("MyCustomSampler");
+
+    public static List2<UnitQuadTreePos> objs = new List2<UnitQuadTreePos>();
+    public static List2<UnitQuadTreePos> bufferAdd = new List2<UnitQuadTreePos>();  //缓冲添加
+
+    public static QuadTree tree;
+
+    public static bool isAsynRun = false;   //是否异步在运行中
+
+
+    public Unit unit;
+    public Vector3 pos;
+    //bool IsDispose;
+
+    float QuadTree.IPos.x { get => pos.x; }
+
+    float QuadTree.IPos.y { get => pos.z;}
+
+    public QuadTree.Node node { get; set; }
+    QuadTree.IPos Deque2<QuadTree.IPos>.INode.next { get; set; }
+    QuadTree.IPos Deque2<QuadTree.IPos>.INode.last { get; set; }
+    Deque2<QuadTree.IPos> Deque2<QuadTree.IPos>.INode.deque { get; set; }
+    int IList2Idx<UnitQuadTreePos>.idx { get; set; }
+
+    /// <summary>
+    /// 同步坐标
+    /// </summary>
+    public void SyncPos()   //尾部清除没有问题
+    {
+        if (!unit.IsDispose)
+        {
+            pos = unit.transform.position;
+        }
+        else
+        {
+            Release();  //移除
+            node.Remove2(this);     //移除后续可以放到线程里面
+        }
+    }
+
+    public void Init(Unit unit_)
+    {
+        //该写法有点危险  比如重复添加 多个1个unit_ 就可能产生多个UnitQuadTreePos 数据 IsDispose还还没有执行 unit_回收并且拿出来了
+        unit = unit_;
+
+        //lock (bufferAdd)  
+        bufferAdd.Add(this);
+    }
+
+    public static void SyncInfo()
+    {
+        if (bufferAdd.Count > 0)
+        {
+            bufferAdd.ForEach((a, _tree) =>
+            {
+                _tree.Insert(a);
+            }, tree);
+            bufferAdd.MoveTo(objs);
+        }
+
+        //同步坐标
+        objs.ForEach((a) =>
+        {
+            a.SyncPos();
+        });
+    }
+
+    public static void OnDrawGizmos(QuadTreeSetting setting)
+    {
+        if (!Application.isPlaying)
+        {
+            setting.OnDrawGizmos();
+        }
+        else
+        {
+            if (!isAsynRun)
+                setting.OnDrawGizmos();
+        }
+
+    }
+
+
+
+    /// <summary>
+    /// 异步运行 维护状态
+    /// </summary>
+    public static System.Threading.Tasks.Task AsyncRun()
+    {
+        if (isAsynRun || tree == null)
+        {
+            if (isAsynRun)
+                Debug.LogError("在计算中");
+
+            return null;
+        }
+
+        SyncInfo();
+        var list = ArmyUnitMgr.Instance.GetAll();
+        list.ForEach((info) => info.SyncInfo());    //同步信息
+
+        isAsynRun = true;
+        return System.Threading.Tasks.Task.Run(() =>
+        {
+            Profiler.BeginThreadProfiling("My threads", "My thread 1");
+            sampler.Begin();
+            tree.OnMove2(objs);
+            isAsynRun = false;
+
+            //Parallel.ForEach()
+            var list = ArmyUnitMgr.Instance.GetAll();
+            var t = Parallel.ForEach(list, (info) =>
+            {
+                info.data.tmpList.Clear();
+                UnitQuadTreePos.tree.FindRect(new Rect() { size = info.data.atkSize, center = info.data.pos },
+                    info.data.tmpList, (posinfo) => {
+                        if (info == posinfo.unit.armyUnitInfo)
+                            return false;
+                        return true;
+                    });
+                info.data.tmpListCount = info.data.tmpList.Count;
+                
+            });
+
+            
+
+            sampler.End();
+            Profiler.EndThreadProfiling();
+        });
+
+        
+    }
+
+}
+
+#endif
+
+
+
+#endregion
 

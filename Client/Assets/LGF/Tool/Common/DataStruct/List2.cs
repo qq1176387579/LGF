@@ -21,8 +21,44 @@ namespace LGF.DataStruct
     }
 
 
+    internal class List2_IEnumerator<T> : Poolable<List2_IEnumerator<T>>, IEnumerator<T> where T : IList2Idx<T>
+    {
+        List2<T> list;
+        int position = -1;
+        public static List2_IEnumerator<T> Get(List2<T> list_)
+        {
+            var tmp = Get();
+            tmp.list = list_;
+            return tmp;
+        }
 
-    public class List2<T> where T : IList2Idx<T>
+        bool IEnumerator.MoveNext()
+        {
+            position++;
+            return position < list.Count;
+        }
+
+        public void Reset()
+        {
+            //Debug.LogError("List2  Reset ");
+            position = -1;
+        }
+
+        T IEnumerator<T>.Current => list[position];
+
+        object IEnumerator.Current => list[position];
+
+
+        public override void Dispose()
+        {
+            list = null;
+            Reset();
+            base.Dispose();     //回收
+        }
+
+    }
+
+    public class List2<T> : IEnumerable<T> where T : IList2Idx<T>
     {
         const int IdxOffset = 30;   //索引偏差值 用来判断是否初始化的
         const int IdxOffsetVal = 1 << IdxOffset;
@@ -252,6 +288,16 @@ namespace LGF.DataStruct
         {
             List2Pool<T>.Release(this);
         }
+
+        #region IEnumerator
+
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => List2_IEnumerator<T>.Get(this);
+
+
+        IEnumerator IEnumerable.GetEnumerator() => List2_IEnumerator<T>.Get(this);
+
+        #endregion
 
     }
 

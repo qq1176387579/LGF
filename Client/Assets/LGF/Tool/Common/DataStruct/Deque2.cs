@@ -227,13 +227,18 @@ namespace LGF.DataStruct
             _front.foreach_root(action);
         }
 
-        public void foreach_root<T1>(System.Action<T,T1> action, T1 param)
+        public void foreach_root<T1>(System.Action<T, T1> action, T1 param)
         {
             _front.foreach_root(action, param);
         }
-        public void foreach_root<T1, T2>(System.Action<T, T1, T2> action, T1 param, T2 param1)
+        public void foreach_root<T1, T2>(System.Action<T, T1, T2> action, in T1 param, in T2 param1)
         {
             _front.foreach_root(action, param, param1);
+        }
+
+        public void foreach_root<T1, T2, T3>(System.Action<T, T1, T2, T3> action, in T1 param, in T2 param1, in T3 param2)
+        {
+            _front.foreach_root(action, param, param1, param2);
         }
 
     }
@@ -348,7 +353,23 @@ namespace LGF.DataStruct
             }
         }
 
+        /// <summary>
+        /// foreach_root 根节点遍历  注意用lambda表达式达成无GC
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="rootNode"></param>
+        public static void foreach_root<T, T1, T2, T3>(this T rootNode, System.Action<T, T1, T2, T3> action, in T1 param, in T2 param1, T3 param2) where T : Deque2<T>.INode
+        {
+            if (!FrontCheck(rootNode)) return;
 
+            T curNode = rootNode;
+            while (curNode != null)
+            {
+                var next = curNode.next;    //防止 action 调用 clear
+                action.Invoke(curNode, param, param1, param2);
+                curNode = next;
+            }
+        }
 
 
         static bool FrontCheck<T>(T rootNode) where T : Deque2<T>.INode
