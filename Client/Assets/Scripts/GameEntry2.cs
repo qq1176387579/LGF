@@ -15,8 +15,16 @@ public class GameEntry2 : GameEntry
     {
         base.OnStart();
 
-        ModuleMgr.Instance.Init();
+        //ModuleMgr.Instance.Init();
+    }
 
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+
+        if (C_ModuleMgr.CheckInstance()) C_ModuleMgr.Instance.Close();
+        if (S_ModuleMgr.CheckInstance()) S_ModuleMgr.Instance.Close();
     }
 
 }

@@ -42,7 +42,7 @@ namespace LGF
 
         }
 
-        protected static bool CheckInstance()
+        public static bool CheckInstance()
         {
             return instance != null;
         }

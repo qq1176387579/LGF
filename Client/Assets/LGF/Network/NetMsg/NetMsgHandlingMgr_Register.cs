@@ -38,8 +38,6 @@ namespace LGF.Net
 
         #region 客户端
 
- 
-
         void InvokeClientMsgEx(NetMsgDefine type, LStream _stream)
         {
             switch (type)

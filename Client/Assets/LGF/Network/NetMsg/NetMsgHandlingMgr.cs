@@ -16,8 +16,6 @@ using UnityEngine;
 namespace LGF.Net
 {
 
-
-
     /// <summary>
     /// 消息处理管理器 
     /// 需要在先注册完 所有的数据事件
@@ -31,6 +29,9 @@ namespace LGF.Net
             base.OnNew();
             netMsgMgr = NetMsgMgr.Instance;
         }
+
+        //System.Action<NetMsgDefine, KcpServer.KcpSession, LStream> InvokeServerMsgEvent;
+        //可以写成这种方法 进行注册
 
 
         #region 客户端的处理
@@ -48,7 +49,8 @@ namespace LGF.Net
         }
 
         /// <summary>
-        /// 注册服务器消息
+        /// 注册客户端消息
+        /// 回调完成后会自动回收 数据
         /// </summary>
         public void RegisterClientMsg<T>(NetMsgDefine type, System.Action<T> action) where T : S2C_BASE<T>, new()
         {

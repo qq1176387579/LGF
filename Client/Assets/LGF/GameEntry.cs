@@ -72,7 +72,7 @@ namespace LGF
         }
 
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             LGFEntry.OnDestroy();
         }

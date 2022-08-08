@@ -63,5 +63,6 @@ public class S_ModuleMgr : SingletonBase<S_ModuleMgr>
     public void Close()
     {
         //_Instance = null;
+        Server.Dispose();
     }
 }

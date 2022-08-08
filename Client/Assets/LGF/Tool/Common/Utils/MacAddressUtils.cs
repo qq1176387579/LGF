@@ -22,7 +22,7 @@ namespace LGF.Util
         protected override void OnNew()
         {
             base.OnNew();
-#if USE_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR 
             Android.AndroidMsgCenter.RegisterOnMsg(Android.AndroidMsgDefine.GetUUIDResp, (a) =>
             {
                 uuid = a.strParam1;
@@ -32,7 +32,7 @@ namespace LGF.Util
 
         public bool HasUUID()
         {
-#if USE_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
             return uuid != null;
 #else
             return true;
@@ -45,8 +45,8 @@ namespace LGF.Util
             if (!HasUUID())
                 return null;
 
-#if !USE_ANDROID
-            if(uuid == null) uuid = GetMacAddress(); 
+#if !USE_ANDROID || UNITY_EDITOR
+            if (uuid == null) uuid = GetMacAddress(); 
 #endif
             return uuid;
         }

@@ -117,7 +117,7 @@ namespace LGF.Net
                 tmpData.S2C_Connect.uid = guid;   //连接成功
                 session.name = tmpData.C2S_Connect.name;
 
-                sLog.Debug("OnConnect  tmpData.S2C_Connect msgType {0}" , tmpData.S2C_Connect.msgType);
+                sLog.Debug("OnConnect  tmpData.S2C_Connect msgType {0} name: {1}" , tmpData.S2C_Connect.msgType, session.name);
                 session.Send(tmpData.S2C_Connect, false);    //发送数据
             }
         }

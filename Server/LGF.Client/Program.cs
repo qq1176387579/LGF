@@ -20,12 +20,15 @@ namespace LGF.Client
         static List<EndPoint> serverList = new List<EndPoint>();    //服务器列表
         static void Main(string[] args)
         {
+            //sLog.OpenStackTrace = true;
             LGFEntry.Startup();
-            kcpClient = new KcpClient();
-            kcpClient.Bing(NetConst.RandomPort, 15);    //15间隔
+           
+            //kcpClient = new KcpClient();
+            //kcpClient.Bing(NetConst.RandomPort, 15);    //15间隔
             Task.Run(sendMsg);
-
+            
             Init();
+          
 
             while (true)
             {
@@ -83,6 +86,9 @@ namespace LGF.Client
 
         static void Init()
         {
+            C_ModuleMgr.Instance.Init();
+            kcpClient = C_ModuleMgr.Instance.Client;
+            
             func = new Dictionary<string, Action<string[]>>();
             //在其他线程里面 非主线程
             EventManager.Instance.AddListener<EndPoint>(GameEventType.Net_GetServersInfo, (point) =>
@@ -97,16 +103,15 @@ namespace LGF.Client
                 //}
             });
 
-
             NetMsgHandlingMgr.Instance.RegisterClientMsg(NetMsgDefine.S2C_Connect, (S2C_Connect data) =>
             {
                 data.Debug($" 连接服务器端成功 当前id: {data.uid}");
             });
 
-            NetMsgHandlingMgr.Instance.RegisterClientMsg(NetMsgDefine.S2C_TextMsg, (S2C_TextMsg data) =>
-            {
-                data.Debug($" call 消息 {data.name} : {data.msg}");
-            });
+            //NetMsgHandlingMgr.Instance.RegisterClientMsg(NetMsgDefine.S2C_TextMsg, (S2C_TextMsg data) =>
+            //{
+            //    data.Debug($" call 消息 {data.name} : {data.msg}");
+            //});
 
 
             func.Add("get_s", (param) =>
@@ -124,7 +129,7 @@ namespace LGF.Client
                     return;
                 }
                 sLog.Debug("connect_s 连接服务器 " + serverList[0].ToString() + "  客户单名称 :" + param.GetByID(1));
-                kcpClient.TryToConnect(param.GetByID(1), serverList[0]);
+                kcpClient.TryToConnect(param.GetByID(1).IsNullOrEmpty() ? "控制台客户端-" + kcpClient.LocalPort : param.GetByID(1), serverList[0]);
             });
 
 

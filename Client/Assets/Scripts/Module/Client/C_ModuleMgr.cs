@@ -38,6 +38,7 @@ public class C_ModuleMgr : SingletonBase<C_ModuleMgr>
         {
             return module as T;
         }
+        sLog.Warning("没有 {0} 模块", typeof(T).Name);
         return null;
     }
 
@@ -54,13 +55,14 @@ public class C_ModuleMgr : SingletonBase<C_ModuleMgr>
             return;
         }
         Client = new KcpClient();
-        Client.Bing(NetConst.ServerPort, interval);    //30间隔
+        Client.Bing(NetConst.RandomPort, interval);    //30间隔
     }
 
 
     public void Close()
     {
         //_Instance = null;
+        Client.Dispose();
     }
 
 }

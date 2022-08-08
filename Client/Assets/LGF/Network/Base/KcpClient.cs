@@ -29,7 +29,7 @@ namespace LGF.Net
         LStream m_SendStream = new LStream(NetConst.Socket_SendBufferSize);
         private KcpSocket.KcpAgent m_ServerKcpAgent;    //服务器的kcp代理
         KcpClientRecvHelper recvHelper;
-        public void Bing(int port = 0, uint interval = 10)
+        public void Bing(int port = 0, uint interval = 15)
         {
             recvHelper = new KcpClientRecvHelper();
             base.Bing(recvHelper, port, interval);

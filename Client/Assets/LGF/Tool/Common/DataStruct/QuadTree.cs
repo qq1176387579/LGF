@@ -80,6 +80,7 @@ namespace LGF.DataStruct
         {
             if (!OpenDrow) return;
 
+#if !NOT_UNITY
             tree?.OnDrawGizmos(drowHeight);
             if (!Application.isPlaying)
             {
@@ -95,6 +96,9 @@ namespace LGF.DataStruct
                 Gizmos.DrawLine(p3, p4);
                 Gizmos.DrawLine(p4, p1);
             }
+#endif
+
+
         }
     }
 
@@ -225,7 +229,7 @@ namespace LGF.DataStruct
         {
             if (node.NeedMaintain)
             {
-                Debug.LogError("非法操作");
+                sLog.Error("非法操作");
                 //在维护队列中不操作
                 return;
             }
@@ -365,7 +369,7 @@ namespace LGF.DataStruct
             {
                 if (IsSplit)
                 {
-                    Debug.LogError("非法操作");
+                    sLog.Error("非法操作");
                     return;
                 }
 
@@ -390,7 +394,7 @@ namespace LGF.DataStruct
             {
                 if (!IsSplit)
                 {
-                    Debug.LogError("非法操作");
+                    sLog.Error("非法操作");
                     return;
                 }
 
@@ -438,7 +442,7 @@ namespace LGF.DataStruct
             {
                 if (!CanInsert(pos))
                 {
-                    Debug.LogError("------------无法添加------" + rect.ToString() + $"  pos {pos.x},{pos.y} " );
+                    sLog.Error("------------无法添加------" + rect.ToString() + $"  pos {pos.x},{pos.y} " );
                     
                     return;
                 }
@@ -461,7 +465,7 @@ namespace LGF.DataStruct
                         }
                     }
 
-                    Debug.LogError("------------出错----start----压线了------" + layer);
+                    sLog.Error("------------出错----start----压线了------" + layer);
                     //Debug.Log($" x: {pos.x} y: {pos.y}");
                     #region 注释
                     //for (int i = 0; i < next.Length; i++)
@@ -588,7 +592,7 @@ namespace LGF.DataStruct
             {
                 if (treePos.node == null || !IsRoot)   //非法操作
                 {
-                    Debug.LogError("OnMove 非法操作  treePos 不在树内");
+                    sLog.Error("OnMove 非法操作  treePos 不在树内");
                     return;
                 }
 
@@ -646,6 +650,8 @@ namespace LGF.DataStruct
 
             public void OnDrawGizmos(in float height = 0.1f)
             {
+
+#if !NOT_UNITY
                 if (!QuadTreeHelper.IsOpenOnDrawGizmos) return;
 
                 if (IsSplit)
@@ -667,6 +673,7 @@ namespace LGF.DataStruct
                 Gizmos.DrawLine(p2, p3);
                 Gizmos.DrawLine(p3, p4);
                 Gizmos.DrawLine(p4, p1);
+#endif
 
             }
 

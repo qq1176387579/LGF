@@ -4,6 +4,7 @@ using LGF;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System;
+using System.Diagnostics;
 
 #if !NOT_UNITY
 using UnityEngine;
@@ -14,14 +15,18 @@ namespace LGF.Log
 
     public static class sLog
     {
-
-
+#if NOT_UNITY
+        public static bool OpenStackTrace = false;
+#endif
         [System.Diagnostics.Conditional("DEBUG")]
         public static void Debug(string format, params object[] args)
         {
 #if NOT_UNITY
+
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(string.Format(format, args));
+            if (OpenStackTrace) Console.WriteLine(new StackTrace().ToString());
+
 #else
             UnityEngine.Debug.LogFormat(format, args);
 #endif
@@ -33,7 +38,9 @@ namespace LGF.Log
         {
 #if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.White;
+            
             Console.WriteLine(message.ToString());
+            if (OpenStackTrace) Console.WriteLine(new StackTrace().ToString());
 #else
             UnityEngine.Debug.Log(message);
 #endif
@@ -46,6 +53,8 @@ namespace LGF.Log
 #if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(message.ToString());
+
+            if (OpenStackTrace) Console.WriteLine(new StackTrace().ToString());
 #else
             UnityEngine.Debug.LogWarning(message);
 #endif
@@ -58,6 +67,7 @@ namespace LGF.Log
 #if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(string.Format(format, args));
+            if (OpenStackTrace) Console.WriteLine(new StackTrace().ToString());
 #else
             UnityEngine.Debug.LogWarningFormat(format, args);
 #endif
@@ -75,6 +85,7 @@ namespace LGF.Log
 #if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message.ToString());
+            if (OpenStackTrace) Console.WriteLine(new StackTrace().ToString());
 #else
             UnityEngine.Debug.LogError(message);
 #endif 
@@ -86,6 +97,7 @@ namespace LGF.Log
 #if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(string.Format(format, args));
+            if (OpenStackTrace) Console.WriteLine(new StackTrace().ToString());
 #else
             UnityEngine.Debug.LogErrorFormat(format, args);
 #endif

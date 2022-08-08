@@ -17,6 +17,7 @@ using UnityEngine;
 /// </summary>
 public class S_ChatModule : S_ModuleBase
 {
+    
     S2C_TextMsg textMsg = new S2C_TextMsg();
 
 
@@ -32,7 +33,9 @@ public class S_ChatModule : S_ModuleBase
 
         textMsg.name = arg1.name; 
         textMsg.msg = arg2.msg;
+        
 
+        sLog.Debug("广播消息：" + textMsg.name + " : " + textMsg.msg);
         //服务器获得信息
         Server.Broadcast(textMsg);  //广播信息
     }
