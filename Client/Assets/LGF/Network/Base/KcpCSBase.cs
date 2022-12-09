@@ -46,8 +46,9 @@ namespace LGF.Net
 
     public class KcpCSBase
     {
-        public virtual bool IsClient { get=> true; }
+        public virtual bool IsClient { get => true; }
         public virtual bool IsServer { get => false; }
+        //public EndPoint LocalEndPoint { get => m_kcpSocket.Sock.LocalEndPoint; } 私有地址信息是0.0.0.0:port 导致该方法无法使用
 
         protected KcpSocket m_kcpSocket;
         protected RecvHelper m_recvHelper;
