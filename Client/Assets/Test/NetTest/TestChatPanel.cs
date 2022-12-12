@@ -25,7 +25,7 @@ public class TestChatPanel : MonoBehaviour
 
     void Start()
     {
-        ChatModule = C_ModuleMgr.Instance.GetModule<C_ChatModule>();
+        ChatModule = C_ModuleMgr.GetModule<C_ChatModule>();
 
         EventManager.Instance.AddListener<string, string>(GameEventType.c_TextMsg, OnTextMsg);
 
@@ -41,6 +41,7 @@ public class TestChatPanel : MonoBehaviour
             sendMsg.text = "";
         });
     }
+
 
 
     void OnTextMsg(string name, string msg)

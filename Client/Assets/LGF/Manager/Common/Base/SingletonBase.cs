@@ -8,7 +8,7 @@ namespace LGF
     public class SingletonBase<T> where T : SingletonBase<T>, new()
     {
         private static T instance = default(T);
-        protected static T _Instance => Instance;
+        protected static T _Instance => instance;
         public static T Instance
         {
             get

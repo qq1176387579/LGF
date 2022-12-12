@@ -21,7 +21,7 @@ public class GCTest : MonoBehaviour
         ass2 = sdsad.PP3;
     }
     QuadTree _tree;
-
+    int t = 1;
     List<QuadTree.Node> list = new List<QuadTree.Node>();
     int count = 1000;
     System.Action<QuadTree.Node> ass;
@@ -67,6 +67,7 @@ public class GCTest : MonoBehaviour
         {
             //int t = a.layer;
             GCTest s = this;
+            QuadTree tttt1 = _tree;
         });
         UnityEngine.Profiling.Profiler.EndSample();
 

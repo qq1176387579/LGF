@@ -26,15 +26,17 @@ namespace LGF
         {
             IsStartup = true;
 
-#if !NOT_UNITY
-            AppConfig.Instance.Init();
-#endif
+
 
 #if USE_ANDROID
             Android.AndroidMsgManager.Instance.Init();
 #endif
             Util.MacAddressUtils.Instance.Init();   //初始化唯一标识符
 
+
+#if !NOT_UNITY
+            AppConfig.Instance.Init();
+#endif
         }
 
 

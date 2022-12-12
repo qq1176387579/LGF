@@ -53,7 +53,7 @@ namespace LGF.Net
         /// 设置低操作 udp连接  处理udp发送失败 与断开连接的问题  不然直接影响整个程序 
         /// </summary>
         /// <param name="socket"></param>
-        public static void IOControl_UdpConnreset(this Socket socket)
+        public static void IOControl_UdpConnreset(Socket socket)
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
             //安卓没有这个问题且   安卓用低级操作模式 socket会报错
@@ -69,7 +69,7 @@ namespace LGF.Net
         public static Socket UdpBind(IPEndPoint local)
         {
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            socket.IOControl_UdpConnreset();
+            IOControl_UdpConnreset(socket);
             socket.Bind(local);
             return socket;
         }
@@ -101,15 +101,49 @@ namespace LGF.Net
         }
 
 
+        public static IPAddress GetAddress(string ip)
+        {
+            return IPAddress.Parse(ip); ;
+        }
+
+
         public static ulong CastIP(string ip)
         {
             IPAddress address = IPAddress.Parse(ip);
             return CastIP(address);
         }
 
+        /// <summary>
+        /// 能获得 ip地址信息
+        ///有一个坑是在 foreach 中PC端得到的第一个IP是本机IP 第二个是127.0.0.1 在IOS端第一个得到的是127.0.0.1 的第二个才是本机IP      所以我在 foreach中加了个判断是否是127.0.0.1
+        ///https://blog.csdn.net/weixin_41798071/article/details/114884642
+        ///https://blog.csdn.net/hp150119/article/details/119393861
+        /// </summary>
+        /// <returns></returns>
+        public static IPAddress GetLocalIPv4_IPAddress()
+        {
+                return Dns.GetHostEntry(Dns.GetHostName())
+                .AddressList.First((f) => {
+                    if (f.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork
+                        && !f.ToString().Contains("127.0.0.1"))
+                    {
+                        return true;
+                    }
+                    return false;
+                });
+        }
+
+
+        //public static string GetLocalIPv4()
+        //{
+        //    return Dns.GetHostEntry(Dns.GetHostName())
+        //        .AddressList.First(
+        //            f => f.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+        //        .ToString();
+        //}
 
         /// <summary>
-        /// 获得ipv4地址  as 
+        /// 获得ipv4地址  as  
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>

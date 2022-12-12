@@ -14,8 +14,8 @@ namespace LGF
 {
     public static class TimeManagerHelper
     {
-        public static ulong Delay(this object obj, System.Action callback, float delayTime = 0.1f) => TimeManager.Instance.AddTask(callback, delayTime);
-        public static ulong Delay(this object obj, System.Action<ulong> callback, float delayTime = 0.1f) => TimeManager.Instance.AddTask(callback, delayTime);
+        public static ulong Delay(this object obj, System.Action callback, float delayTime = 0.001f) => TimeManager.Instance.AddTask(callback, delayTime);
+        public static ulong Delay(this object obj, System.Action<ulong> callback, float delayTime = 0.001f) => TimeManager.Instance.AddTask(callback, delayTime);
     }
 
 }

@@ -442,7 +442,7 @@ namespace LGF.DataStruct
             {
                 if (!CanInsert(pos))
                 {
-                    sLog.Error("------------无法添加------" + rect.ToString() + $"  pos {pos.x},{pos.y} " );
+                    sLog.Error("----------坐标点不在范围内--无法添加------" + rect.ToString() + $"  pos {pos.x},{pos.y} " );
                     
                     return;
                 }

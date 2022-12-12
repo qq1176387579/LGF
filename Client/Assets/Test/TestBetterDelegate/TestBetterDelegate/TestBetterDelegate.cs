@@ -64,12 +64,19 @@ public class TestBetterDelegate : MonoBehaviour
         //my的
         Debug.Log("===================Delegate My sss ==================="); 
         UnityEngine.Profiling.Profiler.BeginSample("Delegate My sss");
+        System.Action<string> t34333 = null;
         for (int i = 0; i < (isTestingCorrectness ? 10 : 10000); i++)
         {
             if (i % 3 == 0)
             {
                 var t = NDelegate<object>.Get(mDel2444, i, inputNames[i], i);
                 t.Invoke(outputNames[i]);
+
+                t34333 = (tfff) =>
+                {
+                    Debug.Log(string.Format("j = {0}, k = {1}, t = {2}, u = {3}", i, inputNames[i], i, tfff));
+                };
+
             }
             else
             {
@@ -81,6 +88,7 @@ public class TestBetterDelegate : MonoBehaviour
             }
         }
 
+        t34333?.Invoke("asdasd");
 
         UnityEngine.Profiling.Profiler.EndSample();
 

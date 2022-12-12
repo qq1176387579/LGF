@@ -19,9 +19,18 @@ namespace LGF.Net
     {
         public void OnCSNetMsg(KcpCSBase csBase, in EndPoint point, LStream stream);
         //public void OnKcpNetMsg(ISession agent, LStream stream);
+
+        /// <summary>
+        /// 流会被序列化 并偏移，  所有不要将使 已经反序列过的LStream在丢进来
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="type"></param>
+        /// <param name="sessionID"></param>
+        /// <param name="_stream"></param>
         public void OnServerMsg(KcpServer server, NetMsgDefine type, uint sessionID, LStream _stream);
 
         public void OnClientMsg(KcpClient client, NetMsgDefine type, LStream _stream);
+
     }
 
     /// <summary>
@@ -93,7 +102,7 @@ namespace LGF.Net
         }
 
         /// <summary>
-        /// 添加到主线程
+        ///静态方法 添加到主线程
         /// </summary>
         public static void QueueOnMainThread<T1>(System.Action<T1> evt, in T1 param2)
         {
@@ -101,7 +110,7 @@ namespace LGF.Net
         }
 
         /// <summary>
-        /// 添加到主线程
+        ///静态方法 添加到主线程
         /// </summary>
         public static void QueueOnMainThread<T1, T2>(System.Action<T1, T2> evt, in T1 param2, in T2 param3)
         {
@@ -110,7 +119,7 @@ namespace LGF.Net
 
 
         /// <summary>
-        /// 添加到主线程
+        ///静态方法 添加到主线程
         /// </summary>
         public static void QueueOnMainThread<T1, T2, T3>(System.Action<T1, T2, T3> evt, in T1 param2, in T2 param3, in T3 param4)
         {
@@ -120,7 +129,7 @@ namespace LGF.Net
 
 
         /// <summary>
-        /// 添加到主线程
+        /// 静态方法 添加到主线程
         /// </summary>
         public static void QueueOnMainThreadt(IDelegateBase evt)
         {
@@ -162,6 +171,33 @@ namespace LGF.Net
         {
             queue.Add(NDelegate.Get(evt, param2, param3, param4));
         }
+
+
+        public void BroadCastEventByMainThreadt<T1, T2>(GameEventType type, in T1 param2, in T2 param3)
+        {
+            QueueOnMainThreadt((type, _param2, _param3) =>
+            {
+                EventManager.Instance.BroadCastEvent(type, _param2, _param3);
+            }, type, param2, param3);
+        }
+
+        public void BroadCastEventByMainThreadt<T1>(GameEventType type, in T1 param2)
+        {
+            QueueOnMainThreadt((type, _param2) =>
+            {
+                EventManager.Instance.BroadCastEvent(type, _param2);
+            }, type, param2);
+        }
+
+        public void BroadCastEventByMainThreadt(GameEventType type)
+        {
+            QueueOnMainThreadt((type) =>
+            {
+                EventManager.Instance.BroadCastEvent(type);
+            }, type);
+        }
+
+
         #endregion
     }
 

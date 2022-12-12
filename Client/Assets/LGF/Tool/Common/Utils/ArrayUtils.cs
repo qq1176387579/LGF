@@ -117,6 +117,25 @@ namespace LGF
             list[idx2] = tmp;
         }
 
+        //public static void Swap<T>(in List<int> tmp)
+        //{
+
+        //}
+
+
+        /// <summary>
+        /// 清理回收成员
+        /// </summary>
+        public static void ClearReleaseMember<T2,T>(this Dictionary<T2,T> valuePairs) where T : Poolable<T>, new() where T2 : struct
+        {
+            foreach (var item in valuePairs)
+            {
+                item.Value.Release();
+            }
+            valuePairs.Clear();
+        }
+
+
         /// <summary>
         /// 回收到list缓冲中
         /// </summary>
@@ -216,17 +235,49 @@ namespace LGF
                 func.Invoke(list[i]);
             }
         }
-        //public static void ForEach<T>(this List<T> list, System.Action<T> func)
-        //{
-        //    if (list == null)
-        //        return;
 
 
-        //    for (int i = 0; i < list.Count; i++)
-        //    {
-        //        func.Invoke(list[i]);
-        //    }
-        //}
+        public static T FirstFunc<T>(this List<T> list, Func<T, bool> func)
+        {
+            if (list == null)
+                return default;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (func(list[i]))
+                    return list[i];
+            }
+            return default;
+        }
+
+
+        public static T FirstFunc<T,T2>(this List<T> list, Func<T,T2, bool> func,T2 t2)
+        {
+            if (list == null)
+                return default;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (func(list[i], t2))
+                    return list[i];
+            }
+
+            return default;
+        }
+
+        public static T FirstFunc<T, T2, T3>(this List<T> list, Func<T, T2, T3, bool> func, T2 t2, T3 t3)
+        {
+            if (list == null)
+                return default;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (func(list[i], t2, t3))
+                    return list[i];
+            }
+
+            return default;
+        }
 
 
 

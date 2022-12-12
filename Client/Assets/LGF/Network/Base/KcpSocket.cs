@@ -79,6 +79,7 @@ namespace LGF.Net
         bool m_disposed = false;
         Dictionary<ulong, KcpAgent> m_KcpAgents = new Dictionary<ulong, KcpAgent>();
         List<KcpAgent> m_addKcpAgent = new List<KcpAgent>();     //缓冲代理
+        List<KcpAgent> m_delKcpAgent = new List<KcpAgent>();
         Timers.SimpleAsynTimer m_timer; //简单定时器
 
         public bool IsDisposed => m_disposed;
@@ -113,8 +114,8 @@ namespace LGF.Net
 
             m_timer = new Timers.SimpleAsynTimer(() =>
             {
-                OnUpdate(DateTime.UtcNow);  
-            },interval);
+                OnUpdate(DateTime.UtcNow);
+            }, interval);
 
             return true;
         }
@@ -141,7 +142,7 @@ namespace LGF.Net
             m_Socket.Dispose();
             m_Socket = null;
 
-            m_timer.Disposed(); //阻塞线程
+            m_timer?.Disposed(); //阻塞线程
             m_timer = null;
             //清理下m_KcpAgents数据   m_timer未阻塞线程话
             OnUpdate(DateTime.Now);
@@ -194,10 +195,32 @@ namespace LGF.Net
 
             foreach (var item in m_KcpAgents)
             {
+                if (item.Value.close)
+                {
+                    m_delKcpAgent.Add(item.Value);
+                    continue;
+                }
+                   
                 objRecv.OnRecv(item.Value, item.Value.Recv(objRecv.bytebuffer));
                 item.Value.OnUpdate(in dateTime);
                 //this.Debug(" OnUpdate >>" + item.Value.ToString());
             }
+
+            //--------------删除--------------------
+            if (m_delKcpAgent.Count > 0)
+            {
+                lock(m_KcpAgents)
+                {
+                    for (int i = 0; i < m_delKcpAgent.Count; i++)
+                    {
+                        m_KcpAgents.Remove(m_delKcpAgent[i].uid);
+                        m_delKcpAgent[i].Dispose();
+                    }
+                } 
+            }
+           
+            
+
         }
 
 
@@ -237,6 +260,8 @@ namespace LGF.Net
             int length = m_Socket.ReceiveFrom(m_RecvBuffer, m_RecvBuffer.Length, SocketFlags.None, ref endPoint);
             //this.Debug($"OnRecv:  {endPoint} {length}");
             if (m_disposed) return;
+            //TODO:未完成
+            //Check 需要加个检查条件 如果时服务端的话。  ---只接收 对应服务端的 KcpAgent 代理  可以用回调实现
             //这里需要处理一下未知的 EndPoint
             GetKcpAgent(endPoint, false)?.Input(length);
         }
@@ -261,7 +286,8 @@ namespace LGF.Net
                 //不知道为啥之前报错 现在又不报错了先不管了
                 lock (m_KcpAgents)  
                 {
-                    m_KcpAgents?.TryGetValue(uid, out kcpAgent);    //m_KcpAgents Dispose注销时 m_KcpAgents 为null
+                    //m_KcpAgents Dispose注销时 m_KcpAgents 为null
+                    m_KcpAgents?.TryGetValue(uid, out kcpAgent);    
                 }
                 
             }
@@ -348,10 +374,12 @@ namespace LGF.Net
 
         /// <summary>
         /// KCP 代理  一个socket接收 可能有多个代理
+        /// TODO:未完成
         /// 后面需要写个心跳检查连接时间
         /// </summary>
         public class KcpAgent : IKcpCallback
         {
+            public bool close = false;
             public ulong uid;
             public EndPoint endPoint; //后面要接收其他的再改EndPoint  现在只接收IPEndPoint
             KcpSocket m_Socket;
@@ -424,6 +452,11 @@ namespace LGF.Net
                 m_Socket = null;
                 endPoint = null;
                 kcp = null;
+            }
+
+            public void Close()
+            {
+                close = true;
             }
 
         }

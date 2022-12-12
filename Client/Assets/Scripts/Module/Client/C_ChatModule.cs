@@ -8,18 +8,17 @@ using System.Collections;
 using System.Collections.Generic;
 using LGF;
 using LGF.Log;
-using LGF.Net;
 
 public class C_ChatModule : C_ModuleBase
 {
-    //S2C_TextMsg textMsg = new S2C_TextMsg();
-    C2S_TextMsg c2s_TextMsg = new C2S_TextMsg();
-    public override void Init()
+    //S2C_ChatMsg textMsg = new S2C_ChatMsg();
+    C2S_ChatMsg C2S_ChatMsg = new C2S_ChatMsg();
+    protected override void OnInit()
     {
-        NetMsgHandlingMgr.Instance.RegisterClientMsg<S2C_TextMsg>(NetMsgDefine.S2C_TextMsg, OnTextMsg);
+        RegisterClientMsg<S2C_ChatMsg>(NetMsgDefine.S2C_ChatMsg, OnTextMsg);
     }
 
-    private void OnTextMsg(S2C_TextMsg data)
+    private void OnTextMsg(S2C_ChatMsg data)
     {
         sLog.Debug($" call 消息 {data.name} : {data.msg}");
         EventManager.Instance.BroadCastEvent(GameEventType.c_TextMsg, data.name, data.msg);
@@ -27,8 +26,9 @@ public class C_ChatModule : C_ModuleBase
 
     public void SendMsg(string msg)
     {
-        c2s_TextMsg.msg = msg;
-        Client.Send(c2s_TextMsg, false);
+        //C2S_ChatMsg.msg = msg;
+        //C2S_ChatMsg
+        Client.Send(C2S_ChatMsg, false);
     }
 
 }

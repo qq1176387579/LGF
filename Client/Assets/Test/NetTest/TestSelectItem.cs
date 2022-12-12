@@ -13,12 +13,13 @@ using LGF.Log;
 
 public class TestSelectItem : MonoBehaviour
 {
-    public int id;
-    public System.Action<int> itemEvent;
+    //public int id;
+    public System.Action<uint> itemEvent;
     Text text;
-    public void Init(int id_, string str)
+    public uint roomid;
+    public void Init(uint id_, string str)
     {
-        id = id_;
+        roomid = id_;
         if (text == null)
             text = transform.GetChild(0).GetComponent<Text>();
         text.text = str;
@@ -28,7 +29,7 @@ public class TestSelectItem : MonoBehaviour
     {
         GetComponent<Button>().onClick.AddListener(() =>
         {
-            itemEvent?.Invoke(id);  //
+            itemEvent?.Invoke(roomid);  //
         });
     }
 

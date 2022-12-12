@@ -1,0 +1,58 @@
+{
+  "Constant": [
+    {
+      "FieldName": "字段名",
+      "Des": "注释",
+      "Type": "类型",
+      "Value": "值"
+    },
+    {
+      "FieldName": "string",
+      "Des": "string",
+      "Type": "string",
+      "Value": "string"
+    },
+    {
+      "FieldName": "TROOP_ROUT",
+      "Des": "兵力溃散阈值",
+      "Type": "int",
+      "Value": 4000
+    },
+    {
+      "FieldName": "MORALE_ROUT",
+      "Des": "士气溃散阈值",
+      "Type": "int",
+      "Value": 40
+    },
+    {
+      "FieldName": "TAKEOFF_WAR_RADIAL",
+      "Des": "脱战范围半径",
+      "Type": "int",
+      "Value": 60
+    },
+    {
+      "FieldName": "MOVE_POWER_EXPEND_SEC",
+      "Des": "移动每秒消耗体力",
+      "Type": "float",
+      "Value": 10
+    },
+    {
+      "FieldName": "FIGHT_POWER_EXPEND_SEC",
+      "Des": "攻击每秒消耗体力",
+      "Type": "float",
+      "Value": 2
+    },
+    {
+      "FieldName": "WARN_RANGE_1",
+      "Des": "警戒范围1 驻守模式 或者相关模式下",
+      "Type": "float",
+      "Value": 50
+    },
+    {
+      "FieldName": "WARN_RANGE_2",
+      "Des": "警戒范围2 默认模式  基础AI等",
+      "Type": "float",
+      "Value": 13
+    }
+  ]
+}

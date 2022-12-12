@@ -1,0 +1,49 @@
+{
+  "Car": [
+    {
+      "Index": "索引名称",
+      "CarName": "交通工具名称",
+      "CarIcon": "交通工具图片地址",
+      "CarExpend": "交通工具每月消耗",
+      "CarNeedMoney": "交通工具使用费",
+      "CarTerm": "交通工具解锁条件(学业)",
+      "CarMessage": "交通工具信息说明"
+    },
+    {
+      "Index": "int",
+      "CarName": "string",
+      "CarIcon": "string",
+      "CarExpend": "int",
+      "CarNeedMoney": "int",
+      "CarTerm": "string[]",
+      "CarMessage": "Dictionary<string,int>"
+    },
+    {
+      "Index": "14001",
+      "CarName": "破旧汽车",
+      "CarIcon": "buyi",
+      "CarExpend": 80,
+      "CarNeedMoney": 3000,
+      "CarTerm": "15001|14230",
+      "CarMessage": "str:5|cg:20|ip:99"
+    },
+    {
+      "Index": "14002",
+      "CarName": "普通汽车",
+      "CarIcon": "buyi",
+      "CarExpend": 100,
+      "CarNeedMoney": 6000,
+      "CarTerm": 15002,
+      "CarMessage": "str:6|cg:21|ip:100"
+    },
+    {
+      "Index": "14003",
+      "CarName": "高级汽车",
+      "CarIcon": "buyi",
+      "CarExpend": 120,
+      "CarNeedMoney": 9000,
+      "CarTerm": 15003,
+      "CarMessage": "str:7|cg:22|ip:101"
+    }
+  ]
+}

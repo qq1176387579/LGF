@@ -15,12 +15,51 @@ using UnityEngine;
 
 namespace LGF.Net
 {
+    public abstract class NetMsgHandlingMgrBase<T> : SingletonBase<T>  where T : NetMsgHandlingMgrBase<T>, new ()
+    {
+
+        protected virtual void InvokeServerMsgEx(NetMsgDefine type, KcpServer.KcpSession session, LStream _stream)
+        {
+            //switch (type)
+            //{
+            //    case NetMsgDefine.C2S_ChatMsg: InvokeServerMsg<C2S_ChatMsg>(type, session, _stream); break;
+            //    default:
+            //        //sLog.Error(<DoubleQuotationMarks> Server 未注册该事件 或者 流程出错 请检查!! < DoubleQuotationMarks > +type);
+            //        sLog.Error("Server 未注册该事件 或者 流程出错 请检查!!   " + type);
+            //        break;
+            //}
+
+            sLog.Error("请先实现化注册该方法 或者 使用unity菜单栏 tools/SteamSerializable/Generated  生成");
+        }
+
+
+        protected virtual void InvokeClientMsgEx(NetMsgDefine type, LStream _stream)
+        {
+
+            //switch (type)
+            //{
+            //    case NetMsgDefine.S2C_Connect:  //连接成功
+            //        InvokeClientMsg<S2C_Connect>(type, _stream);    //这里封装下
+            //        break;
+            //    case NetMsgDefine.S2C_ChatMsg: InvokeClientMsg<S2C_ChatMsg>(type, _stream); break;
+            //    default:
+            //        sLog.Error("Client 未注册该事件 或者 流程出错 请检查!!   " + type);
+            //        //sLog.Error(<DoubleQuotationMarks> Client 未注册该事件 或者 流程出错 请检查!! < DoubleQuotationMarks > +type);
+            //        break;
+            //}
+
+            sLog.Error("请先实现化注册该方法 或者 使用unity菜单栏 tools/SteamSerializable/Generated  生成");
+        }
+
+    }
+
+
 
     /// <summary>
     /// 消息处理管理器 
     /// 需要在先注册完 所有的数据事件
     /// </summary>
-    public partial class NetMsgHandlingMgr : SingletonBase<NetMsgHandlingMgr> , INetMsgHandling
+    public partial class NetMsgHandlingMgr : NetMsgHandlingMgrBase<NetMsgHandlingMgr> , INetMsgHandling
     {
         NetMsgMgr netMsgMgr;
         Dictionary<NetMsgDefine, System.Delegate> m_NetEvent = new Dictionary<NetMsgDefine, System.Delegate>();
@@ -29,6 +68,9 @@ namespace LGF.Net
             base.OnNew();
             netMsgMgr = NetMsgMgr.Instance;
         }
+
+
+        public NetMsgMgr GetNetMsgMgr() => netMsgMgr;
 
         //System.Action<NetMsgDefine, KcpServer.KcpSession, LStream> InvokeServerMsgEvent;
         //可以写成这种方法 进行注册
@@ -84,6 +126,15 @@ namespace LGF.Net
 
             netMsgMgr.QueueOnMainThreadt((_action, _data) =>
             {
+                if (sLog.OpenMsgInfo)
+                    sLog.Debug(">>>> Accept MsgType:{0}", _data.msgType);
+
+                if (_data.ErrorCode != ErrCode.Succeed)
+                {
+                    sLog.Debug("------错误码---"+ _data.ErrorCode); //正常应该弹一个tps
+                }
+
+
                 _action.Invoke(_data);
                 _data.Release();//自动回收
             }, action, data);
@@ -135,6 +186,9 @@ namespace LGF.Net
 
             netMsgMgr.QueueOnMainThreadt((_action, _session, _data) =>
             {
+                if (sLog.OpenMsgInfo)
+                    sLog.Debug(">>>> Accept MsgType:{0}", _data.msgType); 
+               
                 _action.Invoke(_session, _data);
                 _data.Release();    //自动回收
             }, action, session, data);
@@ -191,7 +245,7 @@ namespace LGF.Net
                         //主线程执行
                         netMsgMgr.QueueOnMainThreadt((_endPoint) =>
                         {
-                            EventManager.Instance.BroadCastEvent(GameEventType.Net_GetServersInfo, _endPoint);
+                            EventManager.Instance.BroadCastEvent(GameEventType.ServerEvent_GetServersInfo, _endPoint);
                         }, in endPoint);
                     }
                     break;
@@ -205,6 +259,10 @@ namespace LGF.Net
       
         #endregion
     }
+
+
+
+
 
 }
 

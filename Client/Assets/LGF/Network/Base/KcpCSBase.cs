@@ -59,7 +59,7 @@ namespace LGF.Net
         public INetMsgHandling NetMsgHandling { get=> m_NetMsgHandlingMgr; }
 
         INetMsgHandling m_NetMsgHandlingMgr = NetMsgHandlingMgr.Instance;
-
+        protected NetMsgMgr netMsgMgr = NetMsgMgr.GetSingleton();
 
         /// <summary>
         /// 专门用于连接的Socket kcp 接收广播协议会出问题  发送广播的kcp会接收不到三次握手的回来的数据
@@ -78,7 +78,7 @@ namespace LGF.Net
         /// <param name="OnRecv"></param>
         /// <param name="port"> 0 客户端随机绑定就行   </param>
         /// <param name="interval"></param>
-        public virtual void Bing(RecvHelper recvHelper, int port = 0, uint interval = 10)  //间隔时间
+        public virtual void Bing(RecvHelper recvHelper, int port = -1, int kcpPort = -1, uint interval = 10)  //间隔时间
         {
             if (m_kcpSocket != null)
             {
@@ -89,7 +89,10 @@ namespace LGF.Net
 
             try
             {
-                m_ConnectSock = SocketHelper.UdpBind(IPAddress.Any, port);
+                if (port != -1)
+                {
+                    m_ConnectSock = SocketHelper.UdpBind(IPAddress.Any, port);
+                }
             }
             catch (Exception e)
             {
@@ -103,7 +106,9 @@ namespace LGF.Net
             //m_recvHelper = new RecvHelper();
             //m_recvHelper.Bing(OnRecv);
             m_kcpSocket = new KcpSocket();
-            if (!m_kcpSocket.Bing(m_recvHelper, LGF.Net.NetConst.RandomPort, interval))
+
+
+            if (!m_kcpSocket.Bing(m_recvHelper, kcpPort != -1 ? kcpPort : LGF.Net.NetConst.RandomPort, interval)) 
             {
                 m_kcpSocket.Debug("初始化失败!!");
                 m_disposed = true;

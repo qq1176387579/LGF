@@ -21,11 +21,27 @@ public class TestStartPanel : MonoBehaviour
 
     void Start()
     {
+        //Debug.LogError("GetLocalIPv4_IPAddress" + LGF.Net.SocketHelper.GetLocalIPv4_IPAddress());
+        //Debug.LogError("GetLocalIPv4_IPAddress" + LGF.Net.SocketHelper.GetLocalIPv4_IPAddress().ToString());
+
         button.onClick.AddListener(() =>
         {
-            NetTestEntry3.Instance.name = input.text;
-            nextPanel.SetActive(true);
-            gameObject.SetActive(false);
+            if (C_ModuleMgr.GetSession().IsTryConnecting)
+            {
+                Debug.Log("连接过程中");
+                return;
+            }
+            //NetTestEntry3.Instance.name = input.text;
+            C_ModuleMgr.GetPlayer().SetName(input.text);    //设置名字
+
+            C_ModuleMgr.GetModule<C_LoginModule>().ConnectServer(() =>
+            {
+                Debug.Log("----连接成功---");//连接成功
+                nextPanel.SetActive(true);
+                gameObject.SetActive(false);
+            });
+
+          
         });
     }
 

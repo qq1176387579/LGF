@@ -47,10 +47,10 @@ public class MacAddressTest : MonoBehaviour
 
     }
 
-    private void OnDisable()
-    {
-        LHTestClient.Program.kcpSock.Dispose();
-    }
+    //private void OnDisable()
+    //{
+    //    LHTestClient.Program.kcpSock.Dispose();
+    //}
 
 
  

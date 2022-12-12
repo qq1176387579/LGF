@@ -1,0 +1,147 @@
+{
+  "Clothes": [
+    {
+      "Index": "索引名称",
+      "ClothesName": "服装名称",
+      "ClothesMessage": "服装说明",
+      "ClothesIcon": "服装图片地址:半身像|全是像|图片",
+      "ClothesExpend": "服装每月消耗金币",
+      "ClothesSay": "点击服饰角色的对话",
+      "ClothesBuy": "购买服饰消耗金币",
+      "AddHappyValue": "每月增加心情值",
+      "ClothesVideo": "需要观看视频的次数"
+    },
+    {
+      "Index": "int",
+      "ClothesName": "string",
+      "ClothesMessage": "string",
+      "ClothesIcon": "string[]",
+      "ClothesExpend": "int",
+      "ClothesSay": "Dictionary<string,int>",
+      "ClothesBuy": "int",
+      "AddHappyValue": "int",
+      "ClothesVideo": "int"
+    },
+    {
+      "Index": "13000",
+      "ClothesName": "市井小厮",
+      "ClothesMessage": "小爷今天去哪浪合适呀？",
+      "ClothesIcon": "Clothes_Item_Role_HuTou|MainHall_Role_HuTou|Role_HuTou",
+      "ClothesExpend": 0,
+      "ClothesSay": "汝家澡盆来配鱼！:10|人生大起大落,真是太刺激了...:10|大姐，我念我的诗，你没事做什么反应?:10",
+      "ClothesBuy": 0,
+      "AddHappyValue": 0,
+      "ClothesVideo": ""
+    },
+    {
+      "Index": "13001",
+      "ClothesName": "土豪老板",
+      "ClothesMessage": "什么叫谈业务？当然是手持大哥大，朋友遍天下。",
+      "ClothesIcon": "Clothes_Item_Role_ShouJiNan|MainHall_Role_ShouJiNan|Role_ShouJiNan",
+      "ClothesExpend": 390,
+      "ClothesSay": "总有一天我会买下整个江宁！:10|商业天才正是在下了，低调…低调…。:10|手拿大哥大，谁来都不怕:10|我命油我不油天:10|勤俭节约是咱们的传统!今晚我要吃贵妃烧鸡:10",
+      "ClothesBuy": 6450,
+      "AddHappyValue": 2,
+      "ClothesVideo": ""
+    },
+    {
+      "Index": "13002",
+      "ClothesName": "运镖达人",
+      "ClothesMessage": "天下武功唯快不破。吃我一记手炮…",
+      "ClothesIcon": "Clothes_Item_Role_QiangShou|MainHall_Role_QiangShou|Role_QiangShou",
+      "ClothesExpend": 450,
+      "ClothesSay": "再跑我可开枪了！:10|你们这些无胆匪类:10|百发百中正是在下了:10|谁敢劫镖？吃我一记手炮:10",
+      "ClothesBuy": 44000,
+      "AddHappyValue": 3,
+      "ClothesVideo": ""
+    },
+    {
+      "Index": "13003",
+      "ClothesName": "食府大厨",
+      "ClothesMessage": "厨房做菜最重要的是什么？当然是家伙齐全。",
+      "ClothesIcon": "Clothes_Item_Role_ChuShi|MainHall_Role_ChuShi|Role_ChuShi",
+      "ClothesExpend": 540,
+      "ClothesSay": "我曾在少林三十六房之厨房进修:10|当好一名厨子的关键当然是你得会吃呀:10|给我等！等不了退单:10|一把鼻涕一把泪，投身厨房无所谓:10|身不离案板，手不离面杆。:10",
+      "ClothesBuy": 70000,
+      "AddHappyValue": 4,
+      "ClothesVideo": ""
+    },
+    {
+      "Index": "13004",
+      "ClothesName": "荣耀工匠",
+      "ClothesMessage": "大锤之下必出好钢，没有什么是一锤子解决不了的。如果有，那就再来一锤。",
+      "ClothesIcon": "Clothes_Item_Role_ChuiZi|MainHall_Role_ChuiZi|Role_ChuiZi",
+      "ClothesExpend": 660,
+      "ClothesSay": "打铁还需自身硬！:10|在打铁铺中,我是自由的。:10|重锤出击,锤爆狗头...:10",
+      "ClothesBuy": 110000,
+      "AddHappyValue": 5,
+      "ClothesVideo": ""
+    },
+    {
+      "Index": "13005",
+      "ClothesName": "教书先生",
+      "ClothesMessage": "这是一道送分题，同学们要简单思考下。",
+      "ClothesIcon": "Clothes_Item_Role_KuaiJi|MainHall_Role_KuaiJi|Role_KuaiJi",
+      "ClothesExpend": 780,
+      "ClothesSay": "为什么迟到，我不想听到任何理由！:10|别以为我站在这里，就不知道你们在下面做什么。:11|这节课德业老师有事...:11|你们是我教过最差一届学生。:11",
+      "ClothesBuy": 150000,
+      "AddHappyValue": 7,
+      "ClothesVideo": ""
+    },
+    {
+      "Index": "13006",
+      "ClothesName": "妙手神医",
+      "ClothesMessage": "天下没有我治不好的病。",
+      "ClothesIcon": "Clothes_Item_Role_DaiFu|MainHall_Role_DaiFu|Role_DaiFu",
+      "ClothesExpend": 960,
+      "ClothesSay": "我跟阎王爷是老交情了...:10|哎嘿，天不收，我一治就好!:11|别哭了，打完这针给你颗M豆。:11|有啥头疼脑热，抗生素伺候。:11",
+      "ClothesBuy": 210000,
+      "AddHappyValue": 9,
+      "ClothesVideo": ""
+    },
+    {
+      "Index": "13007",
+      "ClothesName": "梨园戏子",
+      "ClothesMessage": "我就是号称一朵梨花压海棠的玉面飞龙。",
+      "ClothesIcon": "Clothes_Item_Role_XiZi|MainHall_Role_XiZi|Role_XiZi",
+      "ClothesExpend": 1140,
+      "ClothesSay": "别人笑我太疯癫，我笑他人看不穿。:10|秋香好还是圆圆好？:11|别让我见到石榴姐，见一次揍一次。:11|我的扎马步，稳当最稳当。:11",
+      "ClothesBuy": 290000,
+      "AddHappyValue": 11,
+      "ClothesVideo": ""
+    },
+    {
+      "Index": "13008",
+      "ClothesName": "龙门赌神",
+      "ClothesMessage": "跟我赌是你的不幸。",
+      "ClothesIcon": "Clothes_Item_Role_DuShen|MainHall_Role_DuShen|Role_DuShen",
+      "ClothesExpend": 1380,
+      "ClothesSay": "小赌可以养家糊口,大赌可以创业发财...:10|来，喝咖啡。你懂吧？:11|我跟你一百万铜钱,再大你一百万铜钱,再show hand :11",
+      "ClothesBuy": 390000,
+      "AddHappyValue": 14,
+      "ClothesVideo": ""
+    },
+    {
+      "Index": "13009",
+      "ClothesName": "江宁财神",
+      "ClothesMessage": "铜钱只是数字，但我很喜欢这个数字的跳动。",
+      "ClothesIcon": "Clothes_Item_Role_DaKuan|MainHall_Role_DaKuan|Role_DaKuan",
+      "ClothesExpend": 1650,
+      "ClothesSay": "汇通天下！:10|娇妻美妾！:10|一个铜板也别想从我手中溜走！:10|真是怀念小爷的幸福时光。:10|总算是能被人称上一声，财阀大佬了！:10|你赚钱的速度，跟得上我印银票的速度吗？:10",
+      "ClothesBuy": 530000,
+      "AddHappyValue": 18,
+      "ClothesVideo": ""
+    },
+    {
+      "Index": "13010",
+      "ClothesName": "夏日浪客",
+      "ClothesMessage": "在夏威夷沙滩上我是最靓的仔…",
+      "ClothesIcon": "Clothes_Item_Role_HuaBan|MainHall_Role_HuaBan|Role_HuaBan",
+      "ClothesExpend": 555,
+      "ClothesSay": "我的热情，好像一把火！:10|速度够快,姿势够帅。妹子最爱...:10|我真的还想再活五百年:10|整个夏威夷谁不知道我浪客贱心？:10",
+      "ClothesBuy": 5555,
+      "AddHappyValue": 10,
+      "ClothesVideo": 3
+    }
+  ]
+}

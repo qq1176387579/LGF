@@ -20,4 +20,5 @@ public class TestChatItemButton : MonoBehaviour
         text.text = str;
     }
 
+
 }

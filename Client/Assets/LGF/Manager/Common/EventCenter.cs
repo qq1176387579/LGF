@@ -111,7 +111,7 @@ namespace LGF
     {
         public static void RegisterEventDispatcher<T>(Enum type) where T : class, IEntityIndex<T>
         {
-            _Instance.RegisterEventDispatcher<T>(type.ToInt());
+            Instance.RegisterEventDispatcher<T>(type.ToInt());
         }
         public static void Add<T>(Enum type, T obj) where T : class => Add(type.ToInt(), obj);
         public static void Remove<T>(Enum type, T obj) where T : class => Remove(type.ToInt(), obj);

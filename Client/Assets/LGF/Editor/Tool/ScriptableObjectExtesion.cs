@@ -25,6 +25,7 @@ namespace LGF.Editor
         [MenuItem("Assets/Create/ScriptableObject Asset", priority = 1)]
         static void Create()
         {
+            Debug.Log("--fff-666-");
             list.Clear();
             foreach (var item in Selection.objects)
             {
@@ -38,6 +39,7 @@ namespace LGF.Editor
         [MenuItem("Assets/Create/ScriptableObject Asset", true)]
         static bool Validate()
         {
+            Debug.Log("--fff-444-");
             Func<Object, bool> predicate = (obj) =>
             {
                 if (obj is MonoScript)
@@ -58,6 +60,7 @@ namespace LGF.Editor
         }
         static ScriptableObject CreateAsset(Object ms)
         {
+            Debug.Log("--fff--");
             var path = AssetDatabase.GetAssetPath(ms);
             path = path.Substring(0, path.LastIndexOf("/"));
             path = Path.Combine(path, "Data");

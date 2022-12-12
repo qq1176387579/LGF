@@ -36,27 +36,39 @@ namespace LGF
 
 
         //------------------------net--------------------
-        #region net
 
-        /// <summary>
-        /// 得到服务器 端口信息
-        /// </summary>
-        Net_GetServersInfo,  //获得服务器信息
 
-        #endregion
+        #region 客户端事件
 
-        #region c_Module  客户端模块
         c_TextMsg,
 
+        ConnectServerFail,  //连接服务器失败
 
+        ClientEvent_CreateRoomSucceed,  //创建房间成功
+        ClientEvent_GetAllRooms,        //获得全部房间事件
+        ClientEvent_RoomOptSync,        //房间同步事件
+        ClientEvent_JionRoom,           //获得全部房间事件
         #endregion
 
 
-        #region s_Module  服务端模块
+
+
+
+        #region 服务器
+        //------------服务器事件---------------------
         s_TextMsg,
 
+        ServerEvent_GetServersInfo,  //获得服务器信息
+        ServerEvent_PlayerConnect,
+
+
+        ServerEvent_ReConnect,    //退出重进  在连接
+
+
 
         #endregion
+
+
     }
 
 }

@@ -1,0 +1,49 @@
+{
+  "UIArmyInfos": [
+    {
+      "armyId": "部队ID",
+      "armyAtlasName": "部队图集名",
+      "armyTouXiang": "头像图片路径",
+      "armyLevel": "部队等级",
+      "armyBingType": "部队兵种图片",
+      "armyZhenType": "部队阵法图标",
+      "armyName": "部队名称"
+    },
+    {
+      "armyId": "int",
+      "armyAtlasName": "string",
+      "armyTouXiang": "string",
+      "armyLevel": "string",
+      "armyBingType": "string",
+      "armyZhenType": "string",
+      "armyName": "string"
+    },
+    {
+      "armyId": "10001",
+      "armyAtlasName": "ArmyInfos",
+      "armyTouXiang": "icon_guanyu",
+      "armyLevel": 10,
+      "armyBingType": "icon_grid1_2",
+      "armyZhenType": "pro_bar_blue1",
+      "armyName": "关羽"
+    },
+    {
+      "armyId": "10002",
+      "armyAtlasName": "ArmyInfos",
+      "armyTouXiang": "pro_bar_yellow1",
+      "armyLevel": 98,
+      "armyBingType": "icon_grid2_1",
+      "armyZhenType": "pro_bar_red1",
+      "armyName": "刘备"
+    },
+    {
+      "armyId": "10003",
+      "armyAtlasName": "ArmyInfos",
+      "armyTouXiang": "pro_bar_yellow2",
+      "armyLevel": 97,
+      "armyBingType": "icon_grid3_2",
+      "armyZhenType": "pro_bar_red2",
+      "armyName": "张飞"
+    }
+  ]
+}

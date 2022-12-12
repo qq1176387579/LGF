@@ -52,7 +52,7 @@ public class ExcelToJosn : EditorWindow
     //}
 
 
-    [MenuItem("数据工具/刷新AllJsonData")]
+    [MenuItem("Tools/ExcToJson/刷新AllJsonData")]
     public static int GenExcelToJson()
     {
         Process process = new Process();
@@ -68,7 +68,7 @@ public class ExcelToJosn : EditorWindow
     }
     #endregion
 
-    [MenuItem("数据工具/不刷新AllJsonData 生成读取Json的代码")]
+    [MenuItem("Tools/ExcToJson/不刷新AllJsonData 生成读取Json的代码")]
     private static void CreateClassEx()
     {
         string directory = Application.dataPath + AllJsonDataPath;
@@ -123,7 +123,7 @@ public class ExcelToJosn : EditorWindow
 
 
     #region 生成解析json类
-    [MenuItem("数据工具/生成读取Json的代码")]
+    [MenuItem("Tools/ExcToJson/生成读取Json的代码")]
     private static void CreateClass()
     {
         //先刷新表
