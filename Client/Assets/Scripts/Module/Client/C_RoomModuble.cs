@@ -95,7 +95,7 @@ public class C_RoomModuble : C_ModuleBase
         info.uid = player.uid;
         //3当前未准备 想要准备 和 4当前准备
         info.opt = isReady ? 3 : 4;   
-        Send(info);
+        SendNotRecycle(info);
     }
 
 

@@ -30,12 +30,12 @@ public class CMD_BASE2<T> : Poolable<T>, ISerializer where T : CMD_BASE2<T>, new
 
     public virtual void Deserialize(LStream stream)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException("请先实现化注册该方法 或者 使用unity菜单栏 tools/SteamSerializable/Generated  生成");
     }
 
     public virtual void Serialize(LStream stream)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException("请先实现化注册该方法 或者 使用unity菜单栏 tools/SteamSerializable/Generated  生成");
     }
 
     public static T Get(LStream stream)
