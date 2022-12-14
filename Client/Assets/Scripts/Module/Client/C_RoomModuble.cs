@@ -62,7 +62,7 @@ public class C_RoomModuble : C_ModuleBase
         info.uid = player.uid;
         info.opt = 1;
         info.roomID = roomID;
-        Send(info);
+        SendNotRecycle(info);
     }
 
     //public void bool
@@ -119,6 +119,10 @@ public class C_RoomModuble : C_ModuleBase
         if (msg.ErrorCode != ErrCode.Succeed)
         {
             sLog.Error(" 请求失败 错误信息 : {0}", msg.ErrorCode.ToString());
+            if (msg.ErrorCode == ErrCode.RoomNotExist && optType == 1)  //如果房间不存在 且是加入新房间
+            {
+                GetAllTheRoomsInfo();
+            }
             return;
         }
 

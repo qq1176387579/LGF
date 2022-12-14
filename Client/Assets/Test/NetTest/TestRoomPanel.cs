@@ -84,7 +84,9 @@ public class TestRoomPanel : MonoBehaviour
             case 4:
                 roomInfos.FirstFunc((item, _playerID, _optType) =>
                 {
+  
                     bool f = item.playerID == _playerID;
+                    Debug.Log($"--> {f} { item.playerID }  {_playerID}  {_optType}");
                     if (f)
                     {
                         item.SetReady(_optType == 3);
