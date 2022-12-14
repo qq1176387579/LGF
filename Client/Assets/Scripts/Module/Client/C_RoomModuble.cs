@@ -62,6 +62,7 @@ public class C_RoomModuble : C_ModuleBase
         info.uid = player.uid;
         info.opt = 1;
         info.roomID = roomID;
+        player.RoomID = roomID; //加入房间
         SendNotRecycle(info);
     }
 

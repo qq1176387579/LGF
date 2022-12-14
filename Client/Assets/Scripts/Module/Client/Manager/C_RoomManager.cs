@@ -95,7 +95,6 @@ public class C_RoomManager : C_SingletonBase<C_RoomManager>
 
     public void OnCreateRoom(S2C_CreateRoom msg)
     {
-        player.RoomID = msg.roomID;
         houseOwnerID = player.uid;
 
         roomName = msg.roomName;

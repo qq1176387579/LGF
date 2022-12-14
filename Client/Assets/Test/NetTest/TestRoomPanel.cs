@@ -78,8 +78,7 @@ public class TestRoomPanel : MonoBehaviour
         {
             case 1: //加入
             case 2: //离开
-                var info = C_RoomManager.Instance.GetUserInfo(playerID);
-                OnTextMsg("系统 :", StringPool.Concat(info.useinfo.name, "加入房间"));
+                OnTextMsg("系统 :", StringPool.Concat(name, optType == 1 ? "加入房间" : "离开房间"));
                 Refresh();
                 break;
             case 3: //准备
@@ -157,7 +156,7 @@ public class TestRoomPanel : MonoBehaviour
             if (item.playerID == C_ModuleMgr.Instance.Player.uid)    //如果是自己
             {
                 SetReadyBtn(info.ready);
-                Debug.LogError("-------fff--");
+                //Debug.LogError("-------fff--");
             }
         }
 
