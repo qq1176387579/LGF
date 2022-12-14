@@ -198,6 +198,9 @@ public partial class C2S_ChatMsg : C2S_BASE<C2S_ChatMsg>
     public C2S_ChatMsg() : base(NetMsgDefine.C2S_ChatMsg) { }
 
     [LGF.Serializable.SteamMember(1)]
+    public ChatType type;    //
+
+    [LGF.Serializable.SteamMember(2)]
     public string msg;
 }
 
@@ -209,7 +212,7 @@ public partial class S2C_ChatMsg : S2C_BASE<S2C_ChatMsg>
 {
     public S2C_ChatMsg() : base(NetMsgDefine.S2C_ChatMsg) { }
     [LGF.Serializable.SteamMember(1)]
-    public int type;    //
+    public ChatType type;    //
 
     [LGF.Serializable.SteamMember(2)]
     public string name;

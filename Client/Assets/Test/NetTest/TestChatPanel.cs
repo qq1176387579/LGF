@@ -27,7 +27,7 @@ public class TestChatPanel : MonoBehaviour
     {
         ChatModule = C_ModuleMgr.GetModule<C_ChatModule>();
 
-        EventManager.Instance.AddListener<string, string>(GameEventType.c_TextMsg, OnTextMsg);
+        EventManager.Instance.AddListener<string, string>(GameEventType.ClientEvent_RoomChatMsg, OnTextMsg);
 
         sendBtn.onClick.AddListener(() =>
         {
@@ -36,7 +36,7 @@ public class TestChatPanel : MonoBehaviour
                 return;
             }
 
-            ChatModule.SendMsg(sendMsg.text);
+            ChatModule.SendMsgToRoom(sendMsg.text);
 
             sendMsg.text = "";
         });

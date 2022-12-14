@@ -55,6 +55,7 @@ public class S_RoomManager: S_SingletonBase<S_RoomManager>
 
     public void DelRoom(S_Room room)
     {
+        sLog.Debug("删除房间 {0}", room.id);
         roomList.Remove(room.id);   //删除房间
         room.Release();
     }

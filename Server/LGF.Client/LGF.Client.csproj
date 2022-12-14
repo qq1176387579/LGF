@@ -19,13 +19,13 @@
     <ProjectReference Include="..\LGF.Client-Server\LGF.Client-Server.csproj" />
   </ItemGroup>
 
-	
-	<ItemGroup>
-		<Compile Include="..\..\Client\Assets\Scripts\Module\Client\**\*.cs">
-			<Link>Module\%(RecursiveDir)%(FileName)%(Extension)</Link>
-		</Compile>
-	</ItemGroup>
 
+
+    <ItemGroup>
+	    <Compile Include="..\..\Client\Assets\Scripts\Module\Client\**\*.cs">
+		    <Link>Module\%(RecursiveDir)%(FileName)%(Extension)</Link>
+	    </Compile>
+    </ItemGroup>
 
 	
 

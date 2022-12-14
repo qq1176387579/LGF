@@ -103,7 +103,9 @@ public class C_RoomManager : C_SingletonBase<C_RoomManager>
         info.roomjoinRank = 1;
         info.ready = false;
         info.useinfo = player.CopyUserInfo();
+        player.RoomID = msg.roomID;
 
+        //sLog.Debug(" player.RoomID : {0}", player.RoomID);
         curRoomUserlist.ClearReleaseMember();
         curRoomUserlist.Add(player.uid, info);
     }
@@ -113,6 +115,12 @@ public class C_RoomManager : C_SingletonBase<C_RoomManager>
     public Dictionary<uint, CMD_UserRoomInfo> GetRoomUsersInfo()
     {
         return curRoomUserlist;
+    }
+
+    public CMD_UserRoomInfo GetUserInfo(uint id)
+    {
+        curRoomUserlist.TryGetValue(id, out var player);
+        return player;
     }
 
 }

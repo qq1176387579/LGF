@@ -40,14 +40,13 @@ namespace LGF
 
         #region 客户端事件
 
-        c_TextMsg,
-
         ConnectServerFail,  //连接服务器失败
 
         ClientEvent_CreateRoomSucceed,  //创建房间成功
         ClientEvent_GetAllRooms,        //获得全部房间事件
         ClientEvent_RoomOptSync,        //房间同步事件
         ClientEvent_JionRoom,           //获得全部房间事件
+        ClientEvent_RoomChatMsg,        //房间对话消息
         #endregion
 
 

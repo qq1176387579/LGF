@@ -72,3 +72,14 @@ public enum ErrCode
 
 }
 
+
+/// <summary>
+/// 通话类型
+/// </summary>
+public enum ChatType
+{
+    Room = 1,   //房间
+
+}
+
+

@@ -216,7 +216,8 @@ namespace LGF.Net
                         m_KcpAgents.Remove(m_delKcpAgent[i].uid);
                         m_delKcpAgent[i].Dispose();
                     }
-                } 
+                }
+                m_delKcpAgent.Clear();
             }
            
             

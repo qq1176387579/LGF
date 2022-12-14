@@ -18,6 +18,8 @@ public class C_MainPlayerManager : C_SingletonBase<C_MainPlayerManager>
     public uint uid;
     public string name;
     public uint RoomID;
+    public bool InRoom => RoomID > 0;
+
 
     /// <summary>
     /// 设置名字

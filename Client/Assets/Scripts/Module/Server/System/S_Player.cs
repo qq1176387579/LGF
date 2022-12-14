@@ -36,9 +36,7 @@ public class S_Player
     public void ReConnect()
     {
         room.LeaveRoom(this);   //离开房间
-
-
-
+        
     }
 
 

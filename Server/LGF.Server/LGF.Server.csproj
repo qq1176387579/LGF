@@ -9,10 +9,12 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
+    <DefineConstants>$(DefineConstants)TRACE;NOT_UNITY</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
+    <DefineConstants>$(DefineConstants)TRACE;NOT_UNITY</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

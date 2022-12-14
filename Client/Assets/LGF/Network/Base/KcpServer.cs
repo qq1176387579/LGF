@@ -118,6 +118,7 @@ namespace LGF.Net
                 sLog.Warning(" uuid 已经存在 当前暂时先退出原来的"); //表示重新登录  那么顶替之前的
 
                 ReConnect(guid, kcp);    //退出重进的情况
+                
             }
             else
             {
@@ -128,6 +129,7 @@ namespace LGF.Net
                 session.name = tmpData.C2S_Connect.name;
 
                 sLog.Debug("OnConnect  tmpData.S2C_Connect msgType {0} name: {1}" , tmpData.S2C_Connect.msgType, session.name);
+                //这里其实线程不安全 但是登录模块 session 是新的 所以直接用
                 session.Send(tmpData.S2C_Connect, false);    //发送数据
                 
                 //通知玩家登录了
@@ -184,7 +186,11 @@ namespace LGF.Net
 
             session.kcpAgent.Close();   //
             session.kcpAgent = newkcp;  //重新连接
-            netMsgMgr.BroadCastEventByMainThreadt(GameEventType.ServerEvent_GetServersInfo, session);
+            tmpData.S2C_Connect.uid = guid;   //连接成功
+            session.name = tmpData.C2S_Connect.name;
+
+            session.Send(tmpData.S2C_Connect, false);    //发送数据 线程不安全  后面有时间 哭放s_mouble 里面处理  这样线程安全
+            netMsgMgr.BroadCastEventByMainThreadt(GameEventType.ServerEvent_ReConnect, session);    //修改游戏里面的数据数据
         }
 
 

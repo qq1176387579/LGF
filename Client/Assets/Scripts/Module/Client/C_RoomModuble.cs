@@ -87,7 +87,11 @@ public class C_RoomModuble : C_ModuleBase
     public void SetReady(bool isReady)
     {
         if (requestReadying)
+        {
+            sLog.Debug("---requestReadying---请求中-");
             return;
+        }
+            
 
         requestReadying = true;
 
@@ -118,7 +122,7 @@ public class C_RoomModuble : C_ModuleBase
 
         if (msg.ErrorCode != ErrCode.Succeed)
         {
-            sLog.Error(" 请求失败 错误信息 : {0}", msg.ErrorCode.ToString());
+            sLog.Error(" 请求失败 错误信息 : {0} optType {1}", msg.ErrorCode.ToString(), optType);
             if (msg.ErrorCode == ErrCode.RoomNotExist && optType == 1)  //如果房间不存在 且是加入新房间
             {
                 GetAllTheRoomsInfo();
@@ -126,12 +130,16 @@ public class C_RoomModuble : C_ModuleBase
             return;
         }
 
+        string name = "";
+
         switch (optType)   
         {
             case 1:  //玩家加入新玩家加入
                 roomMgr.JoinRoom(msg);
+                name = roomMgr.GetUserInfo(msg.playerID).useinfo.name;
                 break;
             case 2: //玩家加入新玩家加入离开
+                name = roomMgr.GetUserInfo(msg.playerID).useinfo.name;
                 roomMgr.LeaveRoom(msg.playerID);
                 break;
             case 3: //玩家准备
@@ -146,7 +154,7 @@ public class C_RoomModuble : C_ModuleBase
             default: 
                 break;
         }
-        EventManager.Instance.BroadCastEvent(GameEventType.ClientEvent_RoomOptSync, msg.playerID, optType);  //有玩家加入房间
+        EventManager.Instance.BroadCastEvent<uint, int, string>(GameEventType.ClientEvent_RoomOptSync, msg.playerID, optType, name);  //有玩家加入房间
 
     }
 

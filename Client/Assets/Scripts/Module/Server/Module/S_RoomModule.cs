@@ -51,7 +51,7 @@ public class S_RoomModule : S_ModuleBase
             count++;
         }
 
-        for (int i = info.roomList.Count -1 ; i >= count; i++)
+        for (int i = info.roomList.Count -1 ; i >= count; i--)
         {
             info.roomList[i].Release();
             info.roomList.RemoveAt(i);
@@ -94,10 +94,12 @@ public class S_RoomModule : S_ModuleBase
 
         if (player == null)
         {
+            sLog.Debug(" session.playerID  si {0}", session.playerID);
             return;
         }
         int optType = msg.opt;
         var info = tmp_informRoomChange;
+        info.playerID = player.uid;
         info.opt = optType;
         info.ErrorCode = ErrCode.Succeed;
         switch (optType)
@@ -123,6 +125,7 @@ public class S_RoomModule : S_ModuleBase
                 {
                     if (player.roomReally)
                     {
+                        sLog.Debug("---------player.roomReally{0}", player.roomReally);
                         info.ErrorCode = ErrCode.INVALID_OPT;   //非法操作
                         break;
                     }
@@ -135,6 +138,7 @@ public class S_RoomModule : S_ModuleBase
                 {
                     if (!player.roomReally)
                     {
+                        sLog.Debug("--------player.roomReally{0}-" , player.roomReally);
                         info.ErrorCode = ErrCode.INVALID_OPT;   //非法操作
                         break;
                     }

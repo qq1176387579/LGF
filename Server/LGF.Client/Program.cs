@@ -135,7 +135,7 @@ namespace LGF.Client
 
             func.Add("call_s", (param) =>
             {
-                var tmp = C2S_TextMsg.Get();
+                var tmp = C2S_ChatMsg.Get();
                 tmp.msg = param.GetByID(1);
                 kcpClient.Send(tmp);
             });

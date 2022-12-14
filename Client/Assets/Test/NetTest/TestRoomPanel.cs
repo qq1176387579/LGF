@@ -34,7 +34,7 @@ public class TestRoomPanel : MonoBehaviour
 
     RoomInfoItem houseOwner;
 
-    bool isReady = false;
+    bool curReady = false;
 
     // Start is called before the first frame update
     void Start()
@@ -43,7 +43,7 @@ public class TestRoomPanel : MonoBehaviour
 
         ChatModule = C_ModuleMgr.GetModule<C_ChatModule>();
 
-        EventManager.Instance.AddListener<string, string>(GameEventType.c_TextMsg, OnTextMsg);
+        EventManager.Instance.AddListener<string, string>(GameEventType.ClientEvent_RoomChatMsg, OnTextMsg);
 
         sendBtn.onClick.AddListener(() =>
         {
@@ -52,7 +52,7 @@ public class TestRoomPanel : MonoBehaviour
                 return;
             }
 
-            ChatModule.SendMsg(sendMsg.text);
+            ChatModule.SendMsgToRoom(sendMsg.text);
 
             sendMsg.text = "";
         });
@@ -60,28 +60,30 @@ public class TestRoomPanel : MonoBehaviour
 
         ReadyBtn.onClick.AddListener(() =>
         {
-            C_ModuleMgr.GetModule<C_RoomModuble>().SetReady(isReady);
+            C_ModuleMgr.GetModule<C_RoomModuble>().SetReady(!curReady);
         });
 
         Refresh();
         //EventManager.Instance.AddListener();
-        EventManager.Instance.AddListener<uint, int>(GameEventType.ClientEvent_RoomOptSync, OnRoomOptSync);
+        EventManager.Instance.AddListener<uint, int, string>(GameEventType.ClientEvent_RoomOptSync, OnRoomOptSync);
         //    EventManager.Instance.BroadCastEvent(GameEventType.ClientEvent_RoomOptSync, msg.playerID, optType);  //有玩家加入房间
     }
 
     // Update is called once per frame
 
-    void OnRoomOptSync(uint playerID,int optType)
+    void OnRoomOptSync(uint playerID, int optType, string name)
     {
-        sLog.Debug("=--OnRoomOptSync---playerID: " + playerID + " optType: " + optType);
+        sLog.Debug("=--OnRoomOptSync---playerID: " + playerID + " optType: " + optType + "");
         switch (optType)
         {
-            case 1:
-            case 2:
+            case 1: //加入
+            case 2: //离开
+                var info = C_RoomManager.Instance.GetUserInfo(playerID);
+                OnTextMsg("系统 :", StringPool.Concat(info.useinfo.name, "加入房间"));
                 Refresh();
                 break;
-            case 3:
-            case 4:
+            case 3: //准备
+            case 4: //取消准备
                 roomInfos.FirstFunc((item, _playerID, _optType) =>
                 {
   
@@ -99,7 +101,7 @@ public class TestRoomPanel : MonoBehaviour
                     SetReadyBtn(optType == 3);
                 }
                 break;
-            case 5:
+            case 5://交换房主
                 houseOwner.SetHouseOwner(playerID);
                 houseOwner = roomInfos.FirstFunc((item, _playerID) =>
                 {
@@ -154,7 +156,8 @@ public class TestRoomPanel : MonoBehaviour
 
             if (item.playerID == C_ModuleMgr.Instance.Player.uid)    //如果是自己
             {
-                SetReadyBtn(item.ready);
+                SetReadyBtn(info.ready);
+                Debug.LogError("-------fff--");
             }
         }
 
@@ -177,7 +180,8 @@ public class TestRoomPanel : MonoBehaviour
 
     void SetReadyBtn(bool f)
     {
-        isReady = f;
+        curReady = f;
         ReadyBtnText.text = !f ? "准备" : "取消准备";
+        Debug.Log("  isReady" + curReady);
     }
 }

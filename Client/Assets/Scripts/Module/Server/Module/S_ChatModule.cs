@@ -28,21 +28,44 @@ public class S_ChatModule : S_ModuleBase
 
 
 
-    private void OnTextMsg(KcpServer.KcpSession arg1, C2S_ChatMsg arg2)
+    private void OnTextMsg(KcpServer.KcpSession arg1, C2S_ChatMsg msg)
     {
-        //Debug.Log("");
-        //EventManager.Instance.BroadCastEvent(GameEventType.OnUpdate, arg2); //显示到面板中
-        //arg2.uid
-        textMsg.name = arg1.name; 
-        textMsg.msg = arg2.msg;
-        
 
-        sLog.Debug("广播消息：" + textMsg.name + " : " + textMsg.msg);
+        var player = GetPlayer(arg1);
+        if (player == null)
+        {
+            sLog.Error("玩家为空 出错 id: {0}", arg1.playerID);
+            return;
+        }
+        InitTmpChatMsg();
+        textMsg.type = msg.type;
+        if (textMsg.type == ChatType.Room)
+        {
+            if (!player.InRoom)
+            {
+                sLog.Debug("非法操作 不在房间内");
+                textMsg.ErrorCode = ErrCode.INVALID_OPT;
+                SendNotRecycle(player, textMsg);
+                return;
+            }
+            textMsg.name = player.name;
+            textMsg.msg = msg.msg;
+            SendNotRecycle(player.room.GetAllPlayer(), textMsg);
+        }
+
+        sLog.Debug("{0} 广播消息  player > {1} : {2}", textMsg.type, textMsg.name, textMsg.msg);
+
+
         //服务器获得信息
         //Server.Broadcast(textMsg,false);  //广播信息
     }
 
-
+    void InitTmpChatMsg()
+    {
+        textMsg.msg = null;
+        textMsg.ErrorCode = ErrCode.Succeed;
+        textMsg.name = null;
+    }
 
 
     
