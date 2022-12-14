@@ -274,7 +274,7 @@ namespace LGF.Editor
                         //要进行回收  不然有些状态定义的类  也会序列化 但是我只需他为空就行了
                         if (typeof(ISerializer).IsAssignableFrom(type))
                         {
-                            clearStr = $"{name}.Release(); {name} = null;";
+                            clearStr = $"{name}?.Release(); {name} = null;";
                             f = true;
                         }
                     }

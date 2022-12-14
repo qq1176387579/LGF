@@ -84,7 +84,7 @@ public class C_RoomModuble : C_ModuleBase
 
     bool requestReadying;
 
-    public void SetReady()
+    public void SetReady(bool isReady)
     {
         if (requestReadying)
             return;
@@ -93,8 +93,8 @@ public class C_RoomModuble : C_ModuleBase
 
         var info = tmp_InformRoomChange;
         info.uid = player.uid;
-        //服务端是互斥操作 所以没有4
-        info.opt = 4;  
+        //3当前未准备 想要准备 和 4当前准备
+        info.opt = isReady ? 3 : 4;   
         Send(info);
     }
 
@@ -118,7 +118,7 @@ public class C_RoomModuble : C_ModuleBase
 
         if (msg.ErrorCode != ErrCode.Succeed)
         {
-            sLog.Error(" 请求失败 错误信息 :", msg.ErrorCode.ToString());
+            sLog.Error(" 请求失败 错误信息 : {0}", msg.ErrorCode.ToString());
             return;
         }
 

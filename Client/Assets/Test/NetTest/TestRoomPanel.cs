@@ -34,7 +34,7 @@ public class TestRoomPanel : MonoBehaviour
 
     RoomInfoItem houseOwner;
 
-   
+    bool isReady = false;
 
     // Start is called before the first frame update
     void Start()
@@ -60,10 +60,11 @@ public class TestRoomPanel : MonoBehaviour
 
         ReadyBtn.onClick.AddListener(() =>
         {
-            C_ModuleMgr.GetModule<C_RoomModuble>().SetReady();
+            C_ModuleMgr.GetModule<C_RoomModuble>().SetReady(isReady);
         });
 
         Refresh();
+        //EventManager.Instance.AddListener();
         EventManager.Instance.AddListener<uint, int>(GameEventType.ClientEvent_RoomOptSync, OnRoomOptSync);
         //    EventManager.Instance.BroadCastEvent(GameEventType.ClientEvent_RoomOptSync, msg.playerID, optType);  //有玩家加入房间
     }
@@ -174,6 +175,7 @@ public class TestRoomPanel : MonoBehaviour
 
     void SetReadyBtn(bool f)
     {
-        ReadyBtnText.gameObject.SetActive(f);
+        isReady = f;
+        ReadyBtnText.text = !f ? "准备" : "取消准备";
     }
 }
