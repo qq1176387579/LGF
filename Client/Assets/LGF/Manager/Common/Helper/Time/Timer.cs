@@ -108,13 +108,10 @@ namespace LGF
             #endregion
 
 
-            //void PP()
-            //{
-            //    ListPool<TimeTask>.Get();
-            //    ListPool<TimeTask>.Release();
-            //}
-
-            public void Update()
+            /// <summary>
+            /// 内部调用的
+            /// </summary>
+            void Update()
             {
                 while (true)
                 {
@@ -363,6 +360,7 @@ namespace LGF
             /// <returns></returns>
             public ulong AddTask(Action callback, double delay = 0.005)
             {
+                //可以写成无GC的暂时先这样
                 return AddTask((ulong t) => callback.Invoke(), (ulong)(delay * (int)TimeUnit.Second), TimeUnit.Millisecond);
             }
 
@@ -371,6 +369,7 @@ namespace LGF
             /// </summary>
             public ulong AddTask(Action callback, ulong interval, TimeUnit timeUnit = TimeUnit.Second, int count = 1, ulong delay = 0)
             {
+                //可以写成无GC的暂时先这样
                 return AddTask((ulong t) => callback.Invoke(), interval, timeUnit, count, delay);
             }
 

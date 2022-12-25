@@ -37,7 +37,7 @@ namespace LGF.Net
         public bool IsTryConnecting;  //连接中
         int connectCount;
 
-        public void Bing(int port = 0, uint interval = 15)
+        public void Bing(int port = 0, uint interval = 10)
         {
             recvHelper = new KcpClientRecvHelper();
             base.Bing(recvHelper, port, -1, interval);
@@ -97,7 +97,7 @@ namespace LGF.Net
                 {
                     //PC端不做限制 后面测试时候可以测试
                     //安卓端检查断网情况
-#if NOT_UNITY || UNITY_ANDROID
+#if NOT_UNITY
                     tmpData.C2S_Connect.uuid = MacAddressUtils.Instance.GetUUID() + Common.Random(100000);
 #else
                     tmpData.C2S_Connect.uuid = MacAddressUtils.Instance.GetUUID();

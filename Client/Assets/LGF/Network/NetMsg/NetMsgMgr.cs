@@ -41,13 +41,24 @@ namespace LGF.Net
     /// </summary>
     public class NetMsgMgr : SingletonBase<NetMsgMgr>
     {
+       
         NBufferingQueue<IDelegateBase> queue = new NBufferingQueue<IDelegateBase>();
         protected override void OnNew()
         {
             LGFEntry.RegisterOnUpdate(OnUpdate);
 
             queue.OnClear((a) => a.Release());
+
+            //无意义 也执行不了
+            //EventManager.Instance.AddListener(GameEventType.OnReLoadHotfixFinish, OnReLoadHotfixFinish);
         }
+
+        //bool isReLoadHotfixFinish = false;
+        //void OnReLoadHotfixFinish()
+        //{
+        //    isReLoadHotfixFinish = true;    //执行了热修复
+        //}
+
 
         /// <summary>
         /// 主线程update

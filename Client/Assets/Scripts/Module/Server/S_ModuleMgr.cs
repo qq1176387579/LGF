@@ -17,11 +17,13 @@ using static LGF.Net.KcpServer;
 /// </summary>
 public class S_ModuleMgr : SingletonBase<S_ModuleMgr>
 {
-    Dictionary<Type, S_ModuleBase> m_Module = new Dictionary<Type, S_ModuleBase>();
 
-    public S_PlayerManager playerMgr { get; protected set; }
-    public S_RoomManager roomMgr { get; protected set; }
+    List<IServerSingletonBase> m_mgrs = new List<IServerSingletonBase>(); //管理器
 
+    public S_DataMaganer dataMgr { get; protected set; }
+    public S_TimeManager timerMgr { get; protected set; }
+
+    //public S_TimeManager s_TimeSysManager
 
     public KcpServer Server { get; private set; }
 
@@ -37,52 +39,33 @@ public class S_ModuleMgr : SingletonBase<S_ModuleMgr>
 
     void InitAllManager()
     {
-        sLog.Debug("------InitSystem--");
-        playerMgr = S_PlayerManager.Instance.Init(this);
-        roomMgr = S_RoomManager.Instance.Init(this);
+        sLog.Debug("------InitAllManager--");
+    
+        //playerMgr = S_PlayerManager.Instance.Init(this);
+        //roomMgr = S_RoomManager.Instance.Init(this);
+        timerMgr = S_TimeManager.Instance.Init(this);
+        dataMgr = S_DataMaganer.Instance.Init(this);
     }
 
-    
+    //AddManager<T>(out T mgr) 发现索引器无法添加
+    public void AddManager(IServerSingletonBase mgr)
+    {
+        m_mgrs.Add(mgr);
+    }
 
 
     void InitAllModule()
     {
-        CreationModule<S_ChatModule>();
-        CreationModule<S_RoomModule>();
-        CreationModule<S_LoginModule>();
-        
-    }
-
-    void CreationModule<T>() where T : S_ModuleBase, new()
-    {
-        T tmp = new T();
-        m_Module.Add(typeof(T), tmp);
-        tmp.Init(this);
-    }
-
-
-    public T GetModuleEX<T>() where T : S_ModuleBase
-    {
-        if (m_Module.TryGetValue(typeof(T), out S_ModuleBase module))
-        {
-            return module as T;
-        }
-        sLog.Warning("没有 {0} 模块", typeof(T).Name);
-        return null;
-    }
-
-    public static T GetModule<T>() where T : S_ModuleBase
-    {
-        return Instance.GetModuleEX<T>();
+#if NOT_UNITY
+        LGF.Server.HotfixHelper.LoadHotfixAssembly();
+#else
+        LGF.Server.Hotfix.S_HotfixEntry.Init();
+#endif
     }
 
 
 
-    /// <summary>
-    /// 帧同步 服务器帧率为30帧
-    /// </summary>
-    /// <param name="interval"></param>
-    public void InitServer(uint interval = 30)
+    public void InitServer()
     {
         if (Server != null)
         {
@@ -92,9 +75,9 @@ public class S_ModuleMgr : SingletonBase<S_ModuleMgr>
         Server = new KcpServer();
 
 #if NOT_UNITY
-        Server.Bing(-1, NetConst.ServerPort, interval);    //30间隔
+        Server.Bing(-1, NetConst.ServerPort);   
 #else
-        Server.Bing(NetConst.ServerPort, -1, interval);    //30间隔
+        Server.Bing(NetConst.ServerPort, -1);    
 #endif
     }
 
@@ -186,6 +169,12 @@ public class S_ModuleMgr : SingletonBase<S_ModuleMgr>
     {
         //_Instance = null;
         Server.Dispose();
+
+        //客户端
+        foreach (var item in m_mgrs)
+        {
+            item.Close();
+        };
     }
 
 

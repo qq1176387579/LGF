@@ -23,7 +23,10 @@ public class TestStartPanel : MonoBehaviour
     {
         //Debug.LogError("GetLocalIPv4_IPAddress" + LGF.Net.SocketHelper.GetLocalIPv4_IPAddress());
         //Debug.LogError("GetLocalIPv4_IPAddress" + LGF.Net.SocketHelper.GetLocalIPv4_IPAddress().ToString());
-
+        if (button == null)
+        {
+            Debug.LogError("-------sdf-");
+        }
         button.onClick.AddListener(() =>
         {
             if (C_ModuleMgr.GetSession().IsTryConnecting)

@@ -98,7 +98,7 @@ namespace LGF.Net
         {
             if (m_NetEvent.ContainsKey(type))
             {
-                sLog.Warning("重复注册 请检查一下 {0}", type);
+                sLog.Warning("客户端 重复注册 请检查一下 {0}", type);
                 return;
             }
             m_NetEvent.Add(type, action);
@@ -107,8 +107,6 @@ namespace LGF.Net
 
         public void InvokeClientMsg<T>(NetMsgDefine type, LStream _stream) where T : S2C_BASE<T>, new()
         {
-            //主线程处理
-            T data = S2C_BASE<T>.Get(_stream);
 
             m_NetEvent.TryGetValue(type, out System.Delegate delega);
             if (delega == null)
@@ -124,6 +122,10 @@ namespace LGF.Net
                 return;
             }
 
+            //主线程处理  客户端放这里反序列化 能减少判定
+            //如果_stream 没有序列化 也不影响 后续接收的数据  接收数据是以_stream.GetBuffer() 来接收的
+            T data = S2C_BASE<T>.Get(_stream);
+
             netMsgMgr.QueueOnMainThreadt((_action, _data) =>
             {
                 if (sLog.OpenMsgInfo)
@@ -131,13 +133,14 @@ namespace LGF.Net
 
                 if (_data.ErrorCode != ErrCode.Succeed)
                 {
-                    sLog.Debug("------错误码---"+ _data.ErrorCode); //正常应该弹一个tps
+                    sLog.Debug("------错误码---" + _data.ErrorCode); //正常应该弹一个tps
                 }
 
-
                 _action.Invoke(_data);
-                _data.Release();//自动回收
+                _data.Release();
+
             }, action, data);
+
         }
 
 
@@ -158,7 +161,11 @@ namespace LGF.Net
         {
             if (m_NetEvent.ContainsKey(type))
             {
-                sLog.Warning("重复注册 请检查一下 {0}", type);
+                //如果是热更新的话 
+                sLog.Warning("服务器 重复注册 请检查一下 {0}  热更新加载请忽略该提示", type); 
+                //服务端热更注册  
+                //后面加个判断 热更修复
+                m_NetEvent[type] = action;
                 return; 
             }
             m_NetEvent.Add(type, action);
@@ -167,31 +174,41 @@ namespace LGF.Net
 
         public void InvokeServerMsg<T>(NetMsgDefine type, KcpServer.KcpSession session, LStream _stream) where T : C2S_BASE<T>, new()
         {
-            //主线程处理
+         
             T data = C2S_BASE<T>.Get(_stream);
 
-            m_NetEvent.TryGetValue( type,out System.Delegate delega);
-            if (delega == null)
+            //因为存在热更新的原因 服务器的放到QueueOnMainThreadt里面执行 防止调用热更新前的程序
+            //所有逻辑跑主线程 所有NetEvent 赋值与更改都在线程执行。  保证下面的程序调用正确
+            netMsgMgr.QueueOnMainThreadt((_NetEvent, _session, _data) =>
             {
-                sLog.Warning("未注册该事件 !! {0}", type);
-                return;
-            }
+                _NetEvent.TryGetValue(type, out System.Delegate delega);
+                if (delega == null)
+                {
+                    sLog.Warning("未注册该事件 !! {0}", type);
+                    _data.Release();
+                    return;
+                }
 
-            System.Action<KcpServer.KcpSession, T> action = delega as System.Action<KcpServer.KcpSession, T>;
-            if (action == null)
-            {
-                sLog.Error("事件出错 传输数据不对 {0}", typeof(T));
-                return;
-            }
+                System.Action<KcpServer.KcpSession, T> action = delega as System.Action<KcpServer.KcpSession, T>;
+                if (action == null)
+                {
+                    sLog.Error("事件出错 传输数据不对 {0}", typeof(T));
+                    _data.Release();
+                    return;
+                }
 
-            netMsgMgr.QueueOnMainThreadt((_action, _session, _data) =>
-            {
                 if (sLog.OpenMsgInfo)
-                    sLog.Debug(">>>> Accept MsgType:{0}", _data.msgType); 
-               
-                _action.Invoke(_session, _data);
+                    sLog.Debug(">>>> Accept MsgType:{0}", _data.msgType);
+
+                action.Invoke(_session, _data);
                 _data.Release();    //自动回收
-            }, action, session, data);
+            }, m_NetEvent, session, data);
+
+
+
+
+
+
         }
 
 

@@ -87,7 +87,8 @@ namespace LGF.Log
 #if NOT_UNITY
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message.ToString());
-            if (OpenStackTrace) Console.WriteLine(new StackTrace().ToString());
+            //if (OpenStackTrace) 
+            Console.WriteLine(new StackTrace().ToString());
 #else
             UnityEngine.Debug.LogError(message);
 #endif 

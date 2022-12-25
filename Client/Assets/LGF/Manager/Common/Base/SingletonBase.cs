@@ -7,18 +7,18 @@ namespace LGF
     /// <typeparam name="T"></typeparam>
     public class SingletonBase<T> where T : SingletonBase<T>, new()
     {
-        private static T instance = default(T);
-        protected static T _Instance => instance;
+        private static T _instance = default(T);
+        protected static T _Instance => _instance;
         public static T Instance
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
-                    instance = new T();
-                    instance.OnNew(); //周期回调
+                    _instance = new T();
+                    _instance.OnNew(); //周期回调
                 }
-                return instance;
+                return _instance;
             }
         }
 
@@ -44,9 +44,13 @@ namespace LGF
 
         public static bool CheckInstance()
         {
-            return instance != null;
+            return _instance != null;
         }
 
+        public static void SingletonClear()
+        {
+            _instance = null;
+        }
     }
 
 }

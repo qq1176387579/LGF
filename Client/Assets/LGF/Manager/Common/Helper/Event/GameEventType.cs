@@ -33,7 +33,10 @@ namespace LGF
         KeyCode_Mouse1,
 
 
-
+        /// <summary>
+        /// 重新加载热修复完成
+        /// </summary>
+        OnReLoadHotfixFinish,  
 
         //------------------------net--------------------
 

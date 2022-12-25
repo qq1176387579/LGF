@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9be6ed7df4af35442badd240bd961c07, type: 3}
   m_Name: ServerConfig
   m_EditorClassIdentifier: 
-  path: 192.168.31.241:45557
+  path: 192.168.16.105:45557

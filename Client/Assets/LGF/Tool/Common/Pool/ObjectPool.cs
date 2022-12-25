@@ -63,13 +63,59 @@ namespace LGF
 
 
 
-    //public static class StringPoolHelper
-    //{
-    //    public static void Release(this StringBuilder builder)
-    //    {
-    //        StringPool.Release(builder);
-    //    }
-    //}
+
+
+
+
+
+
+   
+    public class ObjectPoolNotLock<T> where T : new()
+    {
+        private readonly Stack<T> m_Stack = new Stack<T>();
+        private readonly Action<T> m_ActionOnGet;
+        private readonly Action<T> m_ActionOnRelease;
+
+        public int countAll { get; private set; }
+        public int countActive { get { return countAll - countInactive; } }
+        public int countInactive { get { return m_Stack.Count; } }
+
+        public ObjectPoolNotLock(Action<T> actionOnGet, Action<T> actionOnRelease)
+        {
+            m_ActionOnGet = actionOnGet;
+            m_ActionOnRelease = actionOnRelease;
+        }
+
+        public T Get()
+        {
+            T element;
+            if (m_Stack.Count == 0)
+            {
+                element = new T();
+                countAll++;
+            }
+            else
+            {
+                element = m_Stack.Pop();
+            }
+            m_ActionOnGet?.Invoke(element);
+            return element;
+        }
+
+        public void Release(T element)
+        {
+            if (m_Stack.Count > 0 && ReferenceEquals(m_Stack.Peek(), element))
+                this.DebugError($"Internal error. Trying to destroy object that is already released to pool. type: {typeof(T)}");
+            m_ActionOnRelease?.Invoke(element);
+     
+           m_Stack.Push(element);
+        }
+
+        public void Clear()
+        {
+            m_Stack.Clear();
+        }
+    }
 
 
 }

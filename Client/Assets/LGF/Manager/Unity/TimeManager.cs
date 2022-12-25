@@ -63,8 +63,14 @@ namespace LGF
             EventManager.Instance.BroadCastEvent(GameEventType.OnNetTimeChange, m_netTimeStampSec);
         }
 
+
+
+
         private void Update()
         {
+            // 后续看情况走哪边 FixedUpdate 或者 Update
+
+
             UpdateTimeStamp();
             //判定切后台 时间会Time.deltaTime吗 
 
@@ -74,6 +80,7 @@ namespace LGF
             m_timer2.Update((ulong)(TimeStampMsec - m_lastTimeStampMsec));      //不受time影响
         }
 
+       
         /// <summary>
         /// 更新时间戳
         /// </summary>
@@ -179,7 +186,7 @@ namespace LGF
         #region 携程延迟
 
         /// <summary>
-        /// 延迟回调 基于携程
+        /// 延迟回调 基于携程 不推荐用
         /// </summary>
         /// <param name="time"></param>
         /// <param name=""></param>

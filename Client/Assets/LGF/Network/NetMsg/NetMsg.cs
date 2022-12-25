@@ -442,6 +442,4 @@ public partial class CMD_UserInfo : CMD_BASE2<CMD_UserInfo>
 }
 
 
-
-
 #endregion

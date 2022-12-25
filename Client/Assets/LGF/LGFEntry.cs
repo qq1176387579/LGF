@@ -40,13 +40,6 @@ namespace LGF
         }
 
 
-
-
-
-
-
-
-
         public static void Update()
         {
             ev_OnUpdate?.Invoke();
@@ -83,6 +76,19 @@ namespace LGF
             ev_OnFixedUpdate += ac;
         }
 
+
+        public static void UnRegisterOnUpdate(System.Action ac)
+        {
+            ev_OnUpdate -= ac;
+        }
+        public static void UnRegisterOnLateUpdate(System.Action ac)
+        {
+            ev_OnLateUpdate -= ac;
+        }
+        public static void UnRegisterOnFixedUpdate(System.Action ac)
+        {
+            ev_OnFixedUpdate -= ac;
+        }
 
         public static void OnDestroy()
         {

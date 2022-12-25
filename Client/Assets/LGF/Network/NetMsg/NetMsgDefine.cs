@@ -40,6 +40,8 @@ public enum NetMsgDefine
 
     S2C_SyncRoomInfo,   //同步房间信息给玩家  进入房间的时候用
 
+    C2S_FrameOpKey,
+    S2C_FrameOpKey,
 
 }
 
