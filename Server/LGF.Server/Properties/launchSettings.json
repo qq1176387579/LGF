@@ -3,6 +3,10 @@
     "WSL": {
       "commandName": "WSL2",
       "distributionName": ""
+    },
+    "配置文件 1": {
+      "commandName": "Executable",
+      "executablePath": "F:\\untiy project\\LGF\\Server\\LGF.Server\\bin\\Debug\\net6.0\\LGF.Server.exe"
     }
   }
 }

@@ -9,10 +9,11 @@ using System.Net;
 using System.Net.Sockets;
 using LGF.Log;
 using LGF;
+using System.Reflection;
 
-namespace LHTestServer
+namespace LGF.Server
 {
-    class Program
+    class AppEntry
     {
         static KcpSocket.KcpAgent kcpAgent1;
         static void Main(string[] args)
@@ -25,6 +26,8 @@ namespace LHTestServer
             {
                 try
                 {
+                    HotfixHelper.CheckHotfix();
+
                     LGFEntry.Update();
                     LGFEntry.LateUpdate();
                     LGFEntry.FixedUpdate();
@@ -35,7 +38,7 @@ namespace LHTestServer
                 }
                
 
-                Thread.Sleep(10);
+                Thread.Sleep(1);
             }
         }
 
@@ -51,13 +54,27 @@ namespace LHTestServer
             while (true)
             {
                 string msg = Console.ReadLine();
+
+                if (msg == "reload")
+                {
+                    HotfixHelper.ReLoadHotfix();
+                    //HotfixHelper.LoadHotfixAssembly();
+                }
+
                 if (kcpAgent1 == null)
                 {
                     continue;
                 }
-                kcpAgent1.Send(Encoding.UTF8.GetBytes(msg));
+
+                //kcpAgent1.Send(Encoding.UTF8.GetBytes(msg));
             }
         }
+
+
+        //public static class DllHelper
+        //{
+           
+        //}
 
     }
 }
