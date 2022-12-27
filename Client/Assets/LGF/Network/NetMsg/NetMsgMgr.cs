@@ -72,6 +72,8 @@ namespace LGF.Net
             {
                 item.Invoke2();
             }
+
+            queue.Clear();
         }
 
 

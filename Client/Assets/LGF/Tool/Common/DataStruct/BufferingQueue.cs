@@ -79,22 +79,21 @@ namespace LGF.DataStruct
         {
             lock (queue)
             {
-                CheckClear();
                 queue[idx].Add(info);   //
             }
                
         }
 
-        public void Add(List<T> infos)
-        {
-            lock (queue)
-            {
-                CheckClear();
-                for (int i = 0; i < infos.Count; i++)
-                    queue[idx].Add(infos[i]);
-            }
+        //public void Add(List<T> infos)
+        //{
+        //    lock (queue)
+        //    {
+        //        CheckClear();
+        //        for (int i = 0; i < infos.Count; i++)
+        //            queue[idx].Add(infos[i]);
+        //    }
                
-        }
+        //}
 
 
         public bool CanGet()
@@ -110,6 +109,12 @@ namespace LGF.DataStruct
         {
             if (!CanGet()) return null;
 
+            if (needClear)
+            {
+                sLog.Error("请先 Clear"); //请先清理
+                return null;
+            }
+
             int lastidx = idx;
             int nexidx = idx ^ 1;
           
@@ -122,7 +127,7 @@ namespace LGF.DataStruct
             return queue[lastidx];
         }
 
-        public void CheckClear()
+        public void Clear()
         {
             if (!needClear)
                 return;
@@ -130,7 +135,9 @@ namespace LGF.DataStruct
             int lastidx = idx ^ 1;
             needClear = false;
             var list = queue[lastidx];
-            for (int i = list.Count - 1; i >= 0; i--)
+            //出现报错信息 System.InvalidOperationException: Collection was modified; enumeration operation may not execute.
+            //之前的逻辑可能 在访问的时候删除  所以Clear 改为Get调用玩后执行
+            for (int i = list.Count - 1; i >= 0; i--)   
             {
                 OnClearEvt?.Invoke(list[i]);
                 list.RemoveAt(i);
