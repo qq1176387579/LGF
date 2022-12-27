@@ -27,5 +27,12 @@
 		</Compile>
 	</ItemGroup>
 
+	<ItemGroup>
+		<Compile Include="..\..\Client\Assets\Scripts\Module\Common\**\*.cs">
+			<Link>Common\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
+
 </Project>
 
