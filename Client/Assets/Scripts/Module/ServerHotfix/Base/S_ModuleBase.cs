@@ -32,9 +32,9 @@ namespace LGF.Server.Hotfix
         /// <typeparam name="T"></typeparam>
         /// <param name="type"></param>
         /// <param name="action"></param>
-        public void RegisterServerMsg<T>(NetMsgDefine type, System.Action<KcpServer.KcpSession, T> action) where T : C2S_BASE<T>, new()
+        public void RegisterServerMsg<T>(NetMsgDefine type, System.Action<KcpServer.KcpSession, T> action,bool isAutoRecycleData = true) where T : C2S_BASE<T>, new()
         {
-            netMsgHandlingMgr.RegisterServerMsg<T>(type, action);
+            netMsgHandlingMgr.RegisterServerMsg<T>(type, action, isAutoRecycleData);
         }
 
 

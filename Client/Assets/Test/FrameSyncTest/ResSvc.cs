@@ -26,24 +26,24 @@ public class ResSvc : LGF.MonoSingleton<ResSvc> {
     //    //.Log("Init ResSvc Done.");
     //}
 
-    private Action prgCB = null;
-    public void AsyncLoadScene(string sceneName, Action<float> loadRate, Action loaded) {
-        AsyncOperation sceneAsync = SceneManager.LoadSceneAsync(sceneName);
+    //private Action prgCB = null;
+    //public void AsyncLoadScene(string sceneName, Action<float> loadRate, Action loaded) {
+    //    AsyncOperation sceneAsync = SceneManager.LoadSceneAsync(sceneName);
 
-        prgCB = () => {
-            float progress = sceneAsync.progress;
-            loadRate?.Invoke(progress);
-            if(progress == 1) {
-                loaded?.Invoke();
-                prgCB = null;
-                sceneAsync = null;
-            }
-        };
-    }
+    //    prgCB = () => {
+    //        float progress = sceneAsync.progress;
+    //        loadRate?.Invoke(progress);
+    //        if(progress == 1) {
+    //            loaded?.Invoke();
+    //            prgCB = null;
+    //            sceneAsync = null;
+    //        }
+    //    };
+    //}
 
-    private void Update() {
-        prgCB?.Invoke();
-    }
+    //private void Update() {
+    //    prgCB?.Invoke();
+    //}
 
 
     private Dictionary<string, AudioClip> adDic = new Dictionary<string, AudioClip>();

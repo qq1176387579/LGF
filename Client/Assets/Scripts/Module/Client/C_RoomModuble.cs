@@ -14,7 +14,7 @@ public class C_RoomModuble : C_ModuleBase
     C2S_CreateRoom tmp_CreateRoom = new C2S_CreateRoom();
     C2S_GetAllTheRooms tmp_GetAllTheRooms = new C2S_GetAllTheRooms();
     C2S_InformRoomChange tmp_InformRoomChange = new C2S_InformRoomChange();
-
+    C2S_RoomProgress tmpRoomProgress = new C2S_RoomProgress();
 
 
 
@@ -26,7 +26,10 @@ public class C_RoomModuble : C_ModuleBase
         RegisterClientMsg<S2C_InformRoomChange>(NetMsgDefine.S2C_InformRoomChange, OnInformRoomChange);
 
         RegisterClientMsg<S2C_SyncRoomInfo>(NetMsgDefine.S2C_SyncRoomInfo, OnSucceededJoining);
-        
+
+        RegisterClientMsg<S2C_RoomtFinishType>(NetMsgDefine.S2C_RoomtFinishType, OnRoomtFinishType);
+        RegisterClientMsg<S2C_RoomProgress>(NetMsgDefine.S2C_RoomProgress, OnRoomProgress);
+
     }
 
     public void GetAllTheRoomsInfo()
@@ -90,6 +93,12 @@ public class C_RoomModuble : C_ModuleBase
         if (requestReadying)
         {
             sLog.Debug("---requestReadying---请求中-");
+            return;
+        }
+
+        if (roomMgr.curState != RoomStateEnum.Create)
+        {
+            sLog.Debug("--房间状态在游戏中 转移-");
             return;
         }
             
@@ -158,6 +167,91 @@ public class C_RoomModuble : C_ModuleBase
         EventManager.Instance.BroadCastEvent<uint, int, string>(GameEventType.ClientEvent_RoomOptSync, msg.playerID, optType, name);  //有玩家加入房间
 
     }
+
+
+
+    public void OnRoomtFinishType(S2C_RoomtFinishType msg)
+    {
+        sLog.Debug("--OnRoomtFinishType-"+ msg.type);
+        if (!player.InRoom)
+        {
+            sLog.Error("非法 请求操作");
+            return;
+        }
+
+
+
+        switch (msg.type)
+        {
+            case 1:
+                if ( roomMgr.curState != RoomStateEnum.Create)
+                {
+                    sLog.Error("非法 请求操作");
+                    return;
+                }
+                StartLoadingScene();
+                break;
+            case 2:
+                if (roomMgr.curState != RoomStateEnum.Loading)
+                {
+                    sLog.Error("非法 请求操作");
+                    return;
+                }
+                StartPlayingGame();
+                break;
+            default:
+                break;
+        }
+
+
+        //开始加载
+    }
+
+
+    void StartLoadingScene()
+    {
+        sLog.Debug("--StartLoadingScene-");
+
+        roomMgr.ChangeState(RoomStateEnum.Loading);
+
+        SceneManager.Instance.AsyncLoadScene("map_102", (prg) =>
+        {
+            //EventManager.Instance.BroadCastEvent(GameEventType.);
+
+            tmpRoomProgress.progress = (int)(prg * 100);
+            if (tmpRoomProgress.progress >= 100)
+            {
+                tmpRoomProgress.progress = 100;
+            }
+            SendNotRecycle(tmpRoomProgress);
+
+        }, () =>
+        {
+            tmpRoomProgress.progress = -1;
+            SendNotRecycle(tmpRoomProgress);
+        });
+
+        roomMgr.ChangeState(RoomStateEnum.Loading);
+        EventManager.Instance.BroadCastEvent(GameEventType.ClientEvent_StartLoadingScene);  //开始加载场景
+    }
+
+
+    void StartPlayingGame()
+    {
+        sLog.Debug("--StartPlayingGame-2");
+        roomMgr.ChangeState(RoomStateEnum.Playing);
+        EventManager.Instance.BroadCastEvent(GameEventType.ClientEvent_StartPlay); //用于显示
+    }
+
+    public void OnRoomProgress(S2C_RoomProgress msg)
+    {
+        sLog.Debug("--OnRoomProgress-");
+        EventManager.Instance.BroadCastEvent(GameEventType.ClientEvent_RoomProgress, msg); //用于显示
+
+    }
+
+
+
 
 
 }

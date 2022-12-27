@@ -50,6 +50,9 @@ namespace LGF
         ClientEvent_RoomOptSync,        //房间同步事件
         ClientEvent_JionRoom,           //获得全部房间事件
         ClientEvent_RoomChatMsg,        //房间对话消息
+        ClientEvent_StartLoadingScene,  //开始游戏
+        ClientEvent_RoomProgress,       //房间进度
+        ClientEvent_StartPlay,          //
         #endregion
 
 
@@ -58,7 +61,7 @@ namespace LGF
 
         #region 服务器
         //------------服务器事件---------------------
-        s_TextMsg,
+        //s_TextMsg,
 
         ServerEvent_GetServersInfo,  //获得服务器信息
         ServerEvent_PlayerConnect,
@@ -66,6 +69,7 @@ namespace LGF
 
         ServerEvent_ReConnect,    //退出重进  在连接
 
+        //ServerEvent_OnLogicFrame,   //逻辑帧
 
 
         #endregion

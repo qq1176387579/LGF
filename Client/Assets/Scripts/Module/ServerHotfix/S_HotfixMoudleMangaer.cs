@@ -48,6 +48,8 @@ namespace LGF.Server.Hotfix
             CreationModule<S_ChatModule>();
             CreationModule<S_RoomModule>();
             CreationModule<S_LoginModule>();
+            CreationModule<S_FrameSyncMoudule>();
+            
         }
 
 

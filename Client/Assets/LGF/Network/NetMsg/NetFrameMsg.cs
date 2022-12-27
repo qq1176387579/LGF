@@ -17,6 +17,55 @@ using LGF.Serializable;
 
 #region 操作
 
+
+/// <summary>
+/// 同步进入进度
+/// </summary>
+[SteamContract]
+
+public partial class S2C_RoomtFinishType : S2C_BASE<S2C_RoomtFinishType>
+{
+    public S2C_RoomtFinishType() : base(NetMsgDefine.S2C_RoomtFinishType) { }
+    [SteamMember(1)]
+    //type = 1 标识开始场景加载  2房间玩家全部加载完成 
+    public int type;
+}
+
+
+
+/// <summary>
+/// 同步进入进度
+/// </summary>
+[SteamContract]
+
+public partial class S2C_RoomProgress : S2C_BASE<S2C_RoomProgress>
+{
+    public S2C_RoomProgress() : base(NetMsgDefine.S2C_RoomProgress) { }
+    [SteamMember(1)]
+    public List<C2S_RoomProgress> list;
+
+}
+
+
+
+
+/// <summary>
+/// 同步进入进度
+/// </summary>
+[SteamContract]
+
+public partial class C2S_RoomProgress : C2S_BASE<C2S_RoomProgress>
+{
+    public C2S_RoomProgress() : base(NetMsgDefine.C2S_RoomProgress) { }
+
+    [SteamMember(1)]
+    public int progress;    //进度值   -1表示加载完成
+}
+
+
+
+
+
 public enum Frame_KeyType
 {
     Kill,
@@ -30,11 +79,14 @@ public enum Frame_KeyType
 /// </summary>
 [SteamContract]
 
-public class S2C_FrameOpKey : S2C_BASE<S2C_FrameOpKey>
+public partial class S2C_FrameOpKey : S2C_BASE<S2C_FrameOpKey>
 {
     public S2C_FrameOpKey() : base(NetMsgDefine.S2C_FrameOpKey) { }
 
     [SteamMember(1)]
+    public ulong curFrame;  //当前是第几帧
+
+    [SteamMember(2)]
     public List<C2S_FrameOpKey> allOpkey;
 }
 
@@ -46,7 +98,7 @@ public class S2C_FrameOpKey : S2C_BASE<S2C_FrameOpKey>
 /// </summary>
 [SteamContract]
 
-public class C2S_FrameOpKey : C2S_BASE<C2S_FrameOpKey>
+public partial class C2S_FrameOpKey : C2S_BASE<C2S_FrameOpKey>
 {
     public C2S_FrameOpKey() : base(NetMsgDefine.C2S_FrameOpKey) { }
 
@@ -61,7 +113,7 @@ public class C2S_FrameOpKey : C2S_BASE<C2S_FrameOpKey>
 
 
 [SteamContract]
-public class Frame_SkiilKey : CMD_BASE2<Frame_SkiilKey>
+public partial class Frame_SkiilKey : CMD_BASE2<Frame_SkiilKey>
 {
     [SteamMember(1)]
     public uint skillID;
@@ -74,7 +126,7 @@ public class Frame_SkiilKey : CMD_BASE2<Frame_SkiilKey>
 
 
 [SteamContract]
-public class Frame_MoveKey : CMD_BASE2<Frame_MoveKey>
+public partial class Frame_MoveKey : CMD_BASE2<Frame_MoveKey>
 {
     [SteamMember(1)]
     public uint Keyid;

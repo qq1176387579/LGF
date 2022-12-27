@@ -220,6 +220,9 @@ namespace LGF.Net
         /// <typeparam name="T"></typeparam>
         public void Send2<T>(T data, bool IsRecycle = true) where T : ISerializer
         {
+            if (sLog.OpenMsgInfo)
+                sLog.Debug(">>>>> Send msgType : {0}", typeof(T).Name);
+
             data.Serialize(m_SendStream);
             m_ServerKcpAgent.Send(m_SendStream.GetBuffer(), m_SendStream.Lenght);
             if (IsRecycle)

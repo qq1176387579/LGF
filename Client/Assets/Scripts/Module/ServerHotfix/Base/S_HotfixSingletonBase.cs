@@ -35,7 +35,10 @@ namespace LGF.Server.Hotfix
             dataMgr = moduleMgr.dataMgr;
             hotfixMgr.AddManager(this);
             _data = dataMgr.GetData<T1>();
-
+            if (_data == null)
+            {
+                sLog.Error(" type {0} _data Is null", typeof(T1));
+            }
             Init();
             return _Instance;
         }

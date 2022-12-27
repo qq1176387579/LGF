@@ -40,6 +40,12 @@ namespace LGF.Serializable
         {
             _out = stream.read.ReadInt64();
         }
+        public static void Read_UInt64(this LGF.Serializable.LStream stream, ref ulong _out)
+        {
+            _out = stream.read.ReadUInt64();
+        }
+
+
 
         public static void Read_Boolean(this LGF.Serializable.LStream stream, ref bool _out)
         {
@@ -96,6 +102,12 @@ namespace LGF.Serializable
         {
             stream.writer.Write(val);
         }
+        public static void Write_UInt64(this LGF.Serializable.LStream stream, in ulong val)
+        {
+            stream.writer.Write(val);
+        }
+
+        
 
         //public static void Write_Enum<T>(this LGF.Serializable.LStream stream, in T val) where T : struct, Enum
         //{

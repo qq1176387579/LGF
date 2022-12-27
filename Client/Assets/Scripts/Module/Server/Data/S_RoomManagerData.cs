@@ -14,11 +14,13 @@ public class S_RoomManagerData : S_ManagerDataBase
     public uint generateUID;
 
     public Dictionary<uint, S_Room> roomList;
+    public Dictionary<uint, S_Room> playingRoomList;
 
     public override void Init()
     {
         
         roomList = new Dictionary<uint, S_Room>();
+        playingRoomList = new Dictionary<uint, S_Room>();   //游戏中的房间
         generateUID = 0;
     }
 }

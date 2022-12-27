@@ -15,7 +15,12 @@ namespace LGF.Log
 
     public static class sLog
     {
+#if NOT_UNITY
+        public static bool OpenMsgInfo = false;
+#else
         public static bool OpenMsgInfo = true;
+#endif
+
 
 #if NOT_UNITY
         public static bool OpenStackTrace = false;

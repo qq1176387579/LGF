@@ -39,7 +39,7 @@ namespace LGF.Editor
         [MenuItem("Assets/Create/ScriptableObject Asset", true)]
         static bool Validate()
         {
-            Debug.Log("--fff-444-");
+            //Debug.Log("--fff-444-");
             Func<Object, bool> predicate = (obj) =>
             {
                 if (obj is MonoScript)

@@ -17,13 +17,12 @@ using static LGF.Net.KcpServer;
 /// </summary>
 public class S_ModuleMgr : SingletonBase<S_ModuleMgr>
 {
+    Dictionary<Type, IServerSingletonBase> m_mgrs = new Dictionary<Type, IServerSingletonBase>();
 
-    List<IServerSingletonBase> m_mgrs = new List<IServerSingletonBase>(); //管理器
-
+    //List<IServerSingletonBase> m_mgrs = new List<IServerSingletonBase>(); //管理器
+    public ulong curTime => timerMgr.curTime;
     public S_DataMaganer dataMgr { get; protected set; }
     public S_TimeManager timerMgr { get; protected set; }
-
-    //public S_TimeManager s_TimeSysManager
 
     public KcpServer Server { get; private set; }
 
@@ -45,12 +44,21 @@ public class S_ModuleMgr : SingletonBase<S_ModuleMgr>
         //roomMgr = S_RoomManager.Instance.Init(this);
         timerMgr = S_TimeManager.Instance.Init(this);
         dataMgr = S_DataMaganer.Instance.Init(this);
+
+        S_FrameSyncManager.Instance.Init(this);
     }
 
     //AddManager<T>(out T mgr) 发现索引器无法添加
-    public void AddManager(IServerSingletonBase mgr)
+    public void AddManager(Type type, IServerSingletonBase mgr)
     {
-        m_mgrs.Add(mgr);
+        m_mgrs.Add(type, mgr);
+    }
+
+
+    public T GetMgr<T>() where T : class, IServerSingletonBase
+    {
+        m_mgrs.TryGetValue(typeof(T), out var mgr);
+        return mgr as T;
     }
 
 
@@ -93,6 +101,9 @@ public class S_ModuleMgr : SingletonBase<S_ModuleMgr>
         }
         LStream stream = null;
 
+        if (sLog.OpenMsgInfo)
+            sLog.Debug(">>>>>Broadcast Send msgType : {0}", data.msgType);
+
         foreach (var item in players)
         {
             KcpSession session = item.Value.session;
@@ -114,6 +125,8 @@ public class S_ModuleMgr : SingletonBase<S_ModuleMgr>
         if (players == null || players.Count == 0) return;
 
         LStream stream = null;
+        if (sLog.OpenMsgInfo)
+            sLog.Debug(">>>>>Broadcast Send msgType : {0}", data.msgType);
 
         foreach (var item in players)
         {
@@ -134,6 +147,9 @@ public class S_ModuleMgr : SingletonBase<S_ModuleMgr>
 
     public void Send<T>(S_Player player, T data, bool IsRecycle = true) where T : S2C_BASE<T>, new()
     {
+        if (sLog.OpenMsgInfo)
+            sLog.Debug(">>>>> Send msgType : {0}", data.msgType);
+
         KcpSession session = player.session;
         var stream = session.GetStream();
         data.Serialize(stream);
@@ -173,7 +189,7 @@ public class S_ModuleMgr : SingletonBase<S_ModuleMgr>
         //客户端
         foreach (var item in m_mgrs)
         {
-            item.Close();
+            item.Value.Close();
         };
     }
 

@@ -24,7 +24,7 @@ public class S_SingletonBase<T> : LGF.SingletonBase<T>, IServerSingletonBase whe
     public T Init(S_ModuleMgr s_ModuleMgr)
     {
         moduleMgr = s_ModuleMgr;
-        moduleMgr.AddManager(this);
+        moduleMgr.AddManager(typeof(T), this);
         Init();
         return _Instance;
     }

@@ -24,6 +24,8 @@ public class S_Player
     public bool InRoom => roomid > 0;
     public bool roomReally; //房间是是否是准备状态
 
+    public bool loadFinish; //是否完成加载
+
     #endregion
 
 

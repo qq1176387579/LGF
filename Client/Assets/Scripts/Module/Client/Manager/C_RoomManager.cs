@@ -14,6 +14,7 @@ public class C_RoomManager : C_SingletonBase<C_RoomManager>
     List<CMD_SimpleRoomInfo> roomInfos; //临时的数据 后面回收  不要拿去用。
 
     Dictionary<uint, CMD_UserRoomInfo> curRoomUserlist;
+    public RoomStateEnum curState { get; protected set; }
 
     public uint houseOwnerID;
     public string roomName;
@@ -29,6 +30,7 @@ public class C_RoomManager : C_SingletonBase<C_RoomManager>
         base.Init();
         roomInfos = new List<CMD_SimpleRoomInfo>();
         curRoomUserlist = new Dictionary<uint, CMD_UserRoomInfo>();
+        curState = RoomStateEnum.Create;
     }
 
 
@@ -79,6 +81,7 @@ public class C_RoomManager : C_SingletonBase<C_RoomManager>
     {
         curRoomUserlist.Add(msg.newUser.useinfo.uid, msg.newUser);    //加入
         msg.newUser = null;
+        curState = RoomStateEnum.Create;
     }
 
     public void LeaveRoom(uint playerID)
@@ -91,6 +94,7 @@ public class C_RoomManager : C_SingletonBase<C_RoomManager>
         curRoomUserlist.Remove(playerID);   //玩家离开
 
         info.Release();
+        curState = RoomStateEnum.Create;
     }
 
     public void OnCreateRoom(S2C_CreateRoom msg)
@@ -107,6 +111,7 @@ public class C_RoomManager : C_SingletonBase<C_RoomManager>
         //sLog.Debug(" player.RoomID : {0}", player.RoomID);
         curRoomUserlist.ClearReleaseMember();
         curRoomUserlist.Add(player.uid, info);
+        curState = RoomStateEnum.Create;
     }
 
 
@@ -120,6 +125,11 @@ public class C_RoomManager : C_SingletonBase<C_RoomManager>
     {
         curRoomUserlist.TryGetValue(id, out var player);
         return player;
+    }
+
+    public void ChangeState(RoomStateEnum type)
+    {
+        curState = type;
     }
 
 }

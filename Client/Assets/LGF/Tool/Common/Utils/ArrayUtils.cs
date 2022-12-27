@@ -117,10 +117,14 @@ namespace LGF
             list[idx2] = tmp;
         }
 
-        //public static void Swap<T>(in List<int> tmp)
-        //{
-
-        //}
+        public static void ClearReleaseMember<T>(this List<T> list) where T : Poolable<T>, new() 
+        {
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                list[i].Release();
+                list.RemoveAt(i);
+            }
+        }
 
 
         /// <summary>

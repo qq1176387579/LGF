@@ -43,6 +43,10 @@ public enum NetMsgDefine
     C2S_FrameOpKey,
     S2C_FrameOpKey,
 
+    S2C_RoomtFinishType,  //type = 1 标识开始场景加载  2房间玩家全部加载完成 
+    S2C_RoomProgress,
+    C2S_RoomProgress,
+
 }
 
 

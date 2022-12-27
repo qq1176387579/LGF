@@ -30,6 +30,7 @@ public class TestRoomPanel : MonoBehaviour
 
 
     List<RoomInfoItem> roomInfos = new List<RoomInfoItem>();
+    public Dictionary<uint, RoomInfoItem> roomDic = new Dictionary<uint, RoomInfoItem>();
     int curUserCount;
 
     RoomInfoItem houseOwner;
@@ -66,8 +67,45 @@ public class TestRoomPanel : MonoBehaviour
         Refresh();
         //EventManager.Instance.AddListener();
         EventManager.Instance.AddListener<uint, int, string>(GameEventType.ClientEvent_RoomOptSync, OnRoomOptSync);
+        EventManager.Instance.AddListener(GameEventType.ClientEvent_StartLoadingScene, OnStartLoadingScene);
+        EventManager.Instance.AddListener<S2C_RoomProgress>(GameEventType.ClientEvent_RoomProgress, OnRoomProgress);
         //    EventManager.Instance.BroadCastEvent(GameEventType.ClientEvent_RoomOptSync, msg.playerID, optType);  //有玩家加入房间
     }
+
+
+    void OnStartLoadingScene()
+    {
+        roomDic.Clear();
+        foreach (var item in roomInfos)
+        {
+            roomDic.Add(item.playerID, item);
+            item.SetPrg(0);
+        }
+
+        
+
+    }
+
+    void OnRoomProgress(S2C_RoomProgress msg)
+    {
+        for (int i = 0; i < msg.list.Count; i++)
+        {
+            roomDic.TryGetValue(msg.list[i].uid, out var info);
+            if (info == null)
+            {
+                sLog.Debug("非法操作 uid： {0} ", msg.list[i].uid);
+            }
+            else
+            {
+                info.SetPrg(msg.list[i].progress);
+            }
+        }
+        
+    }
+
+
+
+
 
     // Update is called once per frame
 
@@ -151,7 +189,8 @@ public class TestRoomPanel : MonoBehaviour
             if (houseOwnerID == item.playerID)
                 houseOwner = roomInfos[i]; 
             
-            roomInfos[i].gameObject.SetActive(true);
+            item.gameObject.SetActive(true);
+            item.loadParent.SetActive(false);
 
             if (item.playerID == C_ModuleMgr.Instance.Player.uid)    //如果是自己
             {

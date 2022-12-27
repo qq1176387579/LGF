@@ -22,25 +22,43 @@ public class GameFrameConfig
 }
 
 
-///// <summary>
-///// 帧同步管理器
-///// </summary>
-//public class S_FrameSyncModule : S_ModuleBase
-//{
-//    ulong taskID;
+/// <summary>
+/// 帧同步管理器
+/// </summary>
+public class S_FrameSyncManager : S_SingletonBase<S_FrameSyncManager>
+{
+    ulong taskID;
 
-//    protected override void OnInit()
-//    {
-//        base.OnInit();
+    event System.Action m_OnLogicFrameEvt;
 
-//        taskID = timerMgr.AddTask(FrameSync, GameFrameConfig.ServerLogicFrameIntervelMs, TimeUnit.Millisecond, 0);
-//    }
+    public override void Init()
+    {
+        taskID = moduleMgr.timerMgr.AddTask(OnLogicFrame, GameFrameConfig.ServerLogicFrameIntervelMs, TimeUnit.Millisecond, 0);    //扩展定时器
+    }
 
+    void OnLogicFrame(ulong tid)
+    {
+        //sLog.Debug("OnLogicFrame");
+        //逻辑帧
+        //EventManager.Instance.BroadCastEvent(GameEventType.ServerEvent_OnLogicFrame);
 
-//    void FrameSync(ulong tid)
-//    {
+        m_OnLogicFrameEvt?.Invoke();
+    }
 
-//    }
+    /// <summary>
+    /// 注册逻辑帧
+    /// </summary>
+    public void RegisterLogicFrame(System.Action action)
+    {
+        m_OnLogicFrameEvt += action;
+    }
 
+    /// <summary>
+    /// 注销逻辑帧
+    /// </summary>
+    public void UnRegisterLogicFrame(System.Action action)
+    {
+        m_OnLogicFrameEvt -= action;
+    }
 
-//}
+}

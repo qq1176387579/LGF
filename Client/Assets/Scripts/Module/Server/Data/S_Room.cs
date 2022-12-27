@@ -8,7 +8,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LGF;
-
 using LGF.Log;
 
 
@@ -20,7 +19,30 @@ public class S_Room : Poolable<S_Room>
     public Dictionary<uint, S_Player> playerList = new Dictionary<uint, S_Player>();    //房间玩家
     public int count => playerList.Count;
     public uint curRoomjoinRank;   //当前房间加入排名
+    public int reallyCount;
+    public int loadFinishCount;
 
+    public ulong curFrame;  //当前帧
+    public RoomStateEnum curState;  //当前状态
+    //public 
+    //public int 
+
+    public S2C_RoomProgress tmpRoomProgress;
+    public S2C_FrameOpKey tmpFrameOpKey;
+
+
+    protected override void OnGet()
+    {
+        base.OnGet();
+        tmpRoomProgress  = S2C_RoomProgress.Get();
+        tmpRoomProgress.list = new List<C2S_RoomProgress>();
+
+        tmpFrameOpKey = S2C_FrameOpKey.Get();
+        tmpFrameOpKey.allOpkey = new List<C2S_FrameOpKey>();
+
+        loadFinishCount = 0;
+        reallyCount = 0;
+    }
 
 
 
@@ -29,6 +51,12 @@ public class S_Room : Poolable<S_Room>
         base.OnRelease();
         playerList.Clear();
         houseOwner = null;
+        tmpRoomProgress.Release();
+        tmpRoomProgress= null;
+
+        tmpFrameOpKey.Release();
+        tmpFrameOpKey = null;
+
     }
 
 

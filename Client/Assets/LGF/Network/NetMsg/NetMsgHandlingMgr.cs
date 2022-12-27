@@ -61,8 +61,15 @@ namespace LGF.Net
     /// </summary>
     public partial class NetMsgHandlingMgr : NetMsgHandlingMgrBase<NetMsgHandlingMgr> , INetMsgHandling
     {
+        class NetMsgDelegateInfo
+        {
+            public System.Delegate evt;
+            public bool autoRecycle;
+        }
+
         NetMsgMgr netMsgMgr;
-        Dictionary<NetMsgDefine, System.Delegate> m_NetEvent = new Dictionary<NetMsgDefine, System.Delegate>();
+        Dictionary<NetMsgDefine, NetMsgDelegateInfo> m_NetEvent = new Dictionary<NetMsgDefine, NetMsgDelegateInfo>();
+        //Dictionary<NetMsgDefine, bool> m_AutoRecycleData = new Dictionary<NetMsgDefine, bool>();    //是否自动回收
         protected override void OnNew()
         {
             base.OnNew();
@@ -101,21 +108,21 @@ namespace LGF.Net
                 sLog.Warning("客户端 重复注册 请检查一下 {0}", type);
                 return;
             }
-            m_NetEvent.Add(type, action);
+            m_NetEvent.Add(type, new NetMsgDelegateInfo() { evt = action, autoRecycle = true });
         }
 
 
         public void InvokeClientMsg<T>(NetMsgDefine type, LStream _stream) where T : S2C_BASE<T>, new()
         {
 
-            m_NetEvent.TryGetValue(type, out System.Delegate delega);
+            m_NetEvent.TryGetValue(type, out var delega);
             if (delega == null)
             {
                 sLog.Warning("未注册该事件 !! {0}", type);
                 return;
             }
 
-            System.Action<T> action = delega as System.Action<T>;
+            System.Action<T> action = delega.evt as System.Action<T>;
             if (action == null)
             {
                 sLog.Error("事件出错 传输数据不对 {0}", typeof(T));
@@ -126,7 +133,7 @@ namespace LGF.Net
             //如果_stream 没有序列化 也不影响 后续接收的数据  接收数据是以_stream.GetBuffer() 来接收的
             T data = S2C_BASE<T>.Get(_stream);
 
-            netMsgMgr.QueueOnMainThreadt((_action, _data) =>
+            netMsgMgr.QueueOnMainThreadt((_action, _data, _autoRecycle) =>
             {
                 if (sLog.OpenMsgInfo)
                     sLog.Debug(">>>> Accept MsgType:{0}", _data.msgType);
@@ -137,9 +144,11 @@ namespace LGF.Net
                 }
 
                 _action.Invoke(_data);
-                _data.Release();
 
-            }, action, data);
+                if (_autoRecycle)   //自动回收
+                    _data.Release();
+
+            }, action, data, delega.autoRecycle);
 
         }
 
@@ -157,18 +166,20 @@ namespace LGF.Net
         /// 注意 泛型回调完成的时候 会自动回收
         /// 请自己做好处理
         /// </summary>
-        public void RegisterServerMsg<T>(NetMsgDefine type, System.Action<KcpServer.KcpSession,T> action) where T : C2S_BASE<T>, new()
+        public void RegisterServerMsg<T>(NetMsgDefine type, System.Action<KcpServer.KcpSession,T> action, bool isAutoRecycleData = true) where T : C2S_BASE<T>, new()
         {
-            if (m_NetEvent.ContainsKey(type))
+            if (m_NetEvent.TryGetValue(type,out var info))
             {
                 //如果是热更新的话 
-                sLog.Warning("服务器 重复注册 请检查一下 {0}  热更新加载请忽略该提示", type); 
+                sLog.Warning("服务器 重复注册 请检查一下 {0}  热更新加载请忽略该提示", type);
                 //服务端热更注册  
                 //后面加个判断 热更修复
-                m_NetEvent[type] = action;
+                info.autoRecycle = isAutoRecycleData;
+                info.evt = action;
                 return; 
             }
-            m_NetEvent.Add(type, action);
+            m_NetEvent.Add(type, new NetMsgDelegateInfo() { evt = action, autoRecycle = isAutoRecycleData });
+        
         }
 
 
@@ -181,7 +192,7 @@ namespace LGF.Net
             //所有逻辑跑主线程 所有NetEvent 赋值与更改都在线程执行。  保证下面的程序调用正确
             netMsgMgr.QueueOnMainThreadt((_NetEvent, _session, _data) =>
             {
-                _NetEvent.TryGetValue(type, out System.Delegate delega);
+                _NetEvent.TryGetValue(type, out var delega);
                 if (delega == null)
                 {
                     sLog.Warning("未注册该事件 !! {0}", type);
@@ -189,7 +200,7 @@ namespace LGF.Net
                     return;
                 }
 
-                System.Action<KcpServer.KcpSession, T> action = delega as System.Action<KcpServer.KcpSession, T>;
+                System.Action<KcpServer.KcpSession, T> action = delega.evt as System.Action<KcpServer.KcpSession, T>;
                 if (action == null)
                 {
                     sLog.Error("事件出错 传输数据不对 {0}", typeof(T));
@@ -201,12 +212,10 @@ namespace LGF.Net
                     sLog.Debug(">>>> Accept MsgType:{0}", _data.msgType);
 
                 action.Invoke(_session, _data);
-                _data.Release();    //自动回收
+                if (delega.autoRecycle)
+                    _data.Release();    //自动回收
+             
             }, m_NetEvent, session, data);
-
-
-
-
 
 
         }

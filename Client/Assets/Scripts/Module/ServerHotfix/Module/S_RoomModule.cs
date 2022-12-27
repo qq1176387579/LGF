@@ -17,7 +17,7 @@ namespace LGF.Server.Hotfix
         S2C_CreateRoom tmp_CreateRoom = new S2C_CreateRoom();
         S2C_InformRoomChange tmp_informRoomChange = new S2C_InformRoomChange();
         S2C_GetAllTheRooms tmp_GetAllTheRooms = new S2C_GetAllTheRooms();
-        //public uint t = 0;
+        
         protected override void OnInit()
         {
             base.OnInit();
@@ -25,9 +25,7 @@ namespace LGF.Server.Hotfix
             RegisterServerMsg<C2S_CreateRoom>(NetMsgDefine.C2S_CreateRoom, OnCreateRoom);
             RegisterServerMsg<C2S_InformRoomChange>(NetMsgDefine.C2S_InformRoomChange, OnRoomChange);
             RegisterServerMsg<C2S_GetAllTheRooms>(NetMsgDefine.C2S_GetAllTheRooms, OnGetAllTheRooms);
-            //t = roomMgr.GenerateUID();
-            
-            //sLog.Debug(" S_RoomModule init t -> " + t);
+            RegisterServerMsg<C2S_RoomProgress>(NetMsgDefine.C2S_RoomProgress, OnRoomProgress, false);
         }
 
 
@@ -112,7 +110,10 @@ namespace LGF.Server.Hotfix
             info.playerID = player.uid;
             info.opt = optType;
             info.ErrorCode = ErrCode.Succeed;
-            //后面可以用责任链 或者状态机修改
+
+         
+
+            //可以用策略模式
             switch (optType)
             {
                 case 1: //请求加入房间
@@ -121,6 +122,11 @@ namespace LGF.Server.Hotfix
                         if (room == null)
                         {
                             info.ErrorCode = ErrCode.RoomNotExist;  //房间不存在
+                            break;
+                        }
+                        if (room.curState != RoomStateEnum.Create)
+                        {
+                            sLog.Debug("非法操作  房间已经在游戏中");
                             break;
                         }
 
@@ -133,11 +139,23 @@ namespace LGF.Server.Hotfix
                     }
                 case 2: //2表示离开房间
                     {
+                        if (player.room.curState != RoomStateEnum.Create)
+                        {
+                            sLog.Error("非法操作  房间已经在游戏中");
+                            break;
+                        }
+
                         player.room.LeaveRoom(player);  //离开房间
                         break;
                     }
                 case 3: //3表示玩家准备
                     {
+                        if (player.room.curState != RoomStateEnum.Create)
+                        {
+                            sLog.Error("非法操作  房间已经在游戏中");
+                            break;
+                        }
+
                         if (player.roomReally)
                         {
                             sLog.Debug("---------player.roomReally{0}", player.roomReally);
@@ -147,19 +165,27 @@ namespace LGF.Server.Hotfix
 
                         player.SetPrepared(true);
                         SendNotRecycle(player.room.GetAllPlayer(), info);
+                        CheakStartLoading(player.room); //检查房间
                         return;
                     }
                 case 4: // 4表示玩家取消准备
                     {
+                        if (player.room.curState != RoomStateEnum.Create)
+                        {
+                            sLog.Error("非法操作  房间已经在游戏中");
+                            break;
+                        }
+
                         if (!player.roomReally)
                         {
                             sLog.Debug("--------player.roomReally{0}-", player.roomReally);
                             info.ErrorCode = ErrCode.INVALID_OPT;   //非法操作
                             break;
                         }
-
+                        sLog.Debug("-----------ff--");
                         player.SetPrepared(false);
                         SendNotRecycle(player.room.GetAllPlayer(), info);
+                        CheakStartLoading(player.room); //检查房间
                         return;
                     }
 
@@ -174,6 +200,56 @@ namespace LGF.Server.Hotfix
             }
 
             session.SendNotRecycle(info);
+        }
+
+
+        /// <summary>
+        /// 检查开始加载
+        /// </summary>
+        void CheakStartLoading(S_Room room)
+        {
+            sLog.Debug("-----------CheakStartLoading count--" + room.reallyCount);
+            sLog.Debug("-----------room.GetAllPlayer().Count--" + room.GetAllPlayer().Count);
+            //var players = room.GetAllPlayer();
+            if (room.GetAllPlayer().Count != room.reallyCount)
+            {
+                sLog.Debug("--------->   {0} {1}",room.reallyCount,room.GetAllPlayer().Count);
+                sLog.Debug("--------->   {0}", room.reallyCount == room.GetAllPlayer().Count);
+                //没有准备
+                return;
+            }
+            sLog.Debug("全部玩家 准备完成 开始进入加载状态");
+
+            if (!room.ChangState(RoomStateEnum.Loading))
+            {
+                sLog.Debug("状态改变失败");
+            }
+
+            
+            //SendNotRecycle(room.GetAllPlayer(),);
+        }
+
+
+        /// <summary>
+        /// 获得进度值
+        /// </summary>
+        void OnRoomProgress(KcpServer.KcpSession session, C2S_RoomProgress msg)
+        {
+            var player = GetPlayer(session);
+
+            if (player == null)
+            {
+                sLog.Error("玩家不存在 playerID: {0}", session.playerID);
+                return;
+            }
+
+            if (player.room == null)
+            {
+                sLog.Error(" 房间不存在 playerID : {0}", session.playerID);
+                return;
+            }
+            
+            player.room.AddLoadingMsg(msg);
         }
 
     }

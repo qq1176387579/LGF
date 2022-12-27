@@ -205,6 +205,9 @@ namespace LGF.Net
                 return;
             }
 
+            if (sLog.OpenMsgInfo)
+                sLog.Debug(">>>>>Broadcast Send msgType : {0}", data.msgType);
+
             LStream stream = null;
 
             foreach (var item in m_Sessions)
@@ -235,6 +238,9 @@ namespace LGF.Net
             }
 
             LStream stream = null;
+
+            if (sLog.OpenMsgInfo)
+                sLog.Debug(">>>>>Broadcast Send msgType : {0}", data.msgType);
 
             foreach (var item in sessions)
             {
@@ -272,6 +278,9 @@ namespace LGF.Net
 
             public void SendNotRecycle<T>(T data) where T : S2C_BASE<T>, new()
             {
+                if (sLog.OpenMsgInfo)
+                    sLog.Debug(">>>>> Send msgType : {0}", data.msgType);
+
                 data.Serialize(m_SendStream);
                 kcpAgent.Send(m_SendStream.GetBuffer(), m_SendStream.Lenght);
             }
@@ -283,6 +292,9 @@ namespace LGF.Net
             /// <typeparam name="T"></typeparam>
             public void Send<T>(T data, bool IsRecycle = true) where T : S2C_BASE<T>, new()
             {
+                if (sLog.OpenMsgInfo)
+                    sLog.Debug(">>>>> Send msgType : {0}", data.msgType);
+
                 data.Serialize(m_SendStream);
                 kcpAgent.Send(m_SendStream.GetBuffer(), m_SendStream.Lenght);
                 if (IsRecycle)
@@ -296,6 +308,9 @@ namespace LGF.Net
             /// <param name="_stream"></param>
             public void Send(LStream _stream)
             {
+                if (sLog.OpenMsgInfo)
+                    sLog.Debug(">>>>> Send _stream.Lenght : {0}", _stream.Lenght);
+
                 kcpAgent.Send(_stream.GetBuffer(), _stream.Lenght);
             }
 

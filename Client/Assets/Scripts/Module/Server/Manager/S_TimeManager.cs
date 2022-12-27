@@ -16,6 +16,7 @@ public class S_TimeManager : S_SingletonBase<S_TimeManager>
 {
     LGF.Timers.Timer timer = new LGF.Timers.Timer();
     public Stopwatch stopwatch = new Stopwatch();
+    public ulong curTime => lastTime;   //当前时间
     ulong lastTime;
     public override void Init()
     {
@@ -23,6 +24,7 @@ public class S_TimeManager : S_SingletonBase<S_TimeManager>
         //OnFixedUpdate 在局域网房间对战时  比较稳定 所以用这个
         LGFEntry.RegisterOnFixedUpdate(OnFixedUpdate);
         stopwatch.Start();
+        sLog.Debug("S_TimeManager Init");
     }
 
 
@@ -31,6 +33,7 @@ public class S_TimeManager : S_SingletonBase<S_TimeManager>
         var curTime = (ulong)stopwatch.ElapsedMilliseconds;
         //sLog.Debug("OnFixedUpdate time {0} ", curTime - lastTime);
         timer.Update(curTime - lastTime);
+        //sLog.Debug("----OnFixedUpdate--");
         lastTime = curTime;
     }
 

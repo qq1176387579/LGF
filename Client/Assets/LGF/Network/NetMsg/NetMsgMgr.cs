@@ -138,6 +138,14 @@ namespace LGF.Net
         }
 
 
+        /// <summary>
+        ///静态方法 添加到主线程
+        /// </summary>
+        public static void QueueOnMainThread<T1, T2, T3, T4>(System.Action<T1, T2, T3, T4> evt, in T1 param2, in T2 param3, in T3 param4, in T4 param5)
+        {
+            Instance.queue.Add(NDelegate.Get(evt, param2, param3, param4, param5));
+        }
+
 
         /// <summary>
         /// 静态方法 添加到主线程
@@ -181,6 +189,15 @@ namespace LGF.Net
         public void QueueOnMainThreadt<T1, T2, T3>(System.Action<T1, T2, T3> evt, in T1 param2, in T2 param3, in T3 param4)
         {
             queue.Add(NDelegate.Get(evt, param2, param3, param4));
+        }
+
+
+        /// <summary>
+        /// 添加到主线程
+        /// </summary>
+        public void QueueOnMainThreadt<T1, T2, T3,T4>(System.Action<T1, T2, T3,T4> evt, in T1 param2, in T2 param3, in T3 param4, in T4 param5)
+        {
+            queue.Add(NDelegate.Get(evt, param2, param3, param4, param5));
         }
 
 

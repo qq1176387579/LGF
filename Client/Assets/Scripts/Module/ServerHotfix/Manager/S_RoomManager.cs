@@ -18,6 +18,7 @@ namespace LGF.Server.Hotfix
         uint generateUID => _data.generateUID;
 
         Dictionary<uint, S_Room> roomList => _data.roomList;
+        Dictionary<uint,S_Room> playingRoomList => _data.playingRoomList;   //没用上 没写功能先弃用
 
         public override void Init()
         {
@@ -65,6 +66,13 @@ namespace LGF.Server.Hotfix
         {
             return roomList;
         }
+
+        public Dictionary<uint, S_Room> GetPlayingRoom()
+        {
+            //游戏中房间
+            return roomList; 
+        }
+
 
         public S_Room GetRoom(uint uid)
         {

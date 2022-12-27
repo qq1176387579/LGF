@@ -18,8 +18,6 @@ namespace LGF.Server.Hotfix
         {
             self.room?.LeaveRoom(self);   //离开房间
             self.name = self.session.name;  //修改成现在名称
-
-
         }
 
 
@@ -29,7 +27,22 @@ namespace LGF.Server.Hotfix
         /// <param name="player"></param>
         public static void SetPrepared(this S_Player self, bool val)
         {
-            self.roomReally = val;
+            if (self.roomReally == val)
+            {
+                sLog.Error(" 禁止 非法请求 已经准备了 或者 取消准备了 ");
+                return;
+            }
+
+            if (!self.roomReally)
+            {
+                self.roomReally = val;
+                self.room.reallyCount++;
+            }
+            else
+            {
+                self.roomReally = val;
+                self.room.reallyCount--;
+            }
         }
 
     }

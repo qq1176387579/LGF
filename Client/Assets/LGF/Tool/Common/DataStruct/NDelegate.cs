@@ -184,6 +184,43 @@ namespace LGF.DataStruct
 
         }
 
+
+        public static Event<T1, T2, T3, T4> Get<T1, T2, T3, T4>(System.Action<T1, T2, T3, T4> evt, in T1 param2, in T2 param3, in T3 param4, T4 param5)
+        {
+            var t = Event<T1, T2, T3, T4>.Get();
+            t.tmp.param1 = evt;
+            t.tmp.param2 = param2;
+            t.tmp.param3 = param3;
+            t.tmp.param4 = param4;
+            t.tmp.param5 = param5;
+            return t;
+        }
+
+        public class Event<T1, T2, T3, T4> : Poolable<Event<T1, T2, T3, T4>>, IDelegateBase
+        {
+            //初始化的时候调用一次
+            internal EvtHelper.Event.DataBase<System.Action<T1, T2, T3, T4>, T1, T2, T3, T4> tmp = EvtHelper.Event.DataBase<System.Action<T1, T2, T3, T4>, T1, T2, T3, T4>.Get();
+
+            public void Invoke()
+            {
+                if (IsRelease())
+                {
+                    sLog.Debug("非法操作 已经 Release 了");
+                    return;
+                }
+                tmp.param1.Invoke(tmp.param2, tmp.param3, tmp.param4, tmp.param5);
+                Release();  //测试回收
+            }
+
+            public void Invoke2()
+            {
+                tmp.param1.Invoke(tmp.param2, tmp.param3, tmp.param4, tmp.param5);
+            }
+
+            protected override void OnRelease() { base.OnRelease(); tmp.Clear(); }
+
+        }
+
     }
     #endregion
 
