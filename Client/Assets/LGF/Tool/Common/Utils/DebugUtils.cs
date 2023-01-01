@@ -335,12 +335,11 @@ namespace LGF.Log
                 //后面开线程  这里会阻塞线程的
                 if (LogFileWriter == null)
                 {
-                    //LogFileName = DateTime.Now.GetDateTimeFormats('s')[0].ToString();
                     //LogFileName = LogFileName.Replace("-", "_");
                     //LogFileName = LogFileName.Replace(":", "_");
                     //LogFileName = LogFileName.Replace(" ", "");
                     //LogFileName += ".log";
-                    LogFileName = "log.txt";
+                    LogFileName = DateTime.UtcNow.Ticks + "__log.txt";
                     if (string.IsNullOrEmpty(LogFileDir))
                     {
 #if NOT_UNITY

@@ -80,7 +80,7 @@ namespace LGF.Net
             {
                 while (!m_disposed)
                 {
-                    Thread.Sleep(2500);
+                    Thread.Sleep(2510);
                     if (isSend)
                     {
                         isSend = false;
