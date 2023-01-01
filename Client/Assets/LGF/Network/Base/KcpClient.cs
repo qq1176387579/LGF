@@ -131,6 +131,7 @@ namespace LGF.Net
                         //this.Delay(() => {
                         //    EventManager.Instance.BroadCastEvent(GameEventType.ConnectServerFail);
                         //});
+                        m_ServerKcpAgent.Close();
                         m_ServerKcpAgent = null;
                         break;
                     }
