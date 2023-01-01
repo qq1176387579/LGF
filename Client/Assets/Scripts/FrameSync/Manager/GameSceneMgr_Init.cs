@@ -101,11 +101,13 @@ public partial class GameSceneMgr
             TestPlayer1 player1 = go.GetComponent<TestPlayer1>();
             player1.Init();
             //player1.logicUnit.playerid = mainPlayer.uid;
+            //player1.logicUnit.testuid = mainPlayer.uid;
             players.Add(player1.logicUnit);
             playerUnits.Add(player1.logicUnit.playerid, player1.logicUnit);
         }
         else
         {
+            sLog.OpenMsgInfo = false;
             var allUserInfo = C_RoomManager.Instance.GetAllUserInfo();
             int count = 0;
             foreach (var user in allUserInfo)
@@ -114,8 +116,9 @@ public partial class GameSceneMgr
                 var go = GameObject.Instantiate<GameObject>(gop);
                 TestPlayer1 player1 = go.GetComponent<TestPlayer1>();
                 player1.Init();
-
+ 
                 player1.logicUnit.playerid = user.Value.useinfo.uid;
+                player1.logicUnit.testuid = user.Value.useinfo.uid.ToString();
                 sLog.Error("-----InitPlayer---" + player1.logicUnit.playerid);
 
                 players.Add(player1.logicUnit);

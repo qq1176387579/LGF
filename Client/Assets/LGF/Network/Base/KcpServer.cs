@@ -184,31 +184,38 @@ namespace LGF.Net
             //创建数据
             tmpData.C2S_Connect.Deserialize(stream);
 
-            if (m_uuidMap.TryGetValue(tmpData.C2S_Connect.uuid,out uint guid))
+            if (m_uuidMap.TryGetValue(tmpData.C2S_Connect.uuid, out uint guid)) 
             {
-                //表示已经存在了 需要去处理下 比如断网重连  我这里不做处理 
-                
-                sLog.Warning(" uuid 已经存在 当前暂时先退出原来的"); //表示重新登录  那么顶替之前的
 
-                ReConnect(guid, kcp);    //退出重进的情况
-                
+                sLog.Warning(" uuid : {0} 登录过", tmpData.C2S_Connect.uuid); //表示重新登录  那么顶替之前的
             }
             else
             {
-                InitConnect(kcp);
+                guid = GenSessionUniqueID();
+                m_uuidMap.Add(tmpData.C2S_Connect.uuid, guid);  //绑定
             }
+
+            var session = GetSessions(guid);
+            if (session == null)
+            {
+                InitConnect(kcp, guid);
+            }
+            else
+            {
+                //表示已经存在了 需要去处理下 比如断网重连  我这里不做处理 
+                sLog.Warning(" guid 在登录中 当前暂时先退出原来的"); //表示重新登录  那么顶替之前的
+                ReConnect(guid, kcp);    //退出重进的情况
+            }
+          
         }
 
 
-        void InitConnect(KcpSocket.KcpAgent kcp)
+        void InitConnect(KcpSocket.KcpAgent kcp, uint guid)
         {
-            uint guid = GenSessionUniqueID();
-            m_uuidMap.Add(tmpData.C2S_Connect.uuid, guid);
             var session = AddSessions(guid, kcp);
             tmpData.S2C_Connect.uid = guid;   //连接成功
             session.name = tmpData.C2S_Connect.name;
             session.UpdateCheckTime();
-
 
             sLog.Debug("OnConnect  tmpData.S2C_Connect msgType {0} name: {1}", tmpData.S2C_Connect.msgType, session.name);
             //这里其实线程不安全 但是登录模块 session 是新的 所以直接用

@@ -27,8 +27,7 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
     }
 
     public uint _keyid = 0;
-    public uint Keyid { get => ++_keyid; }
-
+    public uint Keyid { get => ++_keyid; } 
     List<PlayerUnit> players = new List<PlayerUnit>();
     //暂时先用字典   字典有查询消耗
     Dictionary<uint, PlayerUnit> playerUnits = new Dictionary<uint, PlayerUnit>();
@@ -83,9 +82,10 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
 
 
     S2C_FrameOpKey allkey;
-
+    public ulong CurFrame { get; private set; }
     public void OnServerLogicFrame(S2C_FrameOpKey msg)
     {
+        CurFrame = msg.curFrame;
         var opkey = msg.allOpkey;
         if (opkey != null)
         {

@@ -75,6 +75,12 @@ public partial class MainLogicUnit
             LogicPos = collider.mPos + adj; //当前位置加上矫正值
         }
         collider.mPos = LogicPos;
+
+        //sLog.Debug("{0} ", GameSceneMgr.Instance.CurFrame);
+        //sLog.Debug("{0} ", testuid);
+        //sLog.Debug("{0} ", LogicPos);
+        //sLog.Debug("{0} ", moveDir);
+        sLog.Debug("{0} LogicPos playerid:{1} :  pos: {2}  moveDir: {3}", GameSceneMgr.Instance.CurFrame, testuid, LogicPos, moveDir);
     }
 
 

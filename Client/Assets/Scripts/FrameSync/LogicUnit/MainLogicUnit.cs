@@ -24,7 +24,7 @@ public enum UnitTypeEnum
 
 public partial class MainLogicUnit : LogicUnit
 {
-
+    public string testuid;  //零时uid
 
     public MainLogicUnit()
     {

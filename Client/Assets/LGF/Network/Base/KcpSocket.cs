@@ -443,7 +443,7 @@ namespace LGF.Net
                 Span<byte> buffBytes = new Span<byte>(m_Socket.m_SendBuffer);
                 buffer.Memory.Span.Slice(0, avalidLength).CopyTo(buffBytes);
                 m_Socket.SockSend(m_Socket.m_SendBuffer, avalidLength, endPoint);
-                this.Debug(">>  Output avalidLength{0}", avalidLength);
+                //this.Debug(">>  Output avalidLength{0}", avalidLength);
                 buffer.Dispose();
             }
 
