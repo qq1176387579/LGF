@@ -136,7 +136,11 @@ namespace LGF.Net
             netMsgMgr.QueueOnMainThreadt((_action, _data, _autoRecycle) =>
             {
                 if (sLog.OpenMsgInfo)
-                    sLog.Debug(">>>> Accept MsgType:{0}", _data.msgType);
+                {
+                    if (_data.msgType != NetMsgDefine.S2C_HeartBeat)
+                        sLog.Debug(">>>> Accept MsgType:{0}", _data.msgType);
+                }
+                 
 
                 if (_data.ErrorCode != ErrCode.Succeed)
                 {
@@ -228,6 +232,16 @@ namespace LGF.Net
         public void OnServerMsg(KcpServer server, NetMsgDefine type, uint sessionID, LStream _stream)
         {
             var session = server.GetSessions(sessionID);
+            //这里可以优化 原来的没办法判断  是否登录  并且kcp还在代理还在
+            if (session == null)
+            {
+                sLog.Error("非法请求  请先登录");   
+                return;
+            }
+            session.UpdateCheckTime();
+            if (type == NetMsgDefine.C2S_HeartBeat) return; //心跳不要需要处理
+
+
             InvokeServerMsgEx(type, session, _stream);
         }
 

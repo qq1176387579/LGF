@@ -1,7 +1,7 @@
 /***************************************************
 /// 作者:      liuhuan
 /// 创建日期:  2022/12/11 17:37:07
-/// 功能描述:  客户端玩家信息
+/// 功能描述:  客户端玩家信息 与操作
 ****************************************************/
 
 using System.Collections;
@@ -19,6 +19,12 @@ public class C_MainPlayerManager : C_SingletonBase<C_MainPlayerManager>
     public string name;
     public uint RoomID;
     public bool InRoom => RoomID > 0;
+    C2S_FrameOpKey tmpFrameOpKey;
+    public override void Init()
+    {
+        base.Init();
+        tmpFrameOpKey = C2S_FrameOpKey.Get();
+    }
 
 
     /// <summary>
@@ -50,6 +56,24 @@ public class C_MainPlayerManager : C_SingletonBase<C_MainPlayerManager>
         info.name = name;
         return info;
     }
+
+
+
+
+    public void SendMoveKey(long x, long z, uint Keyid)
+    {
+        C2S_FrameOpKey key = tmpFrameOpKey;
+        key.keytype = Frame_KeyType.Move;
+        if (key.moveKey == null) key.moveKey = Frame_MoveKey.Get();
+        key.moveKey.x = x;
+        key.moveKey.z = z;
+        key.moveKey.Keyid = Keyid;
+
+        SendNotRecycle(key);
+    }
+
+
+
 
 
 }

@@ -23,10 +23,12 @@ namespace LGF.Server.Hotfix
 
             EventManager.Instance.AddListener<KcpSession>(GameEventType.ServerEvent_PlayerConnect, OnPlayerConnect);
             EventManager.Instance.AddListener<KcpSession>(GameEventType.ServerEvent_ReConnect, OnReConnect);
+            EventManager.Instance.AddListener<KcpSession>(GameEventType.ServerEvent_Disconnect, OnDisconnect);
+
         }
 
 
-        public void OnPlayerConnect(KcpSession session)
+        void OnPlayerConnect(KcpSession session)
         {
             if (playerMgr.GetPlayerByID(session.playerID) != null)
             {
@@ -37,12 +39,11 @@ namespace LGF.Server.Hotfix
             playerMgr.AddNewPlayer(session);
         }
 
-        public void OnReConnect(KcpSession session)
+        void OnReConnect(KcpSession session)
         {
-          sLog.Debug(" >>>>>>>> OnReConnect " + session.playerID);
+            sLog.Debug(" >>>>>>>> OnReConnect " + session.playerID);
           
-
-             var player = GetPlayer(session.playerID);
+            var player = GetPlayer(session.playerID);
             if (player == null)
             {
                 sLog.Debug("重进出错  玩家为空 出错 ： {0}  名字{1}", session.kcpAgent.endPoint, session.name);
@@ -56,11 +57,25 @@ namespace LGF.Server.Hotfix
         }
 
 
+
+        void OnDisconnect(KcpSession session)
+        {
+            sLog.Debug(" >>>>>>>> OnDisconnect " + session.playerID);
+            var player = GetPlayer(session.playerID);
+            if (player == null)
+            {
+                sLog.Debug("重进出错  玩家为空 出错 ： {0}  名字{1}", session.kcpAgent.endPoint, session.name);
+                return;
+            }
+
+            player.OnOffline();
+        }
+
         public override void Close()
         {
             EventManager.Instance.RemoveListerner<KcpSession>(GameEventType.ServerEvent_PlayerConnect, OnPlayerConnect);
             EventManager.Instance.RemoveListerner<KcpSession>(GameEventType.ServerEvent_ReConnect, OnReConnect);
-
+            EventManager.Instance.RemoveListerner<KcpSession>(GameEventType.ServerEvent_Disconnect, OnDisconnect);
         }
 
     }

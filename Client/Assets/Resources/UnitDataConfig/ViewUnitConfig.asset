@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b92c43fe84b30d3489dff684710f3649, type: 3}
+  m_Name: ViewUnitConfig
+  m_EditorClassIdentifier: 
+  data:
+    IsSyncPos: 1
+    PredictPos: 1
+    PredictMaxCount: 15
+    SmoothPos: 1
+    viewPosAccer: 10
+    IsSyncDir: 1
+    SmoothDir: 1
+    viewDirAccer: 10
+    AngleMultiplier: 8

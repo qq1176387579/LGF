@@ -68,6 +68,7 @@ namespace LGF.Net
 
     /// <summary>
     /// KcpSocket  线程安全    后面看你用条件变量写Dispose  阻塞其他线程 现在写得感觉有段乱
+    /// 没做删除检查
     /// </summary>
     public class KcpSocket 
     {
@@ -77,7 +78,7 @@ namespace LGF.Net
         byte[] m_RecvBuffer = new byte[NetConst.Socket_RecvBufferSize];
         Thread thread;
         bool m_disposed = false;
-        Dictionary<ulong, KcpAgent> m_KcpAgents = new Dictionary<ulong, KcpAgent>();
+        Dictionary<ulong, KcpAgent> m_KcpAgents = new Dictionary<ulong, KcpAgent>();   
         List<KcpAgent> m_addKcpAgent = new List<KcpAgent>();     //缓冲代理
         List<KcpAgent> m_delKcpAgent = new List<KcpAgent>();
         Timers.SimpleAsynTimer m_timer; //简单定时器

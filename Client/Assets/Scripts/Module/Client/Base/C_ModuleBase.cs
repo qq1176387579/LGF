@@ -10,6 +10,10 @@ using LGF;
 using LGF.Log;
 using LGF.Net;
 
+/// <summary>
+/// 模块不做存储数据  处理一些逻辑 与监听消息
+/// 客户端可以不用这块的。  我尝试下多
+/// </summary>
 public class C_ModuleBase 
 {
     protected C_ModuleMgr moduleMgr;

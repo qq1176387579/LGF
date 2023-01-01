@@ -11,4 +11,9 @@ public class MapRoot : MonoBehaviour {
     public Transform blueCrystal;
     public Transform redCrystal;
 
+
+    private void Start()
+    {
+        GameSceneMgr.Instance.Init();
+    }
 }

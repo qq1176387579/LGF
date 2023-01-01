@@ -165,7 +165,13 @@ namespace LGF.Net
                 }
 
                 var NetMsgtype = this.stream.GetNetMsgType();
-                if (NetMsgtype == NetMsgDefine.S2C_Connect) //存在重复登录的情况
+                //sLog.Debug("NetMsgtype----" + NetMsgtype);
+                if (NetMsgtype == NetMsgDefine.S2C_HeartBeat)
+                {
+                    kcpClient.SendHeartBeat();
+                    return;
+                }
+                else if (NetMsgtype == NetMsgDefine.S2C_Connect)
                 {
                     if (kcpClient.guid != 0)
                     {
@@ -175,19 +181,35 @@ namespace LGF.Net
                     kcpClient.IsTryConnecting = false;
                 }
 
+
                 kcpClient.NetMsgHandling.OnClientMsg(kcpClient, NetMsgtype, stream);
+              
+
             }
 
         }
 
 
+        /// <summary>
+        /// 主线程发 心跳
+        /// </summary>
+        internal void SendHeartBeat()
+        {
+            netMsgMgr.QueueOnMainThreadt((_this) =>
+            {
+                _this.SendNotRecycle(_this.tmpData.C2S_HeartBeat);
+            }, this);
+        }
 
         public void SendNotRecycle<T>(T data) where T : C2S_BASE<T>, new()
         {
             data.uid = guid;
             data.Serialize(m_SendStream);
             if (sLog.OpenMsgInfo)
-                sLog.Debug(">>>>> Send msgType : {0}", data.msgType);
+            {
+                if (data.msgType == NetMsgDefine.C2S_FrameOpKey || data.msgType == NetMsgDefine.C2S_HeartBeat) { }
+                else  sLog.Debug(">>>>> Send msgType : {0}", data.msgType);
+            }
  
             m_ServerKcpAgent.Send(m_SendStream.GetBuffer(), m_SendStream.Lenght);
         }

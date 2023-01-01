@@ -23,6 +23,9 @@ public enum NetMsgDefine
     C2S_Connect,
     S2C_Connect,
 
+    C2S_HeartBeat,      //心跳
+    S2C_HeartBeat,      //新系统
+
     C2S_ChatMsg,        //文本消息
     S2C_ChatMsg,        //文本消息
 

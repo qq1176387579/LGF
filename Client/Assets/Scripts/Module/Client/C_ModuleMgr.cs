@@ -44,6 +44,7 @@ public class C_ModuleMgr : SingletonBase<C_ModuleMgr>
         CreationModule<C_ChatModule>();
         CreationModule<C_LoginModule>();
         CreationModule<C_RoomModuble>();
+        CreationModule<C_FrameSyncModule>();
     }
 
     void CreationModule<T>() where T : C_ModuleBase, new()
@@ -70,11 +71,7 @@ public class C_ModuleMgr : SingletonBase<C_ModuleMgr>
 
 
 
-    /// <summary>
-    /// 帧同步 服务器帧率为30帧
-    /// </summary>
-    /// <param name="interval"></param>
-    public void InitClient(uint interval = 15)
+    public void InitClient()
     {
         if (Client != null)
         {
@@ -82,7 +79,7 @@ public class C_ModuleMgr : SingletonBase<C_ModuleMgr>
             return;
         }
         Client = new KcpClient();
-        Client.Bing(NetConst.RandomPort, interval);    //30间隔
+        Client.Bing(NetConst.RandomPort); 
     }
 
 

@@ -182,6 +182,27 @@ public partial class S2C_Connect : S2C_BASE<S2C_Connect>
 }
 
 
+/// <summary>
+/// 客户端连接  并传递客户端信息
+/// </summary>
+[LGF.Serializable.SteamContract]
+public partial class C2S_HeartBeat : C2S_BASE<C2S_HeartBeat>
+{
+    public C2S_HeartBeat() : base(NetMsgDefine.C2S_HeartBeat) { }
+}
+
+/// <summary>
+/// 服务端 返回连接 信息  
+/// </summary>
+[LGF.Serializable.SteamContract]
+public partial class S2C_HeartBeat : S2C_BASE<S2C_HeartBeat>
+{
+    public S2C_HeartBeat() : base(NetMsgDefine.S2C_HeartBeat) { }
+}
+
+
+
+//HeartBeat
 
 
 

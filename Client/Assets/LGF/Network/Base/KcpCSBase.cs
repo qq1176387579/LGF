@@ -41,6 +41,8 @@ namespace LGF.Net
 
         public S2C_Connect S2C_Connect = new S2C_Connect();  //临时数据
         public C2S_Connect C2S_Connect = new C2S_Connect(); //临时数据
+
+        public C2S_HeartBeat C2S_HeartBeat = new C2S_HeartBeat(); //临时数据
     }
 
 

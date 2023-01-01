@@ -20,6 +20,11 @@ namespace LGF.Server.Hotfix
             self.name = self.session.name;  //修改成现在名称
         }
 
+        public static void OnOffline(this S_Player self)
+        {
+            S_PlayerManager.Instance.OnOffline(self);
+        }
+
 
         /// <summary>
         /// 玩家准备

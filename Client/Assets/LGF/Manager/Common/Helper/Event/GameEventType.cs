@@ -68,7 +68,7 @@ namespace LGF
 
 
         ServerEvent_ReConnect,    //退出重进  在连接
-
+        ServerEvent_Disconnect,       //断开连接
         //ServerEvent_OnLogicFrame,   //逻辑帧
 
 

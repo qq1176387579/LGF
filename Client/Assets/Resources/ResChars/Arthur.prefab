@@ -76,6 +76,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -181,7 +182,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5669233777762471083}
   - component: {fileID: 7028611493261094304}
-  - component: {fileID: -548943091846885855}
+  - component: {fileID: 1967681978}
   m_Layer: 0
   m_Name: Arthur
   m_TagString: Untagged
@@ -305,7 +306,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &-548943091846885855
+--- !u!114 &1967681978
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -314,26 +315,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 5669233777762471084}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71c3fda983d67c54ea75f9053407bd21, type: 3}
+  m_Script: {fileID: 11500000, guid: bc624e681dec77f46b65f4621c1f65a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsSyncPos: 1
-  PredictPos: 1
-  PredictMaxCount: 15
-  SmoothPos: 1
-  viewPosAccer: 10
-  IsSyncDir: 1
-  SmoothDir: 1
-  viewDirAccer: 10
-  AngleMultiplier: 8
-  RoationRoot: {fileID: 2990674558125748809}
-  skillRange: {fileID: 1440414209279517047}
-  fade: 0.25
-  hpRoot: {fileID: 8751474097719979850}
-  ani: {fileID: 2990674558116001777}
-  sk1: {fileID: 0}
-  sk2: {fileID: 0}
-  sk3: {fileID: 0}
+  viewUnit:
+    info:
+      IsSyncPos: 0
+      PredictPos: 0
+      PredictMaxCount: 0
+      SmoothPos: 0
+      viewPosAccer: 0
+      IsSyncDir: 0
+      SmoothDir: 0
+      viewDirAccer: 0
+      AngleMultiplier: 0
+    RoationRoot: {fileID: 0}
+    skillRange: {fileID: 0}
+    fade: 0
+    hpRoot: {fileID: 0}
+    ani: {fileID: 2990674558116001777}
 --- !u!1 &9124188277922223319
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,13 +439,11 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: 83bc0f5634e205244a0457d0f1632e65, type: 3}
 --- !u!4 &2990674558125748809 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 400088, guid: 83bc0f5634e205244a0457d0f1632e65,
-    type: 3}
+  m_CorrespondingSourceObject: {fileID: 400088, guid: 83bc0f5634e205244a0457d0f1632e65, type: 3}
   m_PrefabInstance: {fileID: 2990674558125877393}
   m_PrefabAsset: {fileID: 0}
 --- !u!111 &2990674558116001777 stripped
 Animation:
-  m_CorrespondingSourceObject: {fileID: 11100000, guid: 83bc0f5634e205244a0457d0f1632e65,
-    type: 3}
+  m_CorrespondingSourceObject: {fileID: 11100000, guid: 83bc0f5634e205244a0457d0f1632e65, type: 3}
   m_PrefabInstance: {fileID: 2990674558125877393}
   m_PrefabAsset: {fileID: 0}

@@ -47,8 +47,12 @@ namespace LGF.Server.Hotfix
         }
 
 
-
-
+        public void OnOffline(S_Player player)
+        {
+            playerList.Remove(player.uid);
+            player.room?.LeaveRoom(player);   //离开房间
+            player.session.ServerCloseSession();
+        }
 
 
     }

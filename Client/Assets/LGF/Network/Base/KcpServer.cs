@@ -60,9 +60,82 @@ namespace LGF.Net
     
             this.Debug("服务端已经开启");
             recvHelper.kcpServer = this;
+
             OnBing();
+
+            //
+            StartHeartBeat();   //开始心跳
         }
 
+
+        void StartHeartBeat()
+        {
+            //sLog.Debug("------StartHeartBeat---11111---");
+            LStream tmpStream = new LStream(255);
+            S2C_HeartBeat heartBeat = new S2C_HeartBeat();
+            heartBeat.NSerialize(tmpStream);
+            List<KcpSession> sendList = null;
+            bool isSend = true;
+            Task.Run(() =>
+            {
+                while (!m_disposed)
+                {
+                    Thread.Sleep(2500);
+                    if (isSend)
+                    {
+                        isSend = false;
+                        sendList = ListPool<KcpSession>.Get();
+                    }
+                  
+                    //sLog.Debug("------StartHeartBeat---start---");
+                    if (m_disposed) break; //启动失败
+                    long nowTicks = DateTime.UtcNow.Ticks;
+
+                    lock (m_Sessions) {
+                        foreach (var session in m_Sessions) {
+                            if (session.Value.checkTime <= nowTicks) {
+                                if (m_disposed) break; //启动失败
+
+                                if (session.Value.checkCount >= 3) {
+                                    //sLog.Debug("------session.Value.checkCount-");
+                                    //主线程去关闭连接
+                                    netMsgMgr.BroadCastEventByMainThreadt(GameEventType.ServerEvent_Disconnect, session.Value);   
+                                }
+                                else {
+                                    session.Value.checkCount++;
+                                    session.Value.UpdateNextCheckTime();
+                                    sendList.Add(session.Value);
+                                }
+                            }
+                        }
+                    }
+
+
+                    //不在该线程执行  session.Send 没锁，如果在不同线程调用  会造成未知错误   所以放到主线程send
+                    if (sendList.Count > 0)
+                    {
+                        isSend = true;
+                        netMsgMgr.QueueOnMainThreadt((_sendList, _tmpStream) =>
+                        {
+                            foreach (var item in _sendList)
+                            {
+                                if (item.close) //存在延迟  以及关闭  不执行
+                                    continue;
+                                item.Send(_tmpStream);
+                            }
+                            //bool f = _sendList.Equals(sendList);
+                            //sLog.Debug("------StartHeartBeat--QueueOnMainThreadt----" + f);
+                          
+                            _sendList.Release();
+
+                        }, sendList, tmpStream);
+                    }
+
+                }
+            });
+
+
+        }
 
         public virtual void OnBing()
         {
@@ -122,21 +195,51 @@ namespace LGF.Net
             }
             else
             {
-                guid = GenSessionUniqueID();
-                m_uuidMap.Add(tmpData.C2S_Connect.uuid, guid);
-                var session = AddSessions(guid, kcp);
-                tmpData.S2C_Connect.uid = guid;   //连接成功
-                session.name = tmpData.C2S_Connect.name;
-
-                sLog.Debug("OnConnect  tmpData.S2C_Connect msgType {0} name: {1}" , tmpData.S2C_Connect.msgType, session.name);
-                //这里其实线程不安全 但是登录模块 session 是新的 所以直接用
-                session.Send(tmpData.S2C_Connect, false);    //发送数据
-                
-                //通知玩家登录了
-                netMsgMgr.BroadCastEventByMainThreadt(GameEventType.ServerEvent_PlayerConnect, session);
-              
+                InitConnect(kcp);
             }
         }
+
+
+        void InitConnect(KcpSocket.KcpAgent kcp)
+        {
+            uint guid = GenSessionUniqueID();
+            m_uuidMap.Add(tmpData.C2S_Connect.uuid, guid);
+            var session = AddSessions(guid, kcp);
+            tmpData.S2C_Connect.uid = guid;   //连接成功
+            session.name = tmpData.C2S_Connect.name;
+            session.UpdateCheckTime();
+
+
+            sLog.Debug("OnConnect  tmpData.S2C_Connect msgType {0} name: {1}", tmpData.S2C_Connect.msgType, session.name);
+            //这里其实线程不安全 但是登录模块 session 是新的 所以直接用
+            session.Send(tmpData.S2C_Connect, false);    //发送数据
+   
+
+            //通知玩家登录了
+            netMsgMgr.BroadCastEventByMainThreadt(GameEventType.ServerEvent_PlayerConnect, session);
+        }
+
+
+        /// <summary>
+        /// 退出重进 再连接
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <param name="newkcp"></param>
+        void ReConnect(uint guid, KcpSocket.KcpAgent newkcp)
+        {
+            KcpSession session = GetSessions(guid);
+
+            session.kcpAgent.Close();   //
+            session.kcpAgent = newkcp;  //重新连接
+            tmpData.S2C_Connect.uid = guid;   //连接成功
+            session.name = tmpData.C2S_Connect.name;
+
+            session.UpdateCheckTime();
+
+            session.Send(tmpData.S2C_Connect, false);    //发送数据 线程不安全  后面有时间 哭放s_mouble 里面处理  这样线程安全
+            netMsgMgr.BroadCastEventByMainThreadt(GameEventType.ServerEvent_ReConnect, session);    //修改游戏里面的数据数据
+        }
+
 
 
         public KcpSession GetSessions(uint id)
@@ -172,25 +275,8 @@ namespace LGF.Net
                 session = m_Sessions[guid];
                 m_Sessions.Remove(guid);
             }
-            session.kcpAgent.Close();   //
-        }
-
-        /// <summary>
-        /// 退出重进 再连接
-        /// </summary>
-        /// <param name="guid"></param>
-        /// <param name="newkcp"></param>
-        void ReConnect(uint guid, KcpSocket.KcpAgent newkcp)
-        {
-            KcpSession session = GetSessions(guid);
-
-            session.kcpAgent.Close();   //
-            session.kcpAgent = newkcp;  //重新连接
-            tmpData.S2C_Connect.uid = guid;   //连接成功
-            session.name = tmpData.C2S_Connect.name;
-
-            session.Send(tmpData.S2C_Connect, false);    //发送数据 线程不安全  后面有时间 哭放s_mouble 里面处理  这样线程安全
-            netMsgMgr.BroadCastEventByMainThreadt(GameEventType.ServerEvent_ReConnect, session);    //修改游戏里面的数据数据
+            session.Close();
+            //session.kcpAgent.Close();   //
         }
 
 
@@ -261,18 +347,21 @@ namespace LGF.Net
 
         //暂时先用uint表示guid
         //后面可以写个回收 回收KcpSession
-        uint allSessionGuid = 1;
+        uint allSessionGuid = 100000;   //uid以 100000 开始
         uint GenSessionUniqueID() => allSessionGuid++;
 
 
         public class KcpSession //: ISession
         {
+            public bool close = false;
             LStream m_SendStream = new LStream(NetConst.Socket_SendBufferSize);
             //byte[] m_SendBuffer = new byte[NetConst.Socket_SendBufferSize]; //发送最大大小
             public uint playerID;
             public KcpSocket.KcpAgent kcpAgent;
             public string name;
             public KcpServer server;
+            public long checkTime;     //时间
+            public float checkCount;    //心跳
 
             public LStream GetStream() => m_SendStream;
 
@@ -314,13 +403,41 @@ namespace LGF.Net
                 kcpAgent.Send(_stream.GetBuffer(), _stream.Lenght);
             }
 
-            public void Close()
+
+            internal void UpdateNextCheckTime()
             {
-                server.CloseSessions(playerID); //关闭
-                m_SendStream = null;
-                server = null;
+                checkTime = DateTime.UtcNow.Ticks + 5000;     //5s检查一次
+            }
+            /// <summary>
+            /// 更新 心跳时间
+            /// </summary>
+            internal void UpdateCheckTime()
+            {
+                //更新
+                UpdateNextCheckTime();
+                checkCount = 0;
+                //sLog.Debug(">>>> checkTime : {0}  checkCount： {1}", checkTime, checkCount);
             }
 
+
+            public void ServerCloseSession()
+            {
+                server.CloseSessions(playerID);
+            }
+
+            internal void Close()
+            {
+                if (close) return;
+
+                close = true;
+                //server.CloseSessions(playerID); //注释掉了 不然无线循环了
+                m_SendStream = null;
+                server = null;
+                kcpAgent.Close();
+            }
+
+
+          
         }
 
 

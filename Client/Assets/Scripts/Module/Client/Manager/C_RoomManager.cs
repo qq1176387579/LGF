@@ -1,7 +1,7 @@
 /***************************************************
 /// 作者:      liuhuan
 /// 创建日期:  2022/12/13 0:27:44
-/// 功能描述:  
+/// 功能描述:  房间管理器  管理数据
 ****************************************************/
 
 using System.Collections;
@@ -126,6 +126,13 @@ public class C_RoomManager : C_SingletonBase<C_RoomManager>
         curRoomUserlist.TryGetValue(id, out var player);
         return player;
     }
+
+
+    public Dictionary<uint, CMD_UserRoomInfo> GetAllUserInfo()
+    {
+        return curRoomUserlist;
+    }
+
 
     public void ChangeState(RoomStateEnum type)
     {

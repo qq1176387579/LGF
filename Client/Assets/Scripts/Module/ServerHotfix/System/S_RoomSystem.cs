@@ -243,7 +243,6 @@ namespace LGF.Server.Hotfix
             }
             else if (self.curState == RoomStateEnum.Playing)
             {
-                return;
                 self.curFrame++;    //帧递增
                 self.SendPlayingLogicFrame();
                 return;
@@ -278,15 +277,11 @@ namespace LGF.Server.Hotfix
 
 
         /// <summary>
-        /// 添加
+        /// 添加 房间当前进度消息
         /// </summary>
         /// <param name="self"></param>
         public static void AddLoadingMsg(this S_Room self,C2S_RoomProgress msg)
         {
-            //if (self.tmpRoomProgress.list == null)
-            //{
-            //    self.tmpRoomProgress.list = ListPool<C2S_RoomProgress>.Get();
-            //}
             self.tmpRoomProgress.list.Add(msg);
             if (msg.progress == -1)
             {
@@ -300,6 +295,16 @@ namespace LGF.Server.Hotfix
              
             }
         }
+
+        /// <summary>
+        /// 添加 房间当前进度消息
+        /// </summary>
+        /// <param name="self"></param>
+        public static void AddFrameOpKey(this S_Room self, C2S_FrameOpKey msg)
+        {
+            self.tmpFrameOpKey.allOpkey.Add(msg);
+        }
+
 
         /// <summary>
         /// 发送游戏中的逻辑帧
