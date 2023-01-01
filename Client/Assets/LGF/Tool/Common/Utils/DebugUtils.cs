@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System;
 using System.Diagnostics;
+using System.IO;
 
 #if !NOT_UNITY
 using UnityEngine;
@@ -15,6 +16,9 @@ namespace LGF.Log
 
     public static class sLog
     {
+
+        public static bool isSave = false;
+
 #if NOT_UNITY
         public static bool OpenMsgInfo = false;
 #else
@@ -37,6 +41,15 @@ namespace LGF.Log
 #else
             UnityEngine.Debug.LogFormat(format, args);
 #endif
+            if (isSave) 
+                DebugExtension.DebugUtils.LogToFile(string.Format(format, args));
+        }
+
+
+        public static void DebugAndSave(string format, params object[] args)
+        {
+            Debug(format, args);
+            DebugExtension.DebugUtils.LogToFile(string.Format(format, args));
         }
 
 
@@ -51,7 +64,8 @@ namespace LGF.Log
 #else
             UnityEngine.Debug.Log(message);
 #endif
-
+            if (isSave)
+                DebugExtension.DebugUtils.LogToFile(message.ToString());
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
@@ -312,9 +326,85 @@ namespace LGF.Log
                 return Regex.Replace(e.ToString(), RegexHelper.pattern, RegexHelper.replacement) + "\n\n";
             }
 
+            static StreamWriter LogFileWriter = null;
+            static string LogFileName = null;
+            static string LogFileDir = null;
+
+            internal static void LogToFile(string message, bool EnableStack = false)
+            {
+                //后面开线程  这里会阻塞线程的
+                if (LogFileWriter == null)
+                {
+                    //LogFileName = DateTime.Now.GetDateTimeFormats('s')[0].ToString();
+                    //LogFileName = LogFileName.Replace("-", "_");
+                    //LogFileName = LogFileName.Replace(":", "_");
+                    //LogFileName = LogFileName.Replace(" ", "");
+                    //LogFileName += ".log";
+                    LogFileName = "log.txt";
+                    if (string.IsNullOrEmpty(LogFileDir))
+                    {
+#if NOT_UNITY
+                        string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                        LogFileDir = baseDirectory + "/DebugerLog/";
+#else
+                        string baseDirectory = UnityEngine.Application.dataPath; //AppDomain.CurrentDomain.BaseDirectory;
+                        LogFileDir = baseDirectory + "/../DebugerLog/";
+#endif
+
+                    }
+
+                    string path = LogFileDir + LogFileName;
+                    Error(path);
+                    try
+                    {
+                        if (!Directory.Exists(LogFileDir))
+                        {
+                            Directory.CreateDirectory(LogFileDir);
+                        }
+
+                        LogFileWriter = File.AppendText(path);
+                        LogFileWriter.AutoFlush = true;
+                    }
+                    catch (Exception ex2)
+                    {
+                        LogFileWriter = null;
+
+                        Error("LogToCache() " + ex2.Message + ex2.StackTrace);
+                        return;
+                    }
+                }
+
+                if (LogFileWriter == null)
+                {
+                    return;
+                }
+
+                try
+                {
+                    LogFileWriter.WriteLine(message);
+                    if (EnableStack)
+                    {
+                        LogFileWriter.WriteLine(StackTraceUtility.ExtractStackTrace());
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+
         }
 
-
+        public static void Error(object message)
+        {
+#if NOT_UNITY
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message.ToString());
+            //if (OpenStackTrace) 
+            Console.WriteLine(new StackTrace().ToString());
+#else
+            UnityEngine.Debug.LogError(message);
+#endif 
+        }
 
 
     }

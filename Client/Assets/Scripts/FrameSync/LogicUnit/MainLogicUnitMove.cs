@@ -80,7 +80,8 @@ public partial class MainLogicUnit
         //sLog.Debug("{0} ", testuid);
         //sLog.Debug("{0} ", LogicPos);
         //sLog.Debug("{0} ", moveDir);
-        sLog.Debug("{0} LogicPos playerid:{1} :  pos: {2}  moveDir: {3}", GameSceneMgr.Instance.CurFrame, testuid, LogicPos, moveDir);
+
+        sLog.DebugAndSave("{0} LogicPos playerid:{1} :  pos: {2}  moveDir: {3}", GameSceneMgr.Instance.CurFrame, testuid, LogicPos, moveDir);
     }
 
 
