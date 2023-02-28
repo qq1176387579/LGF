@@ -381,9 +381,9 @@ namespace LGF.Log
                 try
                 {
                     LogFileWriter.WriteLine(message);
-                    if (EnableStack)
-                    {
-                        LogFileWriter.WriteLine(StackTraceUtility.ExtractStackTrace());
+                    if (EnableStack) {
+                        //LogFileWriter.WriteLine(StackTraceUtility.ExtractStackTrace());
+                        LogFileWriter.WriteLine(new StackTrace().ToString());
                     }
                 }
                 catch (Exception)
