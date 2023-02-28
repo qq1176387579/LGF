@@ -19,7 +19,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="..\..\Client\Assets\LGF\Network\**\*.cs">
+		<Compile Include="..\..\Client\Assets\Network\**\*.cs">
 			<Link>Network\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
