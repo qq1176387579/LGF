@@ -21,6 +21,8 @@ public class TestStartPanel : MonoBehaviour
 
     void Start()
     {
+        System.Random random = new System.Random();
+        //random.get
         //Debug.LogError("GetLocalIPv4_IPAddress" + LGF.Net.SocketHelper.GetLocalIPv4_IPAddress());
         //Debug.LogError("GetLocalIPv4_IPAddress" + LGF.Net.SocketHelper.GetLocalIPv4_IPAddress().ToString());
         if (button == null)

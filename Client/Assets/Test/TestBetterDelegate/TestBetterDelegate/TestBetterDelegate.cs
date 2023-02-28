@@ -72,10 +72,10 @@ public class TestBetterDelegate : MonoBehaviour
                 var t = NDelegate<object>.Get(mDel2444, i, inputNames[i], i);
                 t.Invoke(outputNames[i]);
 
-                t34333 = (tfff) =>
-                {
-                    Debug.Log(string.Format("j = {0}, k = {1}, t = {2}, u = {3}", i, inputNames[i], i, tfff));
-                };
+                //t34333 = (tfff) =>
+                //{
+                //    Debug.Log(string.Format("j = {0}, k = {1}, t = {2}, u = {3}", i, inputNames[i], i, tfff));
+                //};
 
             }
             else

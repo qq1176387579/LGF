@@ -10,7 +10,6 @@ using UnityEngine;
 using System.Net;
 using LGF;
 using LGF.Log;
-using LGF.Net;
 
 public class ServerConfig : ScriptableObject
 {

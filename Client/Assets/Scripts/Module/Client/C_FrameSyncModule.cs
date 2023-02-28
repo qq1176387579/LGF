@@ -24,7 +24,9 @@ public class C_FrameSyncModule : C_ModuleBase
     /// <param name="msg"></param>
     void OnServerLogicFrame(S2C_FrameOpKey msg)
     {
-        GameSceneMgr.Instance.OnServerLogicFrame(msg);
+        //感觉不能在这里执行。  
+        //可能因为网络问题一下子出现很多帧
+        GameSceneMgr.Instance.OnServerLogicFrame(msg);  
     }
 
 }

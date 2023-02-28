@@ -33,7 +33,7 @@ namespace LGF.Logic
         MAX,  //
     }
 
-    public class Attr  : PoolableNotLock<Attr>
+    public class Attr  : Poolable<Attr>
     {
         DataType[] data;
         public Attr()

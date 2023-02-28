@@ -81,14 +81,14 @@ public partial class MainLogicUnit
         //sLog.Debug("{0} ", LogicPos);
         //sLog.Debug("{0} ", moveDir);
 
-        sLog.DebugAndSave("{0} LogicPos playerid:{1} :  pos: {2}  moveDir: {3}", GameSceneMgr.Instance.CurFrame, testuid, LogicPos, moveDir);
+        //sLog.DebugAndSave("{0} LogicPos playerid:{1} :  pos: {2}  moveDir: {3}", GameSceneMgr.Instance.CurFrame, testuid, LogicPos, moveDir);
     }
 
 
     public void InputMoveKey(PEVector3 dir)
     {
         InputDir = dir;
-        sLog.Debug("InputDir:" + dir.ConvertViewVector3());
+        //sLog.Debug("InputDir:" + dir.ConvertViewVector3());
     }
 
 }

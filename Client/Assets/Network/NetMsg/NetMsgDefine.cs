@@ -4,10 +4,38 @@
 /// 功能描述:  
 ****************************************************/
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using LGF;
 using LGF.Log;
+
+//GetNetMsgType()
+
+namespace LGF.Serializable
+{
+    public static class LStream_Extend
+    {
+        ///// <summary>
+        ///// 获得网络消息类型 并重置位置
+        ///// 后面看情况改成扩展方法
+        ///// </summary>
+        ///// <returns></returns>
+        public static NetMsgDefine GetNetMsgType(this LStream _this)
+        {
+            NetMsgDefine val = NetMsgDefine.Empty;
+            try {
+                val = (NetMsgDefine)_this.read.ReadInt32();
+            }
+            catch (Exception e) {
+                e.DebugError();
+                return NetMsgDefine.Empty;  //非法操作
+            }
+            _this.Reset();
+            return val;
+        }
+    }
+}
 
 
 /// <summary>
