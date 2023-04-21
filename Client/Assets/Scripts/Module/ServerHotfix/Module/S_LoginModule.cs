@@ -60,7 +60,7 @@ namespace LGF.Server.Hotfix
 
         void OnDisconnect(KcpSession session)
         {
-            sLog.Debug(" >>>>>>>> OnDisconnect " + session.playerID);
+            sLog.Debug(" >>>>>>>> OnDisconnect 断开连接 " + session.playerID);
             var player = GetPlayer(session.playerID);
             if (player == null)
             {

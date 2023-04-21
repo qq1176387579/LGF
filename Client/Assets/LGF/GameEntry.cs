@@ -35,7 +35,7 @@ namespace LGF
 
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             try
             {
@@ -44,6 +44,7 @@ namespace LGF
             catch (System.Exception e)
             {
                 e.DebugError();
+
             }
         }
 
