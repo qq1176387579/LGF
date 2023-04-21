@@ -26,30 +26,54 @@ public class NetTestEntry3 : GameEntry2
         AppConfig.Instance.serverInfo.GetEndPoint();
 
 
-        List<string> strings1 = new List<string>() {"1" };
-        List<string> strings2 = new List<string>() { "2"};
+        //List<string> strings1 = new List<string>() {"1" };
+        //List<string> strings2 = new List<string>() { "2"};
 
-        PP(strings1, strings2);
-        Debug.LogFormat("{0}  {1}", strings1[0], strings2[0]);
+        //PP(strings1, strings2);
+        //Debug.LogFormat("{0}  {1}", strings1[0], strings2[0]);
 
-        PP1(ref strings1, ref strings2);
-        Debug.LogFormat("{0}  {1}", strings1[0], strings2[0]);
+        //PP1(ref strings1, ref strings2);
+        //Debug.LogFormat("{0}  {1}", strings1[0], strings2[0]);
+
+
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;  //防止息屏
     }
 
+    private Rect labelRect = new Rect(30, 30, 100, 30);
+    private float _Interval = 0.5f;
+    private int _FrameCount = 0;
+    private float _TimeCount = 0;
+    private float _FrameRate = 0;
 
-    void PP<T>(List<T> t ,List<T> t1)
+    void Update()
     {
-        var tmp = t;
-        t = t1;
-        t1 = tmp;
+        _FrameCount++;
+        _TimeCount += Time.unscaledDeltaTime;
+        if (_TimeCount >= _Interval) {
+            _FrameRate = _FrameCount / _TimeCount;
+            _FrameCount = 0;
+            _TimeCount -= _Interval;
+        }
     }
 
-    void PP1<T>(ref List<T> t, ref List<T> t1)
+    void OnGUI()
     {
-        var tmp = t;
-        t = t1;
-        t1 = tmp;
+        GUI.Label(labelRect, string.Format("FPS：{0:F1}", _FrameRate));
     }
+
+    //void PP<T>(List<T> t ,List<T> t1)
+    //{
+    //    var tmp = t;
+    //    t = t1;
+    //    t1 = tmp;
+    //}
+
+    //void PP1<T>(ref List<T> t, ref List<T> t1)
+    //{
+    //    var tmp = t;
+    //    t = t1;
+    //    t1 = tmp;
+    //}
 
 
 }

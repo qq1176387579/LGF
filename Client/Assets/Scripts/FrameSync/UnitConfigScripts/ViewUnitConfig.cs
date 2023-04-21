@@ -10,9 +10,9 @@ using UnityEngine;
 using LGF;
 using LGF.Log;
 
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
 [System.Serializable]
-#endif
+//#endif
 public struct ViewUnitData
 {
     //Pos

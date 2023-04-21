@@ -214,9 +214,11 @@ namespace LGF.Net
                 {
                     for (int i = 0; i < m_delKcpAgent.Count; i++)
                     {
+                        this.Debug("KcpAgent Remove >>" + m_delKcpAgent[i].uid);
                         m_KcpAgents.Remove(m_delKcpAgent[i].uid);
                         m_delKcpAgent[i].Dispose();
                     }
+                   
                 }
                 m_delKcpAgent.Clear();
             }

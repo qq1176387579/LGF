@@ -91,7 +91,7 @@ public abstract class MainViewUnit : ViewUnit
         if (aniName.Contains("walk"))
         {
             float moveRate = mainLogicUnit.LogicMoveSpeed.RawFloat / aniMoveSpeed;
-            Debug.Log($"-------{moveRate}----{mainLogicUnit.LogicMoveSpeed.RawFloat} {aniMoveSpeed}");
+            //Debug.Log($"-------{moveRate}----{mainLogicUnit.LogicMoveSpeed.RawFloat} {aniMoveSpeed}");
             ani[aniName].speed = moveRate;
             ani.CrossFade(aniName, fade / moveRate);
         }

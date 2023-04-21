@@ -71,7 +71,15 @@ public class TestSelectPanel : MonoBehaviour
         EventManager.Instance.AddListener(GameEventType.ClientEvent_JionRoom, OnJionRoom);
     }
 
-   
+
+    private void OnDestroy()
+    {
+        EventManager.Instance.RemoveListerner(GameEventType.ClientEvent_CreateRoomSucceed, OnJionRoom);
+
+        EventManager.Instance.RemoveListerner<List<CMD_SimpleRoomInfo>>(GameEventType.ClientEvent_GetAllRooms, Refresh);
+        EventManager.Instance.RemoveListerner(GameEventType.ClientEvent_JionRoom, OnJionRoom);
+    }
+
 
     void Refresh(List<CMD_SimpleRoomInfo> list)
     {

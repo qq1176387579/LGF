@@ -235,9 +235,10 @@ namespace LGF.Net
             //这里可以优化 原来的没办法判断  是否登录  并且kcp还在代理还在
             if (session == null)
             {
-                sLog.Error("非法请求  请先登录");   
+                sLog.Error($"uid:{sessionID} 非法请求  请先登录!! NetMsgType : {type}");   
                 return;
             }
+            //sLog.Debug($"{session.name} : UpdateCheckTime {type}");
             session.UpdateCheckTime();
             if (type == NetMsgDefine.C2S_HeartBeat) return; //心跳不要需要处理
 

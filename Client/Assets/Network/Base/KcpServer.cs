@@ -97,7 +97,7 @@ namespace LGF.Net
                                 if (m_disposed) break; //启动失败
 
                                 if (session.Value.checkCount >= 3) {
-                                    //sLog.Debug("------session.Value.checkCount-");
+                                    sLog.Debug($"------心跳关闭 guid: {session.Key} playerID: {session.Value.playerID}");
                                     //主线程去关闭连接
                                     netMsgMgr.BroadCastEventByMainThreadt(GameEventType.ServerEvent_Disconnect, session.Value);   
                                 }
@@ -122,6 +122,7 @@ namespace LGF.Net
                                 if (item.close) //存在延迟  以及关闭  不执行
                                     continue;
                                 item.Send(_tmpStream);
+                                //sLog.Debug($"{item.name} : send HeartBeat");
                             }
                             //bool f = _sendList.Equals(sendList);
                             //sLog.Debug("------StartHeartBeat--QueueOnMainThreadt----" + f);
@@ -193,6 +194,7 @@ namespace LGF.Net
             {
                 guid = GenSessionUniqueID();
                 m_uuidMap.Add(tmpData.C2S_Connect.uuid, guid);  //绑定
+                sLog.Warning(" SessionID : {0} --- uuid{1} 登录", guid, tmpData.C2S_Connect.uuid);
             }
 
             var session = GetSessions(guid);
@@ -288,36 +290,36 @@ namespace LGF.Net
 
 
 
-        /// <summary>
-        /// 广播给所有玩家
-        /// </summary>
-        public void Broadcast<T>(T data, bool IsRecycle = true) where T : S2C_BASE<T>, new()
-        {
-            if (m_Sessions.Count == 0)
-            {
-                return;
-            }
+        ///// <summary>
+        ///// 广播给所有玩家
+        ///// </summary>
+        //public void Broadcast<T>(T data, bool IsRecycle = true) where T : S2C_BASE<T>, new()
+        //{
+        //    if (m_Sessions.Count == 0)
+        //    {
+        //        return;
+        //    }
 
-            if (sLog.OpenMsgInfo)
-                sLog.Debug(">>>>>Broadcast Send msgType : {0}", data.msgType);
+        //    if (sLog.OpenMsgInfo)
+        //        sLog.Debug(">>>>>Broadcast Send msgType : {0}", data.msgType);
 
-            LStream stream = null;
+        //    LStream stream = null;
 
-            foreach (var item in m_Sessions)
-            {
-                KcpSession session = item.Value;
-                if (stream == null)
-                {
-                    stream = session.GetStream();
-                    data.Serialize(stream);
-                }
+        //    foreach (var item in m_Sessions)
+        //    {
+        //        KcpSession session = item.Value;
+        //        if (stream == null)
+        //        {
+        //            stream = session.GetStream();
+        //            data.Serialize(stream);
+        //        }
 
-                session.Send(stream);
-            }
+        //        session.Send(stream);
+        //    }
 
-            if (IsRecycle)
-                data.Release();
-        }
+        //    if (IsRecycle)
+        //        data.Release();
+        //}
 
         /// <summary>
         /// 广播给所有玩家
@@ -420,6 +422,7 @@ namespace LGF.Net
             /// </summary>
             internal void UpdateCheckTime()
             {
+              
                 //更新
                 UpdateNextCheckTime();
                 checkCount = 0;

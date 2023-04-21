@@ -44,7 +44,7 @@ public class TestRoomPanel : MonoBehaviour
 
         ChatModule = C_ModuleMgr.GetModule<C_ChatModule>();
 
-        EventManager.Instance.AddListener<string, string>(GameEventType.ClientEvent_RoomChatMsg, OnTextMsg);
+    
 
         sendBtn.onClick.AddListener(() =>
         {
@@ -69,9 +69,17 @@ public class TestRoomPanel : MonoBehaviour
         EventManager.Instance.AddListener<uint, int, string>(GameEventType.ClientEvent_RoomOptSync, OnRoomOptSync);
         EventManager.Instance.AddListener(GameEventType.ClientEvent_StartLoadingScene, OnStartLoadingScene);
         EventManager.Instance.AddListener<S2C_RoomProgress>(GameEventType.ClientEvent_RoomProgress, OnRoomProgress);
+        EventManager.Instance.AddListener<string, string>(GameEventType.ClientEvent_RoomChatMsg, OnTextMsg);
         //    EventManager.Instance.BroadCastEvent(GameEventType.ClientEvent_RoomOptSync, msg.playerID, optType);  //有玩家加入房间
     }
 
+    private void OnDestroy()
+    {
+        EventManager.Instance.RemoveListerner<uint, int, string>(GameEventType.ClientEvent_RoomOptSync, OnRoomOptSync);
+        EventManager.Instance.RemoveListerner(GameEventType.ClientEvent_StartLoadingScene, OnStartLoadingScene);
+        EventManager.Instance.RemoveListerner<S2C_RoomProgress>(GameEventType.ClientEvent_RoomProgress, OnRoomProgress);
+        EventManager.Instance.RemoveListerner<string, string>(GameEventType.ClientEvent_RoomChatMsg, OnTextMsg);
+    }
 
     void OnStartLoadingScene()
     {
