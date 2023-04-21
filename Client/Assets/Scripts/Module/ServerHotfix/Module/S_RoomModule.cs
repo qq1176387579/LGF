@@ -122,11 +122,13 @@ namespace LGF.Server.Hotfix
                         if (room == null)
                         {
                             info.ErrorCode = ErrCode.RoomNotExist;  //房间不存在
+                            info.ErrorCode = ErrCode.INVALID_OPT;   //非法操作
                             break;
                         }
                         if (room.curState != RoomStateEnum.Create)
                         {
                             sLog.Debug("非法操作  房间已经在游戏中");
+                            info.ErrorCode = ErrCode.INVALID_OPT;   //非法操作
                             break;
                         }
 
@@ -142,6 +144,7 @@ namespace LGF.Server.Hotfix
                         if (player.room.curState != RoomStateEnum.Create)
                         {
                             sLog.Error("非法操作  房间已经在游戏中");
+                            info.ErrorCode = ErrCode.INVALID_OPT;   //非法操作
                             break;
                         }
 
@@ -153,6 +156,7 @@ namespace LGF.Server.Hotfix
                         if (player.room.curState != RoomStateEnum.Create)
                         {
                             sLog.Error("非法操作  房间已经在游戏中");
+                            info.ErrorCode = ErrCode.INVALID_OPT;   //非法操作
                             break;
                         }
 
@@ -173,6 +177,7 @@ namespace LGF.Server.Hotfix
                         if (player.room.curState != RoomStateEnum.Create)
                         {
                             sLog.Error("非法操作  房间已经在游戏中");
+                            info.ErrorCode = ErrCode.INVALID_OPT;   //非法操作
                             break;
                         }
 
