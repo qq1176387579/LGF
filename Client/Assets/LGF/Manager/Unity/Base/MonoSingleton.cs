@@ -64,6 +64,10 @@ namespace LGF
 
                         //在这个物体上添加这个组件(这个单例类)
                         _instance = go.AddComponent<T>();
+                        _instance.Init();
+                    }
+                    else {
+                        _instance.RestParent();
                     }
                 }
                 return _instance;
@@ -71,6 +75,14 @@ namespace LGF
         }
 
         public static T GetSingleton() => Instance;
+
+        public virtual void Init() { }
+        void RestParent()
+        {
+            if (transform.parent != SingletonHelper.GetRoot().transform) {
+                transform.SetParent(SingletonHelper.GetRoot().transform);
+            }
+        }
     }
 
 

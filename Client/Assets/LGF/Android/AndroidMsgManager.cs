@@ -27,15 +27,16 @@ namespace LGF.Android
                 return;
             }
 #endif
-
-//#if UNITY_ANDROID && USE_ANDROID
+            Debug.Log("packname : " + Application.identifier);
+            //AppConfig.Instance.serverInfo.path
+            //#if UNITY_ANDROID && USE_ANDROID
 #if UNITY_ANDROID && !UNITY_EDITOR && USE_ANDROID
-            m_GameHelperJavaClass = new AndroidJavaClass(StringPool.Concat(AppConfig.Data.AppInfo.PackName, ".GameHelper"));
+            m_GameHelperJavaClass = new AndroidJavaClass(StringPool.Concat(Application.identifier, ".GameHelper"));
 #endif
         }
 
 
-//#if UNITY_ANDROID && USE_ANDROID
+        //#if UNITY_ANDROID && USE_ANDROID
 #if UNITY_ANDROID && !UNITY_EDITOR && USE_ANDROID
         AndroidJavaClass m_GameHelperJavaClass = null;
 

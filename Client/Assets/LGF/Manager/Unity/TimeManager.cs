@@ -10,6 +10,11 @@ using LGF.Log;
 namespace LGF
 {
 
+
+    /// <summary>
+    /// 该方法要比默认mono 优先级高 推荐用-2来标识
+    /// </summary>
+    [DefaultExecutionOrder(-99)]
     public partial class TimeManager : MonoSingleton<TimeManager>
     {
         #region data
@@ -76,7 +81,9 @@ namespace LGF
 
             //后面问策划手机 后台执行要暂定吗 应该是占停的
             ulong tmp = (ulong)(Time.deltaTime * (int)TimeUnit.Second);
+            //UnityEngine.Profiling.Profiler.BeginSample("m_timer.update ");
             m_timer.Update(tmp);     //受time影响
+            //UnityEngine.Profiling.Profiler.EndSample();
             m_timer2.Update((ulong)(TimeStampMsec - m_lastTimeStampMsec));      //不受time影响
         }
 
@@ -116,7 +123,7 @@ namespace LGF
         }
 
         /// <summary>
-        /// 延迟回调
+        /// 延迟回调 有GC 后面有时间再看怎么处理
         /// </summary>
         /// <param name="callback"></param>
         /// <param name="delay"></param>
@@ -134,15 +141,7 @@ namespace LGF
         }
 
 
-        /// <summary>
-        /// 无GC闭包GC
-        /// </summary>
-        /// <param name="callback"></param>
-        /// <param name="interval"></param>
-        /// <param name="timeUnit"></param>
-        /// <param name="count"></param>
-        /// <param name="delay"></param>
-        /// <returns></returns>
+
         public ulong AddTask(Action<ulong> callback, ulong interval, TimeUnit timeUnit = TimeUnit.Second, int count = 1, ulong delay = 0)
         {
             return m_timer.AddTask(callback, interval, timeUnit, count, delay);

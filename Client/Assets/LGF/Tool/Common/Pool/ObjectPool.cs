@@ -6,13 +6,29 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 
-/// <summary>
-/// 后面有时间去实现一个 线程安全队列 做缓冲池
-/// </summary>
-
 namespace LGF
 {
-    public class ObjectPool<T> where T : new()
+    public interface IObjectPool {
+        void Clear();
+    }
+
+    public static class ObjectPoolHelper
+    {
+        
+        static List<IObjectPool> poolList = new List<IObjectPool>();
+        public static void AddObjectPool(IObjectPool pool) => poolList.Add(pool);
+
+
+        public static void ClearAllPool()
+        {
+            for (int i = 0; i < poolList.Count; i++) {
+                poolList[i].Clear();
+            }
+        }
+    }
+
+
+    public class ObjectPool<T> : IObjectPool where T : new()
     {
         private readonly Stack<T> m_Stack = new Stack<T>();
         private readonly Action<T> m_ActionOnGet;
@@ -26,6 +42,7 @@ namespace LGF
         {
             m_ActionOnGet = actionOnGet;
             m_ActionOnRelease = actionOnRelease;
+            ObjectPoolHelper.AddObjectPool(this);
         }
 
         int m_SpinLock = 0;

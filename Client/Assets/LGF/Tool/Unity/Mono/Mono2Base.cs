@@ -8,7 +8,6 @@ namespace LGF
     public abstract class Mono2Base : MonoBase
     {
        
-        [Flags]
         protected enum MonoType
         {
             OnUpdate        = 1,

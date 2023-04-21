@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using LGF.Log;
 
 
 namespace LGF
@@ -57,7 +58,7 @@ namespace LGF
     {
         protected _StateMachine m_StateMachine;
         protected Value m_Value => m_StateMachine.CurValue;
-        public override void Init(object stateMachine)
+        public override void Init(object stateMachine, StateID stateID)
         {
             m_StateMachine = (_StateMachine)stateMachine;
         }
@@ -83,9 +84,10 @@ namespace LGF
     {
         protected _StateMachine _stateMachine;
         protected Value _value => _stateMachine.CurValue;
-        public override void Init(object stateMachine)
+        public override void Init(object stateMachine, StateID stateID)
         {
             _stateMachine = (_StateMachine)stateMachine;
+            base.Init(stateMachine, stateID);
         }
     }
 
@@ -94,9 +96,10 @@ namespace LGF
         where StateID : System.Enum
     {
         protected StateMachine<StateID> _stateMachine;
-        public override void Init(object stateMachine)
+        public override void Init(object stateMachine, StateID stateID)
         {
             _stateMachine = (StateMachine<StateID>)stateMachine;
+            base.Init(stateMachine, stateID);
         }
     }
     #endregion
@@ -107,8 +110,9 @@ namespace LGF
         where StateID : System.Enum
         where StateBase_ : StateBase1<StateID, StateBase_>
     {
-        private int m_Flag = StateMachineDefine.DEFAULT_VALUE;
-        public int Flag { get => m_Flag;}
+        public StateID stateID { get; protected set; }
+        private ulong m_Flag = StateMachineDefine.DEFAULT_VALUE;
+        public ulong Flag { get => m_Flag;}
 
         /// <summary>
         /// 进入状态
@@ -138,14 +142,21 @@ namespace LGF
         /// </summary>
         /// <param name="stateID"></param>
         /// <returns></returns>
-        public bool CanTransitionTo(int stateID) => (m_Flag & stateID) == stateID;
+        public bool CanTransitionTo(int stateID)
+        {
+            //this.Debug($"--m_Flag--stateID-");
+            //this.Debug($"{System.Convert.ToString(m_Flag)}");
+            //this.Debug($"{System.Convert.ToString(ulong.MaxValue)}");
+            //this.Debug($"{System.Convert.ToString(((ulong)1 << stateID))}");
+            return (m_Flag & ((ulong)1 << stateID)) > 0;
+        } 
         /// <summary>
         /// 激活可切换状态
         /// </summary>
         /// <param name="stateID"></param>
         public StateBase1<StateID, StateBase_> EnableTransition(StateID stateID)
         {
-            m_Flag |= stateID.ToInt();
+            m_Flag |= (ulong)1 << stateID.ToInt();
             return this;
         }
 
@@ -155,16 +166,40 @@ namespace LGF
         /// <param name="stateID"></param>
         public StateBase1<StateID, StateBase_> DisableTransition(StateID stateID)
         {
-            m_Flag &= ~stateID.ToInt();
+            m_Flag &= ~((ulong)1 << stateID.ToInt());
             return this;
+        }
+
+        public bool IsCanTransition()
+        {
+            
+            return (m_Flag & StateMachineDefine.TRANSITION_OPEN) > 0;
+        }
+
+
+        /// <summary>
+        /// 关闭变化
+        /// </summary>
+        public void CloseTransition()
+        {
+            m_Flag &= ~StateMachineDefine.TRANSITION_OPEN;
+        }
+
+        /// <summary>
+        /// 打开变化
+        /// </summary>
+        public void OpenTransition()
+        {
+            m_Flag |= StateMachineDefine.TRANSITION_OPEN;
         }
 
         /// <summary>
         /// 初始化 状态机
         /// </summary>
         /// <param name="stateMachine"></param>
-        public virtual void Init(object stateMachine)
+        public virtual void Init(object stateMachine, StateID stateID)
         {
+            this.stateID = stateID;
         }
     }
 

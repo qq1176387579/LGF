@@ -137,7 +137,7 @@ namespace LGF
             }
 
             m_StateMap.Add(stateID, state);
-            state.Init(this);
+            state.Init(this, stateID);
             //DeLog($"  AddState ");
             return (StateMachine)this;
         }
@@ -165,13 +165,18 @@ namespace LGF
         /// <param name="canChangeSelf">当前状态也能改变</param>
         public void ChangeState(StateID stateID, bool canChangeSelf = false, bool canOnExit = true)
         {
+
             if (!m_StateMap.ContainsKey(stateID))
             {
                 DeLog($"状态ID:{stateID}不存在！");
                 return;
             }
 
-            if (CurrentState != null && !CurrentState.CanTransitionTo(1 << stateID.ToInt()))
+            if (!CurrentState.IsCanTransition()) {
+                return;
+            }
+
+            if (CurrentState != null && !CurrentState.CanTransitionTo(stateID.ToInt()))
             {
                 DeLog($"无法切换至{stateID}");
                 return;
@@ -183,7 +188,12 @@ namespace LGF
                 return;
             }
 
+            OnChangeState(stateID, canOnExit);
 
+        }
+
+        private void OnChangeState(StateID stateID, bool canOnExit)
+        {
             var lastStateID = CurrentStateID;
             CurrentStateID = stateID;
             if (canOnExit)
@@ -193,10 +203,34 @@ namespace LGF
         }
 
 
-        public void FsmChangeState(StateID stateID)
+        public StateBase GetState(StateID stateID)
         {
-            if (CurrentStateID.ToInt() != stateID.ToInt())
-                ChangeState(stateID);
+            if (!m_StateMap.TryGetValue(stateID, out var state)) {
+                DeLog($"状态ID:{stateID}不存在！");
+            }
+
+            return state;
+        }
+
+        /// <summary>
+        /// 没有debug的版本
+        /// </summary>
+        /// <param name="stateID"></param>
+        public void ChangeState2(StateID stateID)
+        {
+            int _stateID = stateID.ToInt();
+            if (CurrentStateID.ToInt() == _stateID)
+                return;
+
+            if (!CurrentState.IsCanTransition()) {
+                return;
+            }
+
+            if (!CurrentState.CanTransitionTo(_stateID)) {
+                return;
+            }
+
+            OnChangeState(stateID, true);
         }
 
 

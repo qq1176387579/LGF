@@ -13,6 +13,15 @@ using UnityEngine;
 public static class ColorExtend 
 {
 
+    public static string ToColor(this object obj, Color color)
+    {
+        return string.Format("<color={0}>{1}</color>", color.ColorToHex(), obj);
+    }
+    public static string ToColor(this string str, Color color)
+    {
+        return string.Format("<color={0}>{1}</color>", color.ColorToHex(), str);
+    }
+
 
     public static string ToColor(this object obj, string color)
     {
@@ -60,13 +69,20 @@ public static class ColorExtend
     /// </summary>
     /// <param name="color"></param>
     /// <returns></returns>
-    public static string ColorToHex(Color color)
+    public static string ColorToHex(this Color color,bool HasSign = true)
     {
         int r = Mathf.RoundToInt(color.r * 255.0f);
         int g = Mathf.RoundToInt(color.g * 255.0f);
         int b = Mathf.RoundToInt(color.b * 255.0f);
         int a = Mathf.RoundToInt(color.a * 255.0f);
-        string hex = string.Format("{0:X2}{1:X2}{2:X2}{3:X2}", r, g, b, a);
+        string hex = null;
+        if (HasSign) {
+            hex = string.Format("#{0:X2}{1:X2}{2:X2}{3:X2}", r, g, b, a);
+        }
+        else {
+            hex = string.Format("{0:X2}{1:X2}{2:X2}{3:X2}", r, g, b, a);
+        }
+        
         return hex;
     }
 

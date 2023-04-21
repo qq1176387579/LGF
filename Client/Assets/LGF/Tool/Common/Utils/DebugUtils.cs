@@ -94,13 +94,13 @@ namespace LGF.Log
 #endif
         }
 
-        [System.Diagnostics.Conditional("DEBUG")]
+        //[System.Diagnostics.Conditional("DEBUG")]
         public static void Error(string message)
         {
             Error((object)message);
         }
 
-        [System.Diagnostics.Conditional("DEBUG")]
+        //[System.Diagnostics.Conditional("DEBUG")]
         public static void Error(object message)
         {
 #if NOT_UNITY
@@ -145,16 +145,21 @@ namespace LGF.Log
             LGF.Log.sLog.Debug(str, param);
         }
 
-        [System.Diagnostics.Conditional("DEBUG")]
+        //[System.Diagnostics.Conditional("DEBUG")]
         public static void DebugError(this object obj, object str)
         {
             LGF.Log.sLog.Error(str);
         }
 
-        [System.Diagnostics.Conditional("DEBUG")]
+        //[System.Diagnostics.Conditional("DEBUG")]
         public static void DebugError(this System.Exception e)
         {
+#if UNITY_EDITOR
             LGF.Log.sLog.Error(DebugUtils.GetExceptionStackInfoToUnity(e));
+#else
+            LGF.Log.sLog.Error(e.ToString());
+#endif
+
         }
 
 
