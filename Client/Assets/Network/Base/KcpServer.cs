@@ -149,13 +149,17 @@ namespace LGF.Net
         {
             public KcpServer kcpServer;
 
+            public KcpServerRecvHelper()
+            {
+                sLog.Error("  初始化成功  ");
+            }
+
             protected override void OnRecv(KcpSocket.KcpAgent kcp, int count)
             {
                 //sLog.Debug("------OnRecv-------");
                 //base.OnRecv(kcp, count);
                 if (count < 8)
                 {
-
                     sLog.Error("接收到一个未知的信息 count: " + count);
                     return;
                 }
@@ -170,6 +174,9 @@ namespace LGF.Net
                 }
                 else
                 {
+                    if (uid == 0) {
+                        this.DebugError("uid == 0 || kcpEndPoint :" + kcp.endPoint);
+                    }
                     //记得处理下换网路的问题 这里没处理了
                     kcpServer.NetMsgHandling.OnServerMsg(kcpServer, NetMsgtype, uid, stream);
                 }
@@ -237,7 +244,7 @@ namespace LGF.Net
         void ReConnect(uint guid, KcpSocket.KcpAgent newkcp)
         {
             KcpSession session = GetSessions(guid);
-
+            //ReConnect 关闭原来的
             session.kcpAgent.Close();   //
             session.kcpAgent = newkcp;  //重新连接
             tmpData.S2C_Connect.uid = guid;   //连接成功
@@ -443,6 +450,7 @@ namespace LGF.Net
                 //server.CloseSessions(playerID); //注释掉了 不然无线循环了
                 m_SendStream = null;
                 server = null;
+                this.Debug(" KcpSession close {0}", name);
                 kcpAgent.Close();
             }
 

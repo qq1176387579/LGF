@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using LGF.Log;
 using UnityEngine;
 
+
 namespace LGF.Net
 {
     public static class NetConst
@@ -31,15 +32,20 @@ namespace LGF.Net
         /// </summary>
         public const int RandomPort = 0;
 
-        /// <summary>
-        /// kcp 的 conv值
-        /// </summary>
-        public const int KcpConv = 1022;
+        ///// <summary>
+        ///// kcp 的 conv值  
+        ///// kcp相关
+        ///// https://m.rookiew.com/seo/7830.html
+        ///// </summary>
+        //public const int KcpConv = 1000003;
 
 
 
         public const int Socket_RecvBufferSize = 4096;   //应该不会大于这个
         public const int Socket_SendBufferSize = 4096;   //应该不会大于这个
+
+        public const int KcpConvInitialValue = 20;
+        public const int KcpAbnormal_1 = 1;  //异常1
     }
 
 

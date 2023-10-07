@@ -50,3 +50,6 @@ Assets/StreamingAssets/crashlytics-build.properties
 .vsconfig
 /MemoryCaptures/
 Assets/Scripts/Generated/SteamSerializable
+Pack/
+il2cppPack/
+DebugerLog/

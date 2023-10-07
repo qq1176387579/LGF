@@ -111,8 +111,10 @@ public class C_ModuleMgr : SingletonBase<C_ModuleMgr>
 
     public void Close()
     {
+        this.Debug("关闭中 Close");
         //_Instance = null;
         Client.Dispose();
+        this.Debug("关闭Close");
     }
 
 }

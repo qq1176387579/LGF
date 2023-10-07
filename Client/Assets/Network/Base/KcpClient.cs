@@ -83,7 +83,7 @@ namespace LGF.Net
         /// 尝试连接服务器
         /// 后面需要写 失败的情况
         /// </summary>
-        public void TryToConnect(string localName,in EndPoint endPoint)
+        public void TryToConnect(string localName, EndPoint endPoint)   
         {
             lock (recvHelper)   //防止重复请求
             {
@@ -93,10 +93,11 @@ namespace LGF.Net
                     return;
                 }
 
-                if (MacAddressUtils.Instance.HasUUID())
+                if (MacAddressUtils.Instance.HasUUID()) 
                 {
                     //PC端不做限制 后面测试时候可以测试
                     //安卓端检查断网情况
+                    //后面换 账号密码
 #if NOT_UNITY
                     tmpData.C2S_Connect.uuid = MacAddressUtils.Instance.GetUUID() + Common.Random(100000);
 #else
@@ -110,12 +111,13 @@ namespace LGF.Net
                     return;
                 }
 
-                m_ServerKcpAgent = m_kcpSocket.GetKcpAgent(endPoint);
+                //m_ServerKcpAgent = m_kcpSocket.ClientTryConnectServer(endPoint);
             }
 
             tmpData.C2S_Connect.name = localName;
-            Send2(tmpData.C2S_Connect, false);
+            //Send2(tmpData.C2S_Connect, false);
             //Send(tmpData.C2S_Connect, false);
+            //m_kcpSocket.ClientTryConnectServer(endPoint);
 
             IsTryConnecting = true;
             connectCount = 0;
@@ -123,8 +125,12 @@ namespace LGF.Net
             {
                 while (IsTryConnecting)
                 {
-                    if (connectCount >= 4) 
-                    {
+                  
+                    connectCount++;
+                    m_kcpSocket.ClientTryConnectServer(endPoint);
+                    Thread.Sleep(15000);    //15s一次心跳
+
+                    if (connectCount >= 5) {
                         IsTryConnecting = false;
                         sLog.Error("连接失败");
                         ////暂时先这样
@@ -136,11 +142,7 @@ namespace LGF.Net
                         break;
                     }
 
-                    Thread.Sleep(1000);
-                    connectCount++;
-                  
                 }
-
             });
         }
 
@@ -166,7 +168,7 @@ namespace LGF.Net
                 }
 
                 var NetMsgtype = this.stream.GetNetMsgType();
-                //sLog.Debug("NetMsgtype----" + NetMsgtype);
+                sLog.Debug("NetMsgtype----" + NetMsgtype);
                 if (NetMsgtype == NetMsgDefine.S2C_HeartBeat)
                 {
                     kcpClient.SendHeartBeat();
@@ -179,7 +181,7 @@ namespace LGF.Net
                         sLog.Error("重复登录了  请检查一下");
                     }
                     kcpClient.tmpData.S2C_Connect.Deserialize(stream);
-                    kcpClient.IsTryConnecting = false;
+                    //kcpClient.IsTryConnecting = false;
                 }
 
 
@@ -188,8 +190,31 @@ namespace LGF.Net
 
             }
 
+            protected override void OnConnectServerEvent(IKcpSocketOnRecv.ConnectServerEvent evt, KcpSocket.KcpAgent kcp)
+            {
+                if (evt == IKcpSocketOnRecv.ConnectServerEvent.LoginDone) {
+                    kcpClient.SetToServerKcpAgent(kcp);
+                    kcpClient.SendConnect();
+                }
+            }
+
         }
 
+        internal void SetToServerKcpAgent(KcpSocket.KcpAgent kcp)
+        {
+            IsTryConnecting = false;
+            m_ServerKcpAgent = kcp;
+        }
+
+        internal  void SendConnect()
+        {
+            sLog.Debug($"{tmpData.C2S_Connect.name} 请求登录 ");
+            netMsgMgr.QueueOnMainThreadt((_this) => {
+                _this.Send2<C2S_Connect>(_this.tmpData.C2S_Connect, false);
+                sLog.Debug($"{tmpData.C2S_Connect.name} 请求登录 发送完成 ");
+            }, this);   
+           
+        }
 
         /// <summary>
         /// 主线程发 心跳
@@ -228,6 +253,9 @@ namespace LGF.Net
             data.uid = guid;
             data.Serialize(m_SendStream);
             m_ServerKcpAgent.Send(m_SendStream.GetBuffer(), m_SendStream.Lenght);
+            if (data.uid == 0) {
+                this.Debug("--data.uid == 0--非法操作--");
+            }
             if (IsRecycle)
                 data.Release();
         }

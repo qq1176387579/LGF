@@ -110,7 +110,7 @@ namespace LGF.Net
             m_kcpSocket = new KcpSocket();
 
 
-            if (!m_kcpSocket.Bing(m_recvHelper, kcpPort != -1 ? kcpPort : LGF.Net.NetConst.RandomPort, interval)) 
+            if (!m_kcpSocket.Bing(m_recvHelper, kcpPort != -1 ? kcpPort : LGF.Net.NetConst.RandomPort, interval, IsServer)) 
             {
                 m_kcpSocket.Debug("初始化失败!!");
                 m_disposed = true;
@@ -195,7 +195,7 @@ namespace LGF.Net
         /// <summary>
         /// 线程不安全   需要确保是同一个线程
         /// </summary>
-         protected virtual void SendTo(LStream stream, int lenght, in EndPoint point)
+        protected virtual void SendTo(LStream stream, int lenght, in EndPoint point)
         {
             m_ConnectSock.SendTo(stream.GetBuffer(), lenght, SocketFlags.None, point);    //继续返回给刚刚发送过来的
         }
@@ -204,10 +204,10 @@ namespace LGF.Net
 
 
 
-        public KcpSocket.KcpAgent GetKcpAgent(in EndPoint point)
-        {
-            return m_kcpSocket.GetKcpAgent(point); 
-        }
+        //public KcpSocket.KcpAgent GetKcpAgent(in EndPoint point)
+        //{
+        //    return m_kcpSocket.GetKcpAgent(point); 
+        //}
 
 
         public virtual void Dispose()

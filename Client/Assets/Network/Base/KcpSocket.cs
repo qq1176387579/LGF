@@ -45,7 +45,15 @@ namespace LGF.Net
             
         }
 
-       
+        protected virtual void OnConnectServerEvent(IKcpSocketOnRecv.ConnectServerEvent evt, KcpSocket.KcpAgent kcp)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IKcpSocketOnRecv.OnConnectServerEvent(IKcpSocketOnRecv.ConnectServerEvent evt, KcpSocket.KcpAgent kcp)
+        {
+            OnConnectServerEvent(evt, kcp);
+        }
     }
 
 
@@ -55,6 +63,12 @@ namespace LGF.Net
     /// </summary>
     public interface IKcpSocketOnRecv
     {
+        public enum ConnectServerEvent
+        {
+            LoginDone,  //登录完成
+            ReLoginDone,
+        }
+
         byte[] bytebuffer { get;}
 
         /// <summary>
@@ -62,8 +76,10 @@ namespace LGF.Net
         /// </summary>
         /// <param name=""></param>
         /// <param name="count"></param>
-        void OnRecv(KcpSocket.KcpAgent kcp, int count);   
- 
+        void OnRecv(KcpSocket.KcpAgent kcp, int count);
+
+        void OnConnectServerEvent(ConnectServerEvent evt, KcpSocket.KcpAgent kcp);
+
     }
 
     /// <summary>
@@ -82,16 +98,24 @@ namespace LGF.Net
         List<KcpAgent> m_addKcpAgent = new List<KcpAgent>();     //缓冲代理
         List<KcpAgent> m_delKcpAgent = new List<KcpAgent>();
         Timers.SimpleAsynTimer m_timer; //简单定时器
-
+        public bool IsServer;   //是否是服务器
+        int m_SendSpinLock = 0; //发送的自旋锁
+      
         public bool IsDisposed => m_disposed;
 
 
         public bool HasBing => m_Socket != null;
         public Socket Sock => m_Socket;
         IKcpSocketOnRecv objRecv;
+        uint CurUid = 0;
+        /// <summary>
+        /// 服务器代理  客户端使用
+        /// </summary>
+        public KcpAgent ServerAgent;    
 
-        public bool Bing(IKcpSocketOnRecv onRecv, int port, uint interval = 10)
+        public bool Bing(IKcpSocketOnRecv onRecv, int port, uint interval = 10, bool isServer = true)
         {
+            IsServer = isServer;
             objRecv = onRecv;
             try
             {
@@ -184,7 +208,7 @@ namespace LGF.Net
                         for (int i = 0; i < m_addKcpAgent.Count; i++)   //添加
                         {
                             var kcpAgent = m_addKcpAgent[i];
-
+                            this.Debug($" OnUpdate add kcpAgent.uid {kcpAgent.uid} ");
                             m_KcpAgents.Add(kcpAgent.uid, kcpAgent);
                         }
                     }
@@ -267,65 +291,184 @@ namespace LGF.Net
             //TODO:未完成
             //Check 需要加个检查条件 如果时服务端的话。  ---只接收 对应服务端的 KcpAgent 代理  可以用回调实现
             //这里需要处理一下未知的 EndPoint
-            GetKcpAgent(endPoint, false)?.Input(length);
+            //GetKcpAgent(endPoint, false)?.Input(length);
+            if (!IsServer) {
+                ClientOnRecv(endPoint, length);
+            }
+            else {
+                ServerOnRecv(endPoint, length);
+            }
+        }
+
+        #region Client
+
+
+        void ClientOnRecv(in EndPoint endPoint, int length)
+        {
+            uint uid = BitConverter.ToUInt32(m_RecvBuffer, 0);  //id
+            if (uid == 0) { //连接成功
+                uid = BitConverter.ToUInt32(m_RecvBuffer, 4);
+                if (uid >= NetConst.KcpConvInitialValue) {
+                    //连接成功
+                    CurUid = uid;
+                    IPEndPoint tmpPoint = endPoint as IPEndPoint;
+                    ulong AddressUid = ((ulong)tmpPoint.Address.GetHashCode() << 16 | (ushort)tmpPoint.Port);  //唯一key值
+                    ServerAgent?.Close();   //关闭原来的代理开启新的   存在重连
+                    ServerAgent = null;
+                    ServerAgent = GetOrAddKcpAgent(uid, endPoint, AddressUid, false); //添加代理
+                    //且需要发送
+                    //OnConnectServerEvent.Invoke(ConnectServerEvent.LoginDone);
+                    objRecv.OnConnectServerEvent(IKcpSocketOnRecv.ConnectServerEvent.LoginDone, ServerAgent);
+                }
+                else {
+                    //连接失败
+                    //NetConst.KcpAbnormal_1
+                    if (NetConst.KcpAbnormal_1 == uid) {
+                        //重新请求
+                        sLog.Debug("掉线  需要重连");
+                        //OnConnectServerEvent.Invoke(ConnectServerEvent.ReLoginDone);
+                        objRecv.OnConnectServerEvent(IKcpSocketOnRecv.ConnectServerEvent.ReLoginDone, ServerAgent);
+                    }
+                }
+            }
+            else {
+                //正常流程
+                if (CurUid == uid) {
+                    ServerAgent.Input(length);
+                }
+                else {
+                    sLog.Error(" 出错.... ");
+                }
+
+            }
         }
 
 
 
-        /// <summary>
-        /// 获得自动添加KcpSocket管理类里面 线程安全
-        /// </summary>
-        /// <param name="point"></param>
-        /// <param name="lockKcpAgents"></param>
-        /// <returns></returns>
-        public KcpAgent GetKcpAgent(in EndPoint point, bool lockKcpAgents = true)
+
+        ///// <summary>
+        ///// 连接服务器事件
+        ///// 1表示成功
+        ///// 2表示需要重连
+        ///// </summary>
+        //System.Action<ConnectServerEvent> OnConnectServerEvent;
+
+        public void ClientTryConnectServer(EndPoint point)
         {
-            //endPoint 如果不是 IPEndPoint 另外处理  当前不处理这种情况  后续处理
-            IPEndPoint tmpPoint = point as IPEndPoint;
-            KcpAgent kcpAgent = null;
-            ulong uid = (ulong)((ushort)tmpPoint.Address.GetHashCode() << 16 | tmpPoint.Port);  //唯一key值
+            SockSend(new byte[4], 4, point);
+        }
 
-            if (lockKcpAgents)
-            {
-                //不知道为啥之前报错 现在又不报错了先不管了
-                lock (m_KcpAgents)  
-                {
-                    //m_KcpAgents Dispose注销时 m_KcpAgents 为null
-                    m_KcpAgents?.TryGetValue(uid, out kcpAgent);    
+
+        public KcpAgent ClientGetServer()
+        {
+            if (0 == CurUid) {
+                return null;
+            }
+            return GetKcpAgent(CurUid, true);
+        }
+
+        #endregion
+
+        #region server
+
+        
+        //处理 重复发送问题  一个地址绑定一个uid  同时检测掉线重登的问题
+        Dictionary<ulong, uint> Address2Uid = new Dictionary<ulong, uint>();    //晚点加自旋锁
+
+        void ServerOnRecv(in EndPoint endPoint, int length)
+        {
+            uint uid = BitConverter.ToUInt32(m_RecvBuffer, 0);  //id
+            IPEndPoint tmpPoint = endPoint as IPEndPoint;
+            ulong AddressUid = ((ulong)tmpPoint.Address.GetHashCode() << 16 | (ushort)tmpPoint.Port);  //唯一key值
+            if (0 == uid) {
+                //连接 
+                lock (Address2Uid) {    
+                    //同一个ip地址可能发送多个可能发送多个过来    过滤掉多余的生成的uid
+                    if (!Address2Uid.TryGetValue(AddressUid, out uid)) {
+                        uid = GenerateUniqueUID();
+                        Address2Uid.Add(AddressUid, uid);
+                    }
                 }
-                
+               
+                StartSpinLock_Send();   //开启发送锁
+                m_SendBuffer[0] = 0;
+                m_SendBuffer[1] = 0;
+                m_SendBuffer[2] = 0;
+                m_SendBuffer[3] = 0;
+                Array.Copy(BitConverter.GetBytes(uid), 0, m_SendBuffer, 4, 4);
+                SockSend(m_SendBuffer, 8, endPoint);
+                EndSpinLock_Send();     //关闭发送锁
+                //GetOrAddKcpAgent(uid,endPoint, false);  //
             }
-            else
-            {
-                m_KcpAgents?.TryGetValue(uid, out kcpAgent);
+            else {
+                bool hasAddress2Uid = false;
+                uint uid2 = 0;
+                lock (Address2Uid) {
+                    hasAddress2Uid = Address2Uid.TryGetValue(AddressUid, out uid2);
+                }
+               
+                if (hasAddress2Uid) {
+                    //没换ip地址
+                    if (uid2 != uid) {
+                        //异常
+                        this.DebugError("---------->> 异常1");
+                    }
+                    else {
+                        //正常流程
+                        GetOrAddKcpAgent(uid, endPoint, AddressUid, false).Input(length);
+                    }
+                }
+                else {
+                    //换ip地址  或者断网  需要重连
+                    if (uid2 != uid) {
+                        //id不对了异常 ip地址不对  
+                        this.DebugError("---------->> 异常2");
+                    }
+                    else {
+                        //id相同 没有下线 表示值断了一下 卡了一下 或者换了网络环境 比如wifi切手机  
+                        //卡了的话 服务器会删除当前这个KcpAgent 和  Addressuid
+                        //让客户端自己判断走流程 比如重新登录
+                        this.DebugError("---------->> 客户端重新在服务器中已掉线  但是客户端还能继续请求。 发送客户端错误代码");
+                        StartSpinLock_Send();   //开启发送锁
+                        m_SendBuffer[0] = 0;
+                        m_SendBuffer[1] = 0;
+                        m_SendBuffer[2] = 0;
+                        m_SendBuffer[3] = 0;
+                        Array.Copy(BitConverter.GetBytes(NetConst.KcpAbnormal_1), 0, m_SendBuffer, 4, 4);   //
+                        SockSend(m_SendBuffer, 8, endPoint);
+                        EndSpinLock_Send();     //关闭发送锁
+                    }
+                }
+              
             }
-
-            if (kcpAgent == null)
-            {
-                lock (m_addKcpAgent)
-                {
+        }
+        #endregion
+        //获得或者添加代理
+        public KcpAgent GetOrAddKcpAgent(uint uid, in EndPoint endPoint,ulong AddressUid, bool lockKcpAgents = true)
+        {
+            KcpAgent kcpAgent = GetKcpAgent(uid, lockKcpAgents);
+        
+            if (kcpAgent == null) {
+                lock (m_addKcpAgent) {
                     if (m_disposed) return null;
-
-                    for (int i = 0; i < m_addKcpAgent.Count; i++)   //在添加队列里面
-                    {
-                        if (m_addKcpAgent[i].endPoint.Equals(point)) //测试过 成立EndPoint 等于判定成立
-                        {
+                    //在添加队列里面
+                    for (int i = 0; i < m_addKcpAgent.Count; i++) {
+                        //测试过 成立EndPoint 等于判定成立
+                        if (m_addKcpAgent[i].uid == uid) {  
                             kcpAgent = m_addKcpAgent[i];
                             break;
                         }
                     }
-
-                    if (kcpAgent == null)   //添加新的
-                    {
-                        this.Debug("添加新的 kcpAgent : " + tmpPoint.ToString());
-                        kcpAgent = new KcpAgent().Bing(this, uid, point);
+                    //添加新的
+                    if (kcpAgent == null)  {
+                        this.Debug("添加新的 kcpAgent : " + endPoint.ToString());
+                        kcpAgent = new KcpAgent().Bing(this, uid, AddressUid, endPoint);
                         m_addKcpAgent.Add(kcpAgent);
                     }
                 }
             }
-            else
-            {
-                //验证代码 我觉得不可能出现 关掉了
+            else {
+
                 //if (!kcpAgent.endPoint.Equals(point))  
                 //{
                 //    this.DebugError($"{point} {kcpAgent.endPoint} 的哈希值相同  {uid}");
@@ -335,18 +478,106 @@ namespace LGF.Net
             return kcpAgent;
         }
 
+        public KcpAgent GetKcpAgent(uint uid, bool lockKcpAgents = true)
+        {
+            KcpAgent kcpAgent = null;
+            if (lockKcpAgents) {
+                //不知道为啥之前报错 现在又不报错了先不管了
+                lock (m_KcpAgents) {
+                    //m_KcpAgents Dispose注销时 m_KcpAgents 为null
+                    m_KcpAgents?.TryGetValue(uid, out kcpAgent);
+                }
+            }
+            else {
+                m_KcpAgents?.TryGetValue(uid, out kcpAgent);
+            }
+            return kcpAgent;
+        }
 
+
+        ///// <summary>
+        ///// 获得自动添加KcpSocket管理类里面 线程安全
+        ///// </summary>
+        ///// <param name="point"></param>
+        ///// <param name="lockKcpAgents"></param>
+        ///// <returns></returns>
+        //public KcpAgent GetKcpAgent(in EndPoint point, bool lockKcpAgents = true)
+        //{
+        //    //endPoint 如果不是 IPEndPoint 另外处理  当前不处理这种情况  后续处理
+        //    IPEndPoint tmpPoint = point as IPEndPoint;
+        //    KcpAgent kcpAgent = null;
+        //    ulong uid = (ulong)((ushort)tmpPoint.Address.GetHashCode() << 16 | tmpPoint.Port);  //唯一key值
+
+        //    if (lockKcpAgents)
+        //    {
+        //        //不知道为啥之前报错 现在又不报错了先不管了
+        //        lock (m_KcpAgents)  
+        //        {
+        //            //m_KcpAgents Dispose注销时 m_KcpAgents 为null
+        //            m_KcpAgents?.TryGetValue(uid, out kcpAgent);    
+        //        }
+
+        //    }
+        //    else
+        //    {
+        //        m_KcpAgents?.TryGetValue(uid, out kcpAgent);
+        //    }
+
+        //    if (kcpAgent == null)
+        //    {
+        //        lock (m_addKcpAgent)
+        //        {
+        //            if (m_disposed) return null;
+
+        //            for (int i = 0; i < m_addKcpAgent.Count; i++)   //在添加队列里面
+        //            {
+        //                if (m_addKcpAgent[i].endPoint.Equals(point)) //测试过 成立EndPoint 等于判定成立
+        //                {
+        //                    kcpAgent = m_addKcpAgent[i];
+        //                    break;
+        //                }
+        //            }
+
+        //            if (kcpAgent == null)   //添加新的
+        //            {
+        //                this.Debug("添加新的 kcpAgent : " + tmpPoint.ToString());
+        //                kcpAgent = new KcpAgent().Bing(this, uid, point);
+        //                m_addKcpAgent.Add(kcpAgent);
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //验证代码 我觉得不可能出现 关掉了
+        //        //if (!kcpAgent.endPoint.Equals(point))  
+        //        //{
+        //        //    this.DebugError($"{point} {kcpAgent.endPoint} 的哈希值相同  {uid}");
+        //        //}
+        //    }
+        //    if (m_disposed) return null;
+        //    return kcpAgent;
+        //}
 
         /// <summary>
-        /// 外部接口 线程安全 外部提供缓冲区
+        /// 开始自旋锁 发送的
         /// </summary>
-        /// <param name="buffer"></param>
-        /// <param name="length"></param>
-        /// <param name="endPoint"></param>
-        public void Send(byte[] buffer, int length, IPEndPoint endPoint)
+        private void StartSpinLock_Send()
         {
-            GetKcpAgent(endPoint, false)?.Send(buffer, length);
+            while (Interlocked.Exchange(ref m_SendSpinLock, 1) != 0) {
+                Thread.SpinWait(1);//自旋锁等待
+            }
         }
+
+        /// <summary>
+        /// 关闭自旋锁 发送的
+        /// </summary>
+        private void EndSpinLock_Send()
+        {
+            //释放锁：将_SpinLock重置会0；
+            Interlocked.Exchange(ref m_SendSpinLock, 0);
+        }
+
+
 
 
         /// <summary>
@@ -376,6 +607,26 @@ namespace LGF.Net
         }
 
 
+     
+        public uint GenerateUniqueUID()
+        {
+          
+            lock (m_KcpAgents) {
+                while (true) {
+                    ++CurUid;
+                    if (CurUid == uint.MaxValue || CurUid < NetConst.KcpConvInitialValue) {
+                        CurUid = NetConst.KcpConvInitialValue;
+                    }
+                    if (!m_KcpAgents.ContainsKey(CurUid)) {
+                        break;
+                    }
+                }
+            }
+            return CurUid;
+        }
+
+
+
         /// <summary>
         /// KCP 代理  一个socket接收 可能有多个代理
         /// TODO:未完成
@@ -384,17 +635,19 @@ namespace LGF.Net
         public class KcpAgent : IKcpCallback
         {
             public bool close = false;
-            public ulong uid;
+            public uint uid;
+            public ulong AddressUid;
             public EndPoint endPoint; //后面要接收其他的再改EndPoint  现在只接收IPEndPoint
             KcpSocket m_Socket;
             UnSafeSegManager.Kcp kcp;
             //内部提供一个缓冲流 LGF
 
-            internal KcpAgent Bing(KcpSocket socket, ulong uid_, EndPoint endPoint_)
+            internal KcpAgent Bing(KcpSocket socket, uint conv_, ulong AddressUid_, EndPoint endPoint_)
             {
-                uid = uid_;
+                AddressUid = AddressUid_;
+                uid = conv_;
                 m_Socket = socket;
-                kcp = new UnSafeSegManager.Kcp(NetConst.KcpConv, this);
+                kcp = new UnSafeSegManager.Kcp(conv_, this);  //conv 与 uid 共用一个
                 kcp.NoDelay(1, 15, 2, 1);
                 kcp.WndSize(256, 256);
                 endPoint = endPoint_;
@@ -441,12 +694,15 @@ namespace LGF.Net
 
             void IKcpCallback.Output(IMemoryOwner<byte> buffer, int avalidLength)
             {
+                m_Socket.StartSpinLock_Send();  //开启自旋锁
                 m_Socket.CheckBufferSize(avalidLength);
                 Span<byte> buffBytes = new Span<byte>(m_Socket.m_SendBuffer);
                 buffer.Memory.Span.Slice(0, avalidLength).CopyTo(buffBytes);
                 m_Socket.SockSend(m_Socket.m_SendBuffer, avalidLength, endPoint);
                 //this.Debug(">>  Output avalidLength{0}", avalidLength);
                 buffer.Dispose();
+                m_Socket.EndSpinLock_Send();    //关闭自旋锁
+
             }
 
 
