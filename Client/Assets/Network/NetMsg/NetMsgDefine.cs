@@ -45,38 +45,30 @@ public enum NetMsgDefine
 {
     Empty = 0,          //非法操作
     //Customize,  //自定义类型 处理方式  
-    N_C2S_GetAllServersInfo,    //获得所有服务器信息
-    N_S2C_GetAllServersInfo,    //返回当前服务器信息
-
-    C2S_Connect,
-    S2C_Connect,
-
-    C2S_HeartBeat,      //心跳
-    S2C_HeartBeat,      //新系统
-
-    C2S_ChatMsg,        //文本消息
-    S2C_ChatMsg,        //文本消息
-
-    C2S_CreateRoom,     //创建房间
-    S2C_CreateRoom,     //创建房间
-
-    C2S_GetAllTheRooms, //获得全部房间信息
-    S2C_GetAllTheRooms, //获得全部房间信息
+    //N_C2S_GetAllServersInfo,    //获得所有服务器信息
+    //N_S2C_GetAllServersInfo,    //返回当前服务器信息
+    //GGSYmsg,        //故国神游消息处理
+    //GGSYEvent,        //故国神游消息处理
+    Login,            //登录
+    HeartBeat,      //心跳
+    ChatMsg,        //文本消息
 
 
-    S2C_JionRoom,   //加入房间
+    CreateRoom,     //创建房间
+    GetAllTheRooms, //获得全部房间信息
 
-    C2S_InformRoomChange, //通知房间状态改变  如准备 离开房间等
-    S2C_InformRoomChange, //通知房间状态改变
 
-    S2C_SyncRoomInfo,   //同步房间信息给玩家  进入房间的时候用
+    JionRoom,   //加入房间
 
-    C2S_FrameOpKey,
-    S2C_FrameOpKey,
+    InformRoomChange, //通知房间状态改变  如准备 离开房间等
 
-    S2C_RoomtFinishType,  //type = 1 标识开始场景加载  2房间玩家全部加载完成 
-    S2C_RoomProgress,
-    C2S_RoomProgress,
+    SyncRoomInfo,   //同步房间信息给玩家  进入房间的时候用
+
+    FrameOpKey,
+
+
+    RoomtFinishType,  //type = 1 标识开始场景加载  2房间玩家全部加载完成 
+    RoomProgress,
 
 }
 
@@ -89,12 +81,25 @@ public enum ErrCode
     /// <summary>
     /// 成功
     /// </summary>
+    Success = 0,
+    /// <summary>
+    /// 成功
+    /// </summary>
     Succeed =   0,
-
+    /// <summary>
+    /// 失败
+    /// </summary>
+    Failed = 1,
     /// <summary>
     /// 失败
     /// </summary>
     Fail =   1,
+
+
+    NOT_ENOUGH_GB           = 2,   //没有足够的古币
+    MaxOffsetSignIn         = 3,    //最大补签数量
+    INVALID_OPT             = 4,        //非法操作
+
 
 
     /// <summary>
@@ -102,10 +107,6 @@ public enum ErrCode
     /// </summary>
     RoomNotExist = 100001,  //放假内部存在
 
-    /// <summary>
-    /// 非法操作
-    /// </summary>
-    INVALID_OPT,
 
 }
 

@@ -26,7 +26,7 @@ public class TestRoomPanel : MonoBehaviour
     public RoomInfoItem roomprefabItem;
     public Text ReadyBtnText;
 
-    C_ChatModule ChatModule;
+    ChatModule ChatModule;
 
 
     List<RoomInfoItem> roomInfos = new List<RoomInfoItem>();
@@ -42,7 +42,7 @@ public class TestRoomPanel : MonoBehaviour
     {
         //EventManager.Instance.AddListener()
 
-        ChatModule = C_ModuleMgr.GetModule<C_ChatModule>();
+        ChatModule = ModuleMgr.GetModule<ChatModule>();
 
     
 
@@ -61,7 +61,7 @@ public class TestRoomPanel : MonoBehaviour
 
         ReadyBtn.onClick.AddListener(() =>
         {
-            C_ModuleMgr.GetModule<C_RoomModuble>().SetReady(!curReady);
+            ModuleMgr.GetModule<RoomModuble>().SetReady(!curReady);
         });
 
         Refresh();
@@ -141,7 +141,7 @@ public class TestRoomPanel : MonoBehaviour
                     return f;
                 }, playerID, optType);
 
-                if (playerID == C_ModuleMgr.Instance.Player.uid)    //如果是自己
+                if (playerID == ModuleMgr.Instance.Player.uid)    //如果是自己
                 {
                     SetReadyBtn(optType == 3);
                 }
@@ -168,8 +168,8 @@ public class TestRoomPanel : MonoBehaviour
 
     void Refresh()
     {
-        var tmp = C_RoomManager.Instance.GetRoomUsersInfo();
-        uint houseOwnerID = C_RoomManager.Instance.GetHouseOwnerID();
+        var tmp = RoomManager.Instance.GetRoomUsersInfo();
+        uint houseOwnerID = RoomManager.Instance.GetHouseOwnerID();
         List<CMD_UserRoomInfo> usersInfos = new List<CMD_UserRoomInfo>();
         foreach (var item in tmp)
         {
@@ -200,7 +200,7 @@ public class TestRoomPanel : MonoBehaviour
             item.gameObject.SetActive(true);
             item.loadParent.SetActive(false);
 
-            if (item.playerID == C_ModuleMgr.Instance.Player.uid)    //如果是自己
+            if (item.playerID == ModuleMgr.Instance.Player.uid)    //如果是自己
             {
                 SetReadyBtn(info.ready);
                 //Debug.LogError("-------fff--");

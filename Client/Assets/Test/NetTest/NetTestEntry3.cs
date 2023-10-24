@@ -19,11 +19,9 @@ public class NetTestEntry3 : GameEntry2
     protected override void OnStart()
     {
         base.OnStart();
-
+        Application.targetFrameRate = 60;   //锁帧
         //如果是单机模式 需要该初始化地方
-        C_ModuleMgr.Instance.Init();    //初始客户端
-
-        AppConfig.Instance.serverInfo.GetEndPoint();
+        ModuleMgr.Instance.Init();    //初始客户端
 
 
         //List<string> strings1 = new List<string>() {"1" };

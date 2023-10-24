@@ -214,14 +214,12 @@ namespace LGF
                     info.GoRelease(instanceID);   //回收
                 }
                 else {
-                    this.DebugError((zstring)"该对象重复回收 请检查 代码" + go.name);
+                    this.DebugError("该对象重复回收 请检查 代码" + go.name);
                 }
             }
             else {
                 //Debug.Log("  Release GetInstanceID : " + tmp.GetInstanceID());
-                using (zstring.Block()) {
-                    this.DebugError((zstring)"该对象 不是 GameObjectManager 所管理的 请检查脚本 go: " + go.name);
-                }
+                this.DebugError("该对象 不是 GameObjectManager 所管理的 请检查脚本 go: " + go.name);
             }
         }
     }

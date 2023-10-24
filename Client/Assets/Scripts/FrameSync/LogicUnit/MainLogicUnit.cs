@@ -51,21 +51,18 @@ public partial class MainLogicUnit : LogicUnit
 
     public void InputKey(C2S_FrameOpKey key)
     {
-        switch (key.keytype)
-        {
-            case Frame_KeyType.Kill:
+        if (key.moveKey != null) {
+            PEInt x = PEInt.zero;
+            x.ScaledValue = key.moveKey.x;
+            PEInt z = PEInt.zero;
+            z.ScaledValue = key.moveKey.z;
+            InputMoveKey(new PEVector3(x, 0, z));
 
-                break;
-            case Frame_KeyType.Move:
-                PEInt x = PEInt.zero;
-                x.ScaledValue = key.moveKey.x;
-                PEInt z = PEInt.zero;
-                z.ScaledValue = key.moveKey.z;
-                InputMoveKey(new PEVector3(x, 0, z));
-
-                break;
-            default:
-                break;
         }
+        else if (key.skillKey != null) {
+
+        }
+
+     
     }
 }

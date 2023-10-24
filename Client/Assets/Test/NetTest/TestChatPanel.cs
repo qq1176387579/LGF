@@ -21,11 +21,11 @@ public class TestChatPanel : MonoBehaviour
 
     public InputField sendMsg;
     public Button sendBtn;
-    C_ChatModule ChatModule;
+    ChatModule ChatModule;
 
     void Start()
     {
-        ChatModule = C_ModuleMgr.GetModule<C_ChatModule>();
+        ChatModule = ModuleMgr.GetModule<ChatModule>();
 
         EventManager.Instance.AddListener<string, string>(GameEventType.ClientEvent_RoomChatMsg, OnTextMsg);
 

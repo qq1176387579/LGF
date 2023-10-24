@@ -25,7 +25,7 @@ using LGF.Serializable;
 
 public partial class S2C_RoomtFinishType : S2C_BASE<S2C_RoomtFinishType>
 {
-    public S2C_RoomtFinishType() : base(NetMsgDefine.S2C_RoomtFinishType) { }
+    public S2C_RoomtFinishType() : base(NetMsgDefine.RoomtFinishType) { }
     [SteamMember(1)]
     //type = 1 标识开始场景加载  2房间玩家全部加载完成 
     public int type;
@@ -40,7 +40,7 @@ public partial class S2C_RoomtFinishType : S2C_BASE<S2C_RoomtFinishType>
 
 public partial class S2C_RoomProgress : S2C_BASE<S2C_RoomProgress>
 {
-    public S2C_RoomProgress() : base(NetMsgDefine.S2C_RoomProgress) { }
+    public S2C_RoomProgress() : base(NetMsgDefine.RoomProgress) { }
     [SteamMember(1)]
     public List<C2S_RoomProgress> list;
 
@@ -56,8 +56,9 @@ public partial class S2C_RoomProgress : S2C_BASE<S2C_RoomProgress>
 
 public partial class C2S_RoomProgress : C2S_BASE<C2S_RoomProgress>
 {
-    public C2S_RoomProgress() : base(NetMsgDefine.C2S_RoomProgress) { }
-
+    public C2S_RoomProgress() : base(NetMsgDefine.RoomProgress) { }
+    [SteamMember(3)]
+    public uint uid;
     [SteamMember(1)]
     public int progress;    //进度值   -1表示加载完成
 }
@@ -65,7 +66,9 @@ public partial class C2S_RoomProgress : C2S_BASE<C2S_RoomProgress>
 
 
 
-
+/// <summary>
+/// 弃用
+/// </summary>
 public enum Frame_KeyType
 {
     Kill,
@@ -81,7 +84,7 @@ public enum Frame_KeyType
 
 public partial class S2C_FrameOpKey : S2C_BASE<S2C_FrameOpKey>
 {
-    public S2C_FrameOpKey() : base(NetMsgDefine.S2C_FrameOpKey) { }
+    public S2C_FrameOpKey() : base(NetMsgDefine.FrameOpKey) { }
 
     [SteamMember(1)]
     public ulong curFrame;  //当前是第几帧
@@ -100,10 +103,12 @@ public partial class S2C_FrameOpKey : S2C_BASE<S2C_FrameOpKey>
 
 public partial class C2S_FrameOpKey : C2S_BASE<C2S_FrameOpKey>
 {
-    public C2S_FrameOpKey() : base(NetMsgDefine.C2S_FrameOpKey) { }
+    public C2S_FrameOpKey() : base(NetMsgDefine.FrameOpKey) { }
+    [SteamMember(0)]
+    public uint uid;
 
     [SteamMember(1)]
-    public Frame_KeyType keytype;
+    public Frame_KeyType keytype;   //弃用
     [SteamMember(2)]
     public Frame_SkiilKey skillKey;
     [SteamMember(3)]

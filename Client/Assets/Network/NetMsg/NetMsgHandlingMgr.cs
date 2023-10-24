@@ -12,6 +12,7 @@ using LGF.Log;
 using LGF.Serializable;
 using LGF.DataStruct;
 using UnityEngine;
+using static LGF.Net.KcpServer;
 
 namespace LGF.Net
 {
@@ -137,14 +138,14 @@ namespace LGF.Net
             {
                 if (sLog.OpenMsgInfo)
                 {
-                    if (_data.msgType != NetMsgDefine.S2C_HeartBeat)
+                    //if (_data.msgType != NetMsgDefine.HeartBeat)
                         sLog.Debug(">>>> Accept MsgType:{0}", _data.msgType);
                 }
                  
 
                 if (_data.ErrorCode != ErrCode.Succeed)
                 {
-                    sLog.Debug("------错误码---" + _data.ErrorCode); //正常应该弹一个tps
+                    sLog.Debug($">>> <{_data.msgType}> 错误码 <{_data.ErrorCode}>" ); //正常应该弹一个tps
                 }
 
                 _action.Invoke(_data);
@@ -229,19 +230,19 @@ namespace LGF.Net
         /// <summary>
         /// 服务器 消息
         /// </summary>
-        public void OnServerMsg(KcpServer server, NetMsgDefine type, uint sessionID, LStream _stream)
+        public void OnServerMsg(KcpServer server, NetMsgDefine type, KcpSession session, LStream _stream)
         {
-            var session = server.GetSessions(sessionID);
-            //这里可以优化 原来的没办法判断  是否登录  并且kcp还在代理还在
-            if (session == null)
-            {
-                sLog.Error($"uid:{sessionID} 非法请求  请先登录!! NetMsgType : {type}");   
-                return;
-            }
-            //sLog.Debug($"{session.name} : UpdateCheckTime {type}");
+            //var session = server.GetSessions(sessionID);
+            ////这里可以优化 原来的没办法判断  是否登录  并且kcp还在代理还在
+            //if (session == null)
+            //{
+            //    sLog.Error($"uid:{sessionID} 非法请求  请先登录!! NetMsgType : {type}");   
+            //    return;
+            //}
+          
             session.UpdateCheckTime();
-            if (type == NetMsgDefine.C2S_HeartBeat) return; //心跳不要需要处理
-
+            if (type == NetMsgDefine.HeartBeat) return; //心跳不要需要处理
+            //sLog.Debug($"useid: <{session.useid}> uid <{session.sessionID}> : UpdateCheckTime NetMsgDefine: <{type}>");
 
             InvokeServerMsgEx(type, session, _stream);
         }
@@ -256,46 +257,46 @@ namespace LGF.Net
 
         #region cs udp 处理
 
-        /// <summary>
-        /// 消息处理cs处理  接收数据
-        /// c2s 服务器处理
-        /// s2c 客户端处理
-        /// 非kcp流程  udp处理
-        /// </summary>
-        public void OnCSNetMsg(KcpCSBase csBase, in EndPoint point, LStream stream)
-        {
-            NetMsgDefine type = stream.GetNetMsgType();//
-            //消息处理
-            switch (type)
-            {
+        ///// <summary>
+        ///// 消息处理cs处理  接收数据
+        ///// c2s 服务器处理
+        ///// s2c 客户端处理
+        ///// 非kcp流程  udp处理
+        ///// </summary>
+        //public void OnCSNetMsg(KcpCSBase csBase, in EndPoint point, LStream stream)
+        //{
+        //    NetMsgDefine type = stream.GetNetMsgType();//
+        //    //消息处理
+        //    switch (type)
+        //    {
 
-                case NetMsgDefine.N_C2S_GetAllServersInfo:
-                    {
-                        this.Debug(StringPool.Concat(point.ToString(), $"  请求当前服务器信息 cur port: {csBase.tmpData.n_S2C_GetAllServersInfo.port} ")); 
-                        csBase.SendTo(csBase.tmpData.n_S2C_GetAllServersInfo, point);
-                    }
-                    break;
-                case NetMsgDefine.N_S2C_GetAllServersInfo:
-                    {
-                        csBase.tmpData.n_S2C_GetAllServersInfo.Deserialize(stream);
-                        int port = csBase.tmpData.n_S2C_GetAllServersInfo.port;
-                        EndPoint endPoint = new IPEndPoint((point as IPEndPoint).Address, port);
+        //        case NetMsgDefine.N_C2S_GetAllServersInfo:
+        //            {
+        //                this.Debug(StringPool.Concat(point.ToString(), $"  请求当前服务器信息 cur port: {csBase.tmpData.n_S2C_GetAllServersInfo.port} ")); 
+        //                csBase.SendTo(csBase.tmpData.n_S2C_GetAllServersInfo, point);
+        //            }
+        //            break;
+        //        case NetMsgDefine.N_S2C_GetAllServersInfo:
+        //            {
+        //                csBase.tmpData.n_S2C_GetAllServersInfo.Deserialize(stream);
+        //                int port = csBase.tmpData.n_S2C_GetAllServersInfo.port;
+        //                EndPoint endPoint = new IPEndPoint((point as IPEndPoint).Address, port);
 
-                        sLog.Debug("获得服务器信息  " + endPoint.ToString());
+        //                sLog.Debug("获得服务器信息  " + endPoint.ToString());
 
-                        //主线程执行
-                        netMsgMgr.QueueOnMainThreadt((_endPoint) =>
-                        {
-                            EventManager.Instance.BroadCastEvent(GameEventType.ServerEvent_GetServersInfo, _endPoint);
-                        }, in endPoint);
-                    }
-                    break;
-                default:
-                    this.Debug("type {0} 非法消息" , type);
-                    stream.Clear(); ;
-                    break;
-            }
-        }
+        //                //主线程执行
+        //                netMsgMgr.QueueOnMainThreadt((_endPoint) =>
+        //                {
+        //                    EventManager.Instance.BroadCastEvent(GameEventType.ServerEvent_GetServersInfo, _endPoint);
+        //                }, in endPoint);
+        //            }
+        //            break;
+        //        default:
+        //            this.Debug("type {0} 非法消息" , type);
+        //            stream.Clear(); ;
+        //            break;
+        //    }
+        //}
 
       
         #endregion

@@ -14,7 +14,9 @@ using LGF.Log;
 public class ServerConfig : ScriptableObject
 {
     IPEndPoint endPoint;
+    IPEndPoint localendPoint;
     public string path;
+    public string localPath;
 
     IPAddress GetAddress(string str)
     {
@@ -33,9 +35,11 @@ public class ServerConfig : ScriptableObject
         }
 
         string[] path2 = path.Split(':');
+        string[] localPath2 = localPath.Split(':');
         //Debug.Log(path2[0]);
         //Debug.Log("" + path2[0] +"    "+ path2[1]);
         endPoint = new IPEndPoint(GetAddress(path2[0]), int.Parse(path2[1]));
+        localendPoint = new IPEndPoint(GetAddress(localPath2[0]), int.Parse(localPath2[1]));
         //Debug.Log("  " + endPoint.ToString());
         return endPoint;
     }

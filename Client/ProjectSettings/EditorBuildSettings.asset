@@ -6,12 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Test/Other/TestMac.unity
-    guid: 089b0915075811344958df7773cb7fcf
-  - enabled: 1
-    path: Assets/Test/FrameSyncTest/FrameSyncTest.unity
+    path: Assets/Scenes/FrameSyncTest.unity
     guid: d7a0eaa0902787e4db166ff1a697f432
   - enabled: 1
     path: Assets/Resources/ResScenes/map_102.unity
     guid: 7a8ed2daad74f304dbbef713ed2de376
+  - enabled: 0
+    path: Assets/Test/Other/TestMac.unity
+    guid: 089b0915075811344958df7773cb7fcf
   m_configObjects: {}

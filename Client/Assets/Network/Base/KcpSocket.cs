@@ -45,29 +45,34 @@ namespace LGF.Net
             
         }
 
-        protected virtual void OnConnectServerEvent(IKcpSocketOnRecv.ConnectServerEvent evt, KcpSocket.KcpAgent kcp)
+        protected virtual void OnConnectEvent(ConnectEvent evt, KcpSocket.KcpAgent kcp)
         {
             throw new NotImplementedException();
         }
 
-        void IKcpSocketOnRecv.OnConnectServerEvent(IKcpSocketOnRecv.ConnectServerEvent evt, KcpSocket.KcpAgent kcp)
+        void IKcpSocketOnRecv.OnConnectEvent(ConnectEvent evt, KcpSocket.KcpAgent kcp)
         {
-            OnConnectServerEvent(evt, kcp);
+            OnConnectEvent(evt, kcp);
         }
     }
 
+    /// <summary>
+    /// 连接事件
+    /// </summary>
+    public enum ConnectEvent
+    {
+        Client_ConnectDone,  //登录完成
+        Client_ReConnectDone, //客户端重新连接
+        Client_Close,
 
-
+        Server_ClentReConnectDone, //服务器的 客户重新连接 
+    }
     /// <summary>
     /// 绑定接收空间
     /// </summary>
     public interface IKcpSocketOnRecv
     {
-        public enum ConnectServerEvent
-        {
-            LoginDone,  //登录完成
-            ReLoginDone,
-        }
+      
 
         byte[] bytebuffer { get;}
 
@@ -78,7 +83,7 @@ namespace LGF.Net
         /// <param name="count"></param>
         void OnRecv(KcpSocket.KcpAgent kcp, int count);
 
-        void OnConnectServerEvent(ConnectServerEvent evt, KcpSocket.KcpAgent kcp);
+        void OnConnectEvent(ConnectEvent evt, KcpSocket.KcpAgent kcp);
 
     }
 
@@ -88,7 +93,7 @@ namespace LGF.Net
     /// </summary>
     public class KcpSocket 
     {
-        Socket m_Socket;
+        System.Net.Sockets.Socket m_Socket;
         IPEndPoint m_ipEndPoint;
         byte[] m_SendBuffer = new byte[NetConst.Socket_SendBufferSize];
         byte[] m_RecvBuffer = new byte[NetConst.Socket_RecvBufferSize];
@@ -146,6 +151,9 @@ namespace LGF.Net
         }
 
 
+       
+
+
         /// <summary>
         /// 线程安全移除
         /// </summary>
@@ -164,6 +172,7 @@ namespace LGF.Net
             }
             m_ipEndPoint = null;
             m_Socket.Close();
+            this.DebugError("m_Socket Close");
             m_Socket.Dispose();
             m_Socket = null;
 
@@ -303,6 +312,28 @@ namespace LGF.Net
         #region Client
 
 
+        /// <summary>
+        /// 重新绑定 ip 地址
+        /// 用来实现 客户端重连机制
+        /// </summary>
+        public bool ReBing()
+        {
+            var tmpSocket = m_Socket;
+            try {
+                m_Socket = SocketHelper.UdpBind(m_ipEndPoint);
+            }
+            catch (Exception e) {
+                this.DebugError(e.ToString());
+                return false;
+                //throw;
+            }
+
+            tmpSocket.Close();   //关闭原来的socket
+            //this.DebugError("Bing ReBing");
+            this.Debug("Bing ReBing" + m_Socket.LocalEndPoint.ToString());
+            return true;
+        }
+
         void ClientOnRecv(in EndPoint endPoint, int length)
         {
             uint uid = BitConverter.ToUInt32(m_RecvBuffer, 0);  //id
@@ -318,16 +349,24 @@ namespace LGF.Net
                     ServerAgent = GetOrAddKcpAgent(uid, endPoint, AddressUid, false); //添加代理
                     //且需要发送
                     //OnConnectServerEvent.Invoke(ConnectServerEvent.LoginDone);
-                    objRecv.OnConnectServerEvent(IKcpSocketOnRecv.ConnectServerEvent.LoginDone, ServerAgent);
+                    objRecv.OnConnectEvent(ConnectEvent.Client_ConnectDone, ServerAgent); //客户端连接完毕
                 }
                 else {
-                    //连接失败
+                    
+                    ////连接失败
                     //NetConst.KcpAbnormal_1
                     if (NetConst.KcpAbnormal_1 == uid) {
+                        //重连失败 需要 重新登录  服务端已经关闭代理了
                         //重新请求
-                        sLog.Debug("掉线  需要重连");
-                        //OnConnectServerEvent.Invoke(ConnectServerEvent.ReLoginDone);
-                        objRecv.OnConnectServerEvent(IKcpSocketOnRecv.ConnectServerEvent.ReLoginDone, ServerAgent);
+                        sLog.Debug("掉线了 需要重启游戏");
+                        objRecv.OnConnectEvent(ConnectEvent.Client_Close, ServerAgent);
+                    }
+                    else if (NetConst.KcpAbnormal_2 == uid) {
+                        sLog.Debug("重连成功");
+                        objRecv.OnConnectEvent(ConnectEvent.Client_ReConnectDone, ServerAgent);
+                    }
+                    else {
+                        sLog.Error(">>>> 出错.....");
                     }
                 }
             }
@@ -337,6 +376,9 @@ namespace LGF.Net
                     ServerAgent.Input(length);
                 }
                 else {
+                    //和服务端异常1一样
+                    //objRecv.OnConnectEvent(ConnectEvent.Client_Close, ServerAgent);//让他重启游戏
+                    ReBing();//重连试下？
                     sLog.Error(" 出错.... ");
                 }
 
@@ -388,16 +430,16 @@ namespace LGF.Net
                         uid = GenerateUniqueUID();
                         Address2Uid.Add(AddressUid, uid);
                     }
+                    else {
+                        //有时候出现重复连接请求的情况  在网络不稳定的情况下
+
+                        //sLog.Error("  出现非法情况， 请检查一下代码 当前IP地址 已经在服务器中 出现重复连接的情况");
+                        //return;
+                    }
+
                 }
-               
-                StartSpinLock_Send();   //开启发送锁
-                m_SendBuffer[0] = 0;
-                m_SendBuffer[1] = 0;
-                m_SendBuffer[2] = 0;
-                m_SendBuffer[3] = 0;
-                Array.Copy(BitConverter.GetBytes(uid), 0, m_SendBuffer, 4, 4);
-                SockSend(m_SendBuffer, 8, endPoint);
-                EndSpinLock_Send();     //关闭发送锁
+
+                ServerSendUID(uid, endPoint);
                 //GetOrAddKcpAgent(uid,endPoint, false);  //
             }
             else {
@@ -410,38 +452,60 @@ namespace LGF.Net
                 if (hasAddress2Uid) {
                     //没换ip地址
                     if (uid2 != uid) {
-                        //异常
+                        //异常  这种情况是 ip地址与端口号没有换掉 且原来的ip地址没回收  这时候用导致同一个端口号 不同的uid 出问题。
                         this.DebugError("---------->> 异常1");
                     }
                     else {
-                        //正常流程
+                        //正常流程  
                         GetOrAddKcpAgent(uid, endPoint, AddressUid, false).Input(length);
                     }
+
+                  
                 }
                 else {
-                    //换ip地址  或者断网  需要重连
-                    if (uid2 != uid) {
-                        //id不对了异常 ip地址不对  
-                        this.DebugError("---------->> 异常2");
+                    //新的ip地址  但是客户端有老的uid的数据  表示那么该状态表示断线重连
+                    this.Debug($">>> 断线重连 <{uid}>");
+                    var kcp = GetKcpAgent(uid);
+                    if (kcp == null) {
+                        this.DebugError($"---------->> 客户端重新在服务器中已掉线  但是客户端还能继续请求。 发送客户端错误代码 uid<{uid}>");
+                        //换ip地址(换wifi 换流量)  或者断网  需要重连
+                        //id相同 没有下线 表示值断了一下 卡了一下 或者换了网络环境
+                        //卡了的话 服务器会删除当前这个KcpAgent 和  Addressuid
+                        //让客户端自己判断走流程 比如重新登录 目前没做这块  晚点查看一下
+
+                        ServerSendUID(NetConst.KcpAbnormal_1, endPoint);
                     }
                     else {
-                        //id相同 没有下线 表示值断了一下 卡了一下 或者换了网络环境 比如wifi切手机  
-                        //卡了的话 服务器会删除当前这个KcpAgent 和  Addressuid
-                        //让客户端自己判断走流程 比如重新登录
-                        this.DebugError("---------->> 客户端重新在服务器中已掉线  但是客户端还能继续请求。 发送客户端错误代码");
-                        StartSpinLock_Send();   //开启发送锁
-                        m_SendBuffer[0] = 0;
-                        m_SendBuffer[1] = 0;
-                        m_SendBuffer[2] = 0;
-                        m_SendBuffer[3] = 0;
-                        Array.Copy(BitConverter.GetBytes(NetConst.KcpAbnormal_1), 0, m_SendBuffer, 4, 4);   //
-                        SockSend(m_SendBuffer, 8, endPoint);
-                        EndSpinLock_Send();     //关闭发送锁
+                        kcp.endPoint = endPoint;    //更换新的ip地址
+
+                        lock (Address2Uid) {
+                            Address2Uid.Remove(kcp.AddressUid); //删除原来的
+                            Address2Uid.Add(AddressUid, uid);   //改成新的IP地址
+                            kcp.AddressUid = AddressUid;
+                        }
+
+                        ServerSendUID(NetConst.KcpAbnormal_2, endPoint);
+                        objRecv.OnConnectEvent(ConnectEvent.Server_ClentReConnectDone, kcp); //客户端连接完毕
+                        kcp.Input(length);  //继续处理数据
                     }
+
                 }
               
             }
         }
+
+        void ServerSendUID(uint uid, in EndPoint endPoint)
+        {
+            StartSpinLock_Send();   //开启发送锁
+            m_SendBuffer[0] = 0;
+            m_SendBuffer[1] = 0;
+            m_SendBuffer[2] = 0;
+            m_SendBuffer[3] = 0;
+            Array.Copy(BitConverter.GetBytes(uid), 0, m_SendBuffer, 4, 4);
+            SockSend(m_SendBuffer, 8, endPoint);
+            EndSpinLock_Send();     //关闭发送锁
+        }
+
         #endregion
         //获得或者添加代理
         public KcpAgent GetOrAddKcpAgent(uint uid, in EndPoint endPoint,ulong AddressUid, bool lockKcpAgents = true)
@@ -493,6 +557,7 @@ namespace LGF.Net
             }
             return kcpAgent;
         }
+
 
 
         ///// <summary>
@@ -588,7 +653,20 @@ namespace LGF.Net
         /// <param name="endPoint"></param>
         void SockSend(byte[] buffer,int length, EndPoint endPoint)
         {
-             m_Socket.SendTo(buffer, length, SocketFlags.None, endPoint);
+            //
+#if !UNITY_ANDROID
+            m_Socket.SendTo(buffer, length, SocketFlags.None, endPoint);
+#else
+            //安卓端的时候  断网的时候 会异常  子线程无法捕获异常导致报错
+            //报错也无任何信息
+            try {
+                m_Socket.SendTo(buffer, length, SocketFlags.None, endPoint);
+            }
+            catch (Exception e) {
+                this.Debug("网络不可达...");
+            }
+#endif
+
         }
 
 
@@ -637,8 +715,12 @@ namespace LGF.Net
             public bool close = false;
             public uint uid;
             public ulong AddressUid;
-            public EndPoint endPoint; //后面要接收其他的再改EndPoint  现在只接收IPEndPoint
-            KcpSocket m_Socket;
+            /// <summary>
+            /// 如果断线重连 直接修改 endPoint地址就行了  
+            /// 服务器和客户端同时换 不修改其他部分
+            /// </summary>
+            public EndPoint endPoint;
+            KcpSocket m_Socket; 
             UnSafeSegManager.Kcp kcp;
             //内部提供一个缓冲流 LGF
 
@@ -670,6 +752,9 @@ namespace LGF.Net
             /// <param name="length"></param>
             public void Send(byte[] buffer, int length) //外部可以直接调用
             {
+                if (kcp == null) {
+                    this.DebugError("-----44444--");
+                }
                 Span<byte> buffBytes = new Span<byte>(buffer, 0, length);
                 kcp.Send(buffBytes);
             }
@@ -694,6 +779,8 @@ namespace LGF.Net
 
             void IKcpCallback.Output(IMemoryOwner<byte> buffer, int avalidLength)
             {
+
+                //m_Socket.testReBing
                 m_Socket.StartSpinLock_Send();  //开启自旋锁
                 m_Socket.CheckBufferSize(avalidLength);
                 Span<byte> buffBytes = new Span<byte>(m_Socket.m_SendBuffer);
@@ -708,6 +795,7 @@ namespace LGF.Net
 
             public void Dispose()
             {
+                //this.DebugError("------Dispose");
                 kcp.Dispose();
                 m_Socket = null;
                 endPoint = null;
@@ -717,7 +805,11 @@ namespace LGF.Net
             public void Close()
             {
                 close = true;
+                lock (m_Socket.Address2Uid) {
+                    m_Socket.Address2Uid.Remove(AddressUid);
+                }
             }
+
 
         }
 

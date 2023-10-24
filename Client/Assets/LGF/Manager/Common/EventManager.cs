@@ -209,7 +209,7 @@ namespace LGF
                     }
                     else
                     {
-                        sLog.Debug("不是同一个对象!");
+                        //sLog.Debug("不是同一个对象!");
                     }
                 }
                 isSucessed = true;

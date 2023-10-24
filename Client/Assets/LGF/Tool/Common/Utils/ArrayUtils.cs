@@ -341,6 +341,35 @@ namespace LGF
                 }
         }
 
+
+        public static void RemoveFunc<T,T2>(this List<T> list, Func<T,T2, bool> func, Action<T,T2> OnInvoke,T2 _this)
+        {
+            if (list == null)
+                return;
+
+            // 找出第一个空元素 O(n)
+            int count = list.Count;
+            for (int i = 0; i < count; i++)
+                if (func.Invoke(list[i], _this)) {
+                    OnInvoke.Invoke(list[i],_this);
+                    // 记录当前位置
+                    int newCount = i++;
+
+                    // 对每个非空元素，复制至当前位置 O(n)
+                    for (; i < count; i++)
+                        if (!func.Invoke(list[i], _this)) {
+                            list[newCount++] = list[i];
+                        }
+                        else {
+                            OnInvoke.Invoke(list[i], _this);
+                        }
+
+                    // 移除多余的元素 O(n)
+                    list.RemoveRange(newCount, count - newCount);
+                    break;
+                }
+        }
+
         /// <summary>
         /// 取出最上面的
         /// </summary>

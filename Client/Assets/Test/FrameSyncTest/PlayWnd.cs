@@ -19,26 +19,44 @@ using UnityEngine;
 
 public class PlayWnd : MonoBehaviour {
 
-
+    public TestJoystick joystick;
     private Vector2 lastKeyDir = Vector2.zero;
-    private void Update() {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
-        Vector2 keyDir = new Vector2(h, v);
-        if(keyDir != lastKeyDir) {
-            if(h != 0 || v != 0) {
-                keyDir = keyDir.normalized;
-            }
-            InputMoveKey(keyDir);
-            lastKeyDir = keyDir;
-        }
+    private void Start()
+    {
+        joystick.MoveEvent = InputMoveKey;
     }
+
+    /// <summary>
+    /// 锁帧 1s60次发送
+    /// </summary>
+    private void Update() {
+        //float h = Input.GetAxisRaw("Horizontal");
+        //float v = Input.GetAxisRaw("Vertical");
+        //Vector2 keyDir = new Vector2(h, v);
+        //if(keyDir != lastKeyDir) {
+        //    if(h != 0 || v != 0) {
+        //        keyDir = keyDir.normalized;
+        //    }
+        //    InputMoveKey(keyDir);
+        //    lastKeyDir = keyDir;
+        //}
+
+
+        //InputMoveKey();
+    }
+
+    private void FixedUpdate()
+    {
+        
+
+    }
+
 
     private Vector2 lastStickDir = Vector2.zero;
     private void InputMoveKey(Vector2 dir) {
         if(!dir.Equals(lastStickDir)) {
             Vector3 dirVector3 = new Vector3(dir.x, 0, dir.y);
-            dirVector3 = Quaternion.Euler(0, 45, 0) * dirVector3;
+            dirVector3 = Quaternion.Euler(0, 45, 0) * dirVector3;   //在游戏中需要选择45度
             PEVector3 logicDir = PEVector3.zero;
             if(dir != Vector2.zero) {
                 logicDir.x = (PEInt)dirVector3.x;

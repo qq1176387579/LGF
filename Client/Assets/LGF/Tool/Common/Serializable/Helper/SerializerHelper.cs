@@ -22,7 +22,7 @@ namespace LGF.Serializable
 
     public static partial class SerializerHelper
     {
-        public static byte[] bytebuffer = new byte[1024];   //后面写个池子 现在图方便
+        public static byte[] bytebuffer = new byte[40960];   //后面写个池子 现在图方便
 
 
         public static void Read_UInt32(this LGF.Serializable.LStream stream, ref uint _out)
@@ -125,6 +125,10 @@ namespace LGF.Serializable
             {
                 var buffer = bytebuffer;
                 //多线程加锁
+                if (val != null && val.Length >= buffer.Length) {
+                    val.DebugError($"{val.Length} | {buffer.Length}");
+                }
+              
                 int Length = val == null ? 0 : Encoding.UTF8.GetBytes(val, 0, val.Length, buffer, 0);
                 //sLog.Error("Length" + Length);
                 stream.writer.Write((ushort)Length);

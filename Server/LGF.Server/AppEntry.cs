@@ -19,7 +19,7 @@ namespace LGF.Server
         static void Main(string[] args)
         {
             LGFEntry.Startup();
-            S_ModuleMgr.Instance.Init();
+            ModuleMgr.Instance.Init();
             Task.Run(sendMsg);
             
             while (true)
@@ -28,9 +28,9 @@ namespace LGF.Server
                 {
                     HotfixHelper.CheckHotfix();
 
+                    LGFEntry.FixedUpdate();
                     LGFEntry.Update();
                     LGFEntry.LateUpdate();
-                    LGFEntry.FixedUpdate();
                 }
                 catch (Exception e)
                 {

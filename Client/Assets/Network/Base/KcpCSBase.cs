@@ -36,11 +36,11 @@ namespace LGF.Net
     /// </summary>
     public class KcpCSBaseTmpData
     {
-        public N_C2S_GetAllServersInfo n_C2S_GetAllServersInfo = new N_C2S_GetAllServersInfo();
-        public N_S2C_GetAllServersInfo n_S2C_GetAllServersInfo = new N_S2C_GetAllServersInfo();
+        //public N_C2S_GetAllServersInfo n_C2S_GetAllServersInfo = new N_C2S_GetAllServersInfo();
+        //public N_S2C_GetAllServersInfo n_S2C_GetAllServersInfo = new N_S2C_GetAllServersInfo();
 
-        public S2C_Connect S2C_Connect = new S2C_Connect();  //临时数据
-        public C2S_Connect C2S_Connect = new C2S_Connect(); //临时数据
+        //public S2C_Connect S2C_Connect = new S2C_Connect();  //临时数据
+        //public C2S_Connect C2S_Connect = new C2S_Connect(); //临时数据
 
         public C2S_HeartBeat C2S_HeartBeat = new C2S_HeartBeat(); //临时数据
     }
@@ -119,60 +119,62 @@ namespace LGF.Net
 
             LocalPort = (m_kcpSocket.Sock.LocalEndPoint as IPEndPoint).Port;    //当前端口
 
-            Listener();
+            //Listener();
         }
 
+        #region 
+        ///// <summary>
+        ///// 监听 连接端口
+        ///// </summary>
+        //public void Listener()
+        //{
+        //    EndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
+        //    Task.Run(() =>
+        //    {
+        //        while (!m_disposed)
+        //        {
+        //            try
+        //            {
+        //                if (m_ConnectSock == null) return;
+        //                OnListener();   //用来处理外部发送信息的
 
-        /// <summary>
-        /// 监听 连接端口
-        /// </summary>
-        public void Listener()
-        {
-            EndPoint endPoint = new IPEndPoint(IPAddress.Any, 0);
-            Task.Run(() =>
-            {
-                while (!m_disposed)
-                {
-                    try
-                    {
-                        if (m_ConnectSock == null) return;
-                        OnListener();   //用来处理外部发送信息的
-
-                        if (m_ConnectSock.Available <= 0)
-                        {
-                            Thread.Sleep(1000);    //没事情做休息一下
-                            continue;
-                        }
-
-
-                        int length = 0;
-                        length = m_ConnectSock.ReceiveFrom(m_UdpStream.GetBuffer(), ref endPoint);   //监听端口
-
-                        if (length < NetMsgHelper.INT32_SIZE)
-                        {
-                            sLog.Error("非法消息!");
-                            Thread.Sleep(100);
-                            continue;
-                        }
-
-                        if (m_disposed) return;
-                        m_NetMsgHandlingMgr.OnCSNetMsg(this, endPoint, m_UdpStream);
-                    }
-                    catch (Exception e)
-                    {
-                        this.DebugError(e);
-                        Thread.Sleep(100);
-                        //Task.Delay(10);   任务延迟有GC
-                    }
-                }
-            });
-        }
+        //                if (m_ConnectSock.Available <= 0)
+        //                {
+        //                    Thread.Sleep(1000);    //没事情做休息一下
+        //                    continue;
+        //                }
 
 
-        protected virtual void OnListener()
-        {
+        //                int length = 0;
+        //                length = m_ConnectSock.ReceiveFrom(m_UdpStream.GetBuffer(), ref endPoint);   //监听端口
 
-        }
+        //                if (length < NetMsgHelper.INT32_SIZE)
+        //                {
+        //                    sLog.Error("非法消息!");
+        //                    Thread.Sleep(100);
+        //                    continue;
+        //                }
+
+        //                if (m_disposed) return;
+        //                m_NetMsgHandlingMgr.OnCSNetMsg(this, endPoint, m_UdpStream);
+        //            }
+        //            catch (Exception e)
+        //            {
+        //                this.DebugError(e);
+        //                Thread.Sleep(100);
+        //                //Task.Delay(10);   任务延迟有GC
+        //            }
+        //        }
+        //    });
+        //}
+        //protected virtual void OnListener()
+        //{
+
+        //}
+        #endregion
+
+
+
 
 
 

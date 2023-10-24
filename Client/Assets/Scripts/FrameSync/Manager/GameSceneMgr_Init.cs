@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using LGF;
 using LGF.Log;
 using PEMath;
-using PEMath;
 using PEPhysx;
 using UnityEngine;
 
@@ -108,7 +107,7 @@ public partial class GameSceneMgr
         else
         {
             sLog.OpenMsgInfo = false;
-            var allUserInfo = C_RoomManager.Instance.GetAllUserInfo();
+            var allUserInfo = RoomManager.Instance.GetAllUserInfo();
             int count = 0;
             foreach (var user in allUserInfo)
             {

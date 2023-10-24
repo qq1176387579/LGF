@@ -40,10 +40,12 @@ namespace LGF.Server
         {
             try
             {
-                byte[] dllBytes = File.ReadAllBytes("../../../../LGF.Server.Hotfix/bin/Debug/net6.0/LGF.Server.Hotfix.dll");
-                byte[] pdbBytes = File.ReadAllBytes("../../../../LGF.Server.Hotfix/bin/Debug/net6.0/LGF.Server.Hotfix.pdb");
+                //byte[] dllBytes = File.ReadAllBytes("../../../../LGF.Server.Hotfix/bin/Debug/net6.0/LGF.Server.Hotfix.dll");
+                //byte[] pdbBytes = File.ReadAllBytes("../../../../LGF.Server.Hotfix/bin/Debug/net6.0/LGF.Server.Hotfix.pdb");
+                byte[] dllBytes = File.ReadAllBytes("LGF.Server.Hotfix.dll");
+                byte[] pdbBytes = File.ReadAllBytes("LGF.Server.Hotfix.pdb");
                 Assembly assembly = Assembly.Load(dllBytes, pdbBytes);
-                var moudleEntry = assembly.GetType("LGF.Server.Hotfix.S_HotfixEntry");
+                var moudleEntry = assembly.GetType("LGF.Server.Hotfix.HotfixEntry");
                 var moudleEntry_Init = moudleEntry.GetMethod("Init");
                 moudleEntry_Init.Invoke(null, null);
                 OnCloseHotfixMethod = moudleEntry.GetMethod("Close");

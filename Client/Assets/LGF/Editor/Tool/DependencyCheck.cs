@@ -23,12 +23,12 @@ namespace LGF.Editor
 //					version = "1.6.0-pre.2",
 //				},
 //#endif
-#if !MODULE_MATHEMATICS
-				new Dependency {
-					name = "com.unity.mathematics",
-					version = "1.1.0",
-				},
-#endif
+//#if !MODULE_MATHEMATICS
+//				new Dependency {
+//					name = "com.unity.mathematics",
+//					version = "1.1.0",
+//				},
+//#endif
 //#if !MODULE_COLLECTIONS
 //				new Dependency {
 //					name = "com.unity.collections",

@@ -11,13 +11,15 @@ using LGF;
 using LGF.Log;
 using LGF.Serializable;
 using LGF.DataStruct;
+using System;
+using static LGF.Net.KcpServer;
 
 namespace LGF.Net
 {
 
     public interface INetMsgHandling
     {
-        public void OnCSNetMsg(KcpCSBase csBase, in EndPoint point, LStream stream);
+        //void OnCSNetMsg(KcpCSBase csBase, in EndPoint point, LStream stream);
         //public void OnKcpNetMsg(ISession agent, LStream stream);
 
         /// <summary>
@@ -27,9 +29,9 @@ namespace LGF.Net
         /// <param name="type"></param>
         /// <param name="sessionID"></param>
         /// <param name="_stream"></param>
-        public void OnServerMsg(KcpServer server, NetMsgDefine type, uint sessionID, LStream _stream);
+        void OnServerMsg(KcpServer server, NetMsgDefine type, KcpSession session, LStream _stream);
 
-        public void OnClientMsg(KcpClient client, NetMsgDefine type, LStream _stream);
+        void OnClientMsg(KcpClient client, NetMsgDefine type, LStream _stream);
 
     }
 
@@ -43,11 +45,12 @@ namespace LGF.Net
     {
        
         NBufferingQueue<IDelegateBase> queue = new NBufferingQueue<IDelegateBase>();
+        List<IDelegateBase> tmpList = new List<IDelegateBase>();
         protected override void OnNew()
         {
-            LGFEntry.RegisterOnUpdate(OnUpdate);
+            LGFEntry.RegisterOnFixedUpdate(OnFixedUpdate);
 
-            queue.OnClear((a) => a.Release());
+            //queue.OnClear((a) => a.Release());    //弃用
 
             //无意义 也执行不了
             //EventManager.Instance.AddListener(GameEventType.OnReLoadHotfixFinish, OnReLoadHotfixFinish);
@@ -61,19 +64,47 @@ namespace LGF.Net
 
 
         /// <summary>
-        /// 主线程update
+        /// 物理update
         /// </summary>
-        void OnUpdate()
+        void OnFixedUpdate()
         {
+            //网络回调应该是单独的定时器 不能让其影响上下文 所以应该是用拷贝
+            //不然出现异常 游戏直接挂掉
             if (!queue.CanGet()) return;
-
-            var list = queue.Get();
-            foreach (var item in list)
-            {
-                item.Invoke2();
+            if (tmpList.Count > 0) {
+                this.Debug("  出错 请检查代码 ");
             }
+            queue.Get().CopyTo(tmpList);
+            queue.Clear();  //拷贝出来后清理数据
 
-            queue.Clear();
+            while (tmpList.Count > 0) {
+                ExecuteMsg();
+            }
+           
+            //foreach (var item in list)
+            //{
+            //    item.Invoke2();
+            //}
+
+
+        }
+
+        void ExecuteMsg()
+        {
+            int count = tmpList.Count;
+            for (int i = count - 1; i >= 0; i--) {
+                IDelegateBase callBack = tmpList[i];
+                tmpList.RemoveAt(i);
+                try {
+                    callBack.Invoke2();
+                }
+                catch (Exception e) {
+                    e.DebugError(); //打印路径
+                }
+                finally {
+                    callBack.Release();
+                }
+            }
         }
 
 
@@ -96,7 +127,7 @@ namespace LGF.Net
 
         #region QueueOnMainThread  主线程处理数据
 
-  
+
         /// <summary>
         /// 添加到主线程
         /// </summary>
@@ -205,25 +236,25 @@ namespace LGF.Net
 
         public void BroadCastEventByMainThreadt<T1, T2>(GameEventType type, in T1 param2, in T2 param3)
         {
-            QueueOnMainThreadt((type, _param2, _param3) =>
+            QueueOnMainThreadt((_type, _param2, _param3) =>
             {
-                EventManager.Instance.BroadCastEvent(type, _param2, _param3);
+                EventManager.Instance.BroadCastEvent(_type, _param2, _param3);
             }, type, param2, param3);
         }
 
         public void BroadCastEventByMainThreadt<T1>(GameEventType type, in T1 param2)
         {
-            QueueOnMainThreadt((type, _param2) =>
+            QueueOnMainThreadt((_type, _param2) =>
             {
-                EventManager.Instance.BroadCastEvent(type, _param2);
+                EventManager.Instance.BroadCastEvent(_type, _param2);
             }, type, param2);
         }
 
         public void BroadCastEventByMainThreadt(GameEventType type)
         {
-            QueueOnMainThreadt((type) =>
+            QueueOnMainThreadt((_type) =>
             {
-                EventManager.Instance.BroadCastEvent(type);
+                EventManager.Instance.BroadCastEvent(_type);
             }, type);
         }
 

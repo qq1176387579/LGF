@@ -18,10 +18,10 @@ using UnityEngine;
 public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
 {
     bool isNative = true;
-    C_MainPlayerManager _mainPlayer;
-    C_MainPlayerManager mainPlayer {
+    MainPlayerManager _mainPlayer;
+    MainPlayerManager mainPlayer {
         get {
-            if (_mainPlayer == null) _mainPlayer = C_MainPlayerManager.Instance;
+            if (_mainPlayer == null) _mainPlayer = MainPlayerManager.Instance;
             return _mainPlayer;
         } 
     }
@@ -29,7 +29,11 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
     public uint _keyid = 0;
     public uint Keyid { get => ++_keyid; } 
     List<PlayerUnit> players = new List<PlayerUnit>();
-    //暂时先用字典   字典有查询消耗
+    /// <summary>
+    ///  帧同步里面可以用Dict的，只是你不要用它来保存需要遍历的元素。
+    ///  如果用foreach 不一定保证顺序一样
+    ///  正确理解 是在在帧同步中 不要遍历Dict  因为遍历字典是无序的 不保证所有设备都一样
+    /// </summary>
     Dictionary<uint, PlayerUnit> playerUnits = new Dictionary<uint, PlayerUnit>();
 
 
@@ -39,8 +43,8 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
 
     void NativeInit()
     {
-        isNative = !C_ModuleMgr.CheckInstance();    //判断是否有开启 客户端服务
-
+        isNative = !ModuleMgr.CheckInstance();    //判断是否有开启 客户端服务
+        
         if (isNative)   //单机模式
         {
             MonoManager.Instance.AddFixedUpdateListener(OnFixedUpdate);
@@ -91,7 +95,18 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
         {
             for (int i = 0; i < opkey.Count; i++)
             {
-                playerUnits[opkey[i].uid].InputKey(opkey[i]);
+                try {
+                    playerUnits[opkey[i].uid].InputKey(opkey[i]);
+                }
+                catch (System.Exception e) {
+                    Debug.LogError($"opkey[i].uid {opkey[i].uid}");
+                    foreach (var item in playerUnits) {
+                        Debug.Log($"info Key: {item.Key} valinfo playeid:{item.Value.playerid}");
+                    }
+                    throw;
+                }
+                //Debug.Log("uid >> "+ opkey[i].uid);
+               
             }
         }
       
@@ -131,7 +146,7 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
         }
 
         C2S_FrameOpKey key = C2S_FrameOpKey.Get();
-
+        key.uid = mainPlayer.uid;
         key.keytype = Frame_KeyType.Move;
         key.moveKey = Frame_MoveKey.Get();
         key.moveKey.x = logicDir.x.ScaledValue;

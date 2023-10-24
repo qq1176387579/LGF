@@ -31,11 +31,12 @@ namespace LGF
 #if USE_ANDROID
             Android.AndroidMsgManager.Instance.Init();
 #endif
-            Util.MacAddressUtils.Instance.Init();   //初始化唯一标识符
+            //Util.MacAddressUtils.Instance.Init();   //初始化唯一标识符
 
 
 #if !NOT_UNITY
-            AppConfig.Instance.Init();
+            //弃用 热更新的时候无法配置文件坑 除非ScriptableObject的脚本在热更新意外就加载了 否则无法脚本热更新
+            //AppConfig.Instance.Init();
 #endif
         }
 
@@ -53,6 +54,9 @@ namespace LGF
             EventCenter.Fire(EvtHelper.EventsType.OnLateUpdate);
         }
 
+        /// <summary>
+        /// 在服务器的时候 会执行在update之前
+        /// </summary>
         public static void FixedUpdate()
         {
             ev_OnFixedUpdate?.Invoke();

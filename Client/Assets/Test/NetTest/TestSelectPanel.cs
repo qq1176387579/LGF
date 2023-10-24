@@ -51,14 +51,14 @@ public class TestSelectPanel : MonoBehaviour
             }
 
             refreshTime = Time.time + 3f;
-            C_ModuleMgr.GetModule<C_RoomModuble>().GetAllTheRoomsInfo();
+            ModuleMgr.GetModule<RoomModuble>().GetAllTheRoomsInfo();
         });
 
         //创建服务器房间房间
         CreateButton.onClick.AddListener(() =>
         {
 
-            C_ModuleMgr.GetModule<C_RoomModuble>().CreateRoom();
+            ModuleMgr.GetModule<RoomModuble>().CreateRoom();
             //S_ModuleMgr.Instance.Init();
             //var t = new IPEndPoint(LGF.Net.SocketHelper.GetLocalIPv4_IPAddress(), S_ModuleMgr.Instance.Server.LocalPort);
             //JoinServer(t);
@@ -130,7 +130,7 @@ public class TestSelectPanel : MonoBehaviour
     {
         //进入服务器
         sLog.Debug(" SelectEvent roomid: {0}", roomid);
-        C_ModuleMgr.GetModule<C_RoomModuble>().JionRoom(roomid);
+        ModuleMgr.GetModule<RoomModuble>().JionRoom(roomid);
 
 
         //C_ModuleMgr.Instance.Client.TryToConnect(NetTestEntry3.Instance.name, endPoint);

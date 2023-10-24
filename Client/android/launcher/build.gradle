@@ -34,9 +34,9 @@ android {
     signingConfigs {
         release {
             storeFile file('F:/unity keystores/unity2020keysore/android.keystore')
-            storePassword 'zxc123'
+            storePassword ''
             keyAlias 'android.keystore'
-            keyPassword 'zxc123'
+            keyPassword ''
         }
     }
 

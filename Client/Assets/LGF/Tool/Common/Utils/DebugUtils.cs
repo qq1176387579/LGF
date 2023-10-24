@@ -29,7 +29,7 @@ namespace LGF.Log
 #if NOT_UNITY
         public static bool OpenStackTrace = false;
 #endif
-        [System.Diagnostics.Conditional("DEBUG")]
+        //[System.Diagnostics.Conditional("DEBUG")]
         public static void Debug(string format, params object[] args)
         {
 #if NOT_UNITY
@@ -53,7 +53,7 @@ namespace LGF.Log
         }
 
 
-        [System.Diagnostics.Conditional("DEBUG")]
+        //[System.Diagnostics.Conditional("DEBUG")]
         public static void Debug(object message)
         {
 #if NOT_UNITY
@@ -68,7 +68,7 @@ namespace LGF.Log
                 DebugExtension.DebugUtils.LogToFile(message.ToString());
         }
 
-        [System.Diagnostics.Conditional("DEBUG")]
+        //[System.Diagnostics.Conditional("DEBUG")]
         public static void Warning(object message)
         {
 #if NOT_UNITY
@@ -82,7 +82,7 @@ namespace LGF.Log
 
         }
 
-        [System.Diagnostics.Conditional("DEBUG")]
+        //[System.Diagnostics.Conditional("DEBUG")]
         public static void Warning(string format, params object[] args)
         {
 #if NOT_UNITY
@@ -131,25 +131,51 @@ namespace LGF.Log
     public static class DebugExtension
     {
         //static int testCount = 0;
+        static System.Action<object> OnDebug;
+        static System.Action<object> OnDebugError;
+        static System.Action<string, object> OnDebugFormat1;
+        //static System.Action<string, object> OnDebugErrorFormat;
 
-        [System.Diagnostics.Conditional("DEBUG")]
+        public static void SetDebug(System.Action<object> action) => OnDebug = action;
+        public static void SetDebugError(System.Action<object> action) => OnDebugError = action;
+
+        public static void SetDebug(System.Action<string, object> action) => OnDebugFormat1 = action;
+        //public static void SetDebugError(System.Action<string, object> action) => OnDebugErrorFormat = action;
+
+        //[System.Diagnostics.Conditional("DEBUG")]
         public static void Debug(this object obj, object str)
         {
-            LGF.Log.sLog.Debug(str);
+            if (OnDebug == null) {
+                LGF.Log.sLog.Debug(str);
+            }
+            else {
+                OnDebug?.Invoke(str);
+            }
         }
 
-        [System.Diagnostics.Conditional("DEBUG")]
-        public static void Debug(this object obj,string str,params object[] param)
+        //[System.Diagnostics.Conditional("DEBUG")]
+        public static void Debug(this object obj, string str,  object param1)
         {
-
-            LGF.Log.sLog.Debug(str, param);
+            if (OnDebug == null) {
+                LGF.Log.sLog.Debug(str, param1);
+            }
+            else {
+                OnDebugFormat1?.Invoke(str, param1);
+            }
+            
         }
 
         //[System.Diagnostics.Conditional("DEBUG")]
         public static void DebugError(this object obj, object str)
         {
-            LGF.Log.sLog.Error(str);
+            if (OnDebugError == null) {
+                LGF.Log.sLog.Error(str);
+            }
+            else {
+                OnDebugError.Invoke(str);
+            }
         }
+
 
         //[System.Diagnostics.Conditional("DEBUG")]
         public static void DebugError(this System.Exception e)
@@ -157,7 +183,12 @@ namespace LGF.Log
 #if UNITY_EDITOR
             LGF.Log.sLog.Error(DebugUtils.GetExceptionStackInfoToUnity(e));
 #else
-            LGF.Log.sLog.Error(e.ToString());
+            if (OnDebugError == null) {
+                LGF.Log.sLog.Error(e.ToString());
+            }
+            else {
+                OnDebugError.Invoke(e.ToString());
+            }
 #endif
 
         }

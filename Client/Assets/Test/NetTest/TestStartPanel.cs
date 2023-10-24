@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using LGF;
 using LGF.Log;
+using LGF.Util;
 
 public class TestStartPanel : MonoBehaviour
 {
@@ -31,15 +32,16 @@ public class TestStartPanel : MonoBehaviour
         }
         button.onClick.AddListener(() =>
         {
-            if (C_ModuleMgr.GetSession().IsTryConnecting)
+            if (ModuleMgr.GetSession().IsDisconnection())
             {
-                Debug.Log("连接过程中");
+                Debug.Log("连接不到服务器");
                 return;
             }
             //NetTestEntry3.Instance.name = input.text;
-            C_ModuleMgr.GetPlayer().SetName(input.text);    //设置名字
 
-            C_ModuleMgr.GetModule<C_LoginModule>().ConnectServer(() =>
+            ModuleMgr.GetPlayer().SetName(input.text);    //设置名字
+
+            ModuleMgr.GetModule<LoginModule>().LoginServer(() =>
             {
                 Debug.Log("----连接成功---");//连接成功
                 nextPanel.SetActive(true);

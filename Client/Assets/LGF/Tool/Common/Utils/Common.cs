@@ -207,22 +207,38 @@ namespace LGF.Util
 
 
         #region 位运算
-        public static bool bit_has(int state, int idx)
+        public static bool bit_has(this int state, int idx)
         {
             if (idx == 0) return false;
             return ((state >> (idx - 1)) & 1) > 0;
         }
 
-        public static int bit_add(int state, int idx)
+        public static int bit_add(this int state, int idx)
         {
             return state | (1 << (idx - 1));
         }
 
-        public static int bit_remove(int state, int idx)
+        public static int bit_remove(this int state, int idx)
         {
             return state ^ (1 << (idx - 1));
         }
 
+
+        public static bool bit_has(this long state, int idx)
+        {
+            if (idx == 0) return false;
+            return ((state >> (idx - 1)) & 1) > 0;
+        }
+
+        public static long bit_add(this long state, int idx)
+        {
+            return state | ((long)1 << (idx - 1));
+        }
+
+        public static long bit_remove(this long state, int idx)
+        {
+            return state ^ (1 << (idx - 1));
+        }
 
         #region 之前写的lua代码  后面有需求可以加上
 

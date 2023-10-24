@@ -20,7 +20,7 @@ namespace LGF.Net
         /// <summary>
         /// 服务器端口   后面写个算法 随机10范围的ip地址
         /// </summary>
-        public const int ServerPort = 45557;
+        public const int ServerPort = 51503;
 
         /// <summary>
         /// 客户端端口 随机端口号
@@ -46,6 +46,17 @@ namespace LGF.Net
 
         public const int KcpConvInitialValue = 20;
         public const int KcpAbnormal_1 = 1;  //异常1
+        public const int KcpAbnormal_2 = 2;  //异常2 这里表示 重连成功
+
+        /// <summary>
+        /// 发送心跳包的间隔时间
+        /// </summary>
+        public const int CheckHeartBeatPackTime = 6010;
+
+        /// <summary>
+        /// 客户端判断 服务器断开连接的时间
+        /// </summary>
+        public const int Client_CheckHeartBeatPackTime = CheckHeartBeatPackTime * 2;
     }
 
 

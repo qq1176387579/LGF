@@ -57,7 +57,7 @@ public partial class MainLogicUnit
         PEVector3 adj = PEVector3.zero;
         try
         {
-            collider.CalcCollidersInteraction(envColliderList, ref moveDir, ref adj);
+            //collider.CalcCollidersInteraction(envColliderList, ref moveDir, ref adj); //暂时关闭碰撞检查
         }
         catch (System.Exception e)
         {

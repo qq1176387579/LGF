@@ -41,7 +41,7 @@ public class MacAddressTest : MonoBehaviour
 
         //text.text = GetMacAddress();
 #else
-        text.text = GetMacAddress();
+        //text.text = GetMacAddress();
 #endif
 
 

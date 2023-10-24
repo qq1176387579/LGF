@@ -83,12 +83,15 @@ public class CMD_BASE<T> : CMD_BASE2<T> where T : CMD_BASE<T>, new()
 
 public partial class C2S_BASE<T> : CMD_BASE<T> where T : C2S_BASE<T>, new()
 {
-    [LGF.Serializable.SteamMember(-999)]
-    public uint uid;    //用户ID 玩家ID
-    public C2S_BASE(NetMsgDefine type, uint uid_ = 0) : base(type)
-    {
-        this.uid = uid_;
-    }
+    //[LGF.Serializable.SteamMember(-999)]
+    //public uint uid;    //用户ID 玩家ID
+    //public C2S_BASE(NetMsgDefine type, uint uid_ = 0) : base(type)
+    //{
+    //    this.uid = uid_;
+    //}
+
+    public C2S_BASE(NetMsgDefine type) : base(type) { }
+
 
 }
 
@@ -125,60 +128,75 @@ public partial class S2C_BASE<T> : CMD_BASE<T> where T : S2C_BASE<T>, new()
 //    public byte[] data;
 //}
 
-#region 非KCP 消息
-
-
-/// <summary>
-/// 获得所有服务器的信息
-/// </summary>
-[LGF.Serializable.SteamContract]
-public partial class N_C2S_GetAllServersInfo : CMD_BASE<N_C2S_GetAllServersInfo>
-{
-    public N_C2S_GetAllServersInfo() : base(NetMsgDefine.N_C2S_GetAllServersInfo) { }
-}
-
-
-/// <summary>
-/// 服务端 返回连接 信息
-/// </summary>
-[LGF.Serializable.SteamContract]
-public partial class N_S2C_GetAllServersInfo : CMD_BASE<N_S2C_GetAllServersInfo>
-{
-    public N_S2C_GetAllServersInfo() : base(NetMsgDefine.N_S2C_GetAllServersInfo) { }
-
-    [LGF.Serializable.SteamMember(1)]
-    public int port;    //端口号
-}
-
-#endregion
-
 
 #region 连接服务器的后的消息通知 消息
+
+
+
+
+///// <summary>
+///// 并传递客户端信息
+///// </summary>
+//[LGF.Serializable.SteamContract]
+//public partial class C2S_GGSYmsg : C2S_BASE<C2S_GGSYmsg>
+//{
+//    public C2S_GGSYmsg() : base(NetMsgDefine.GGSYmsg) { }
+//    [SteamMember(1)]
+//    public uint type;
+//    [SteamMember(2)]
+//    public Dictionary<int, string> data; 
+//}
+
+
+///// <summary>
+///// 服务端 返回连接 信息  
+///// </summary>
+//[LGF.Serializable.SteamContract]
+//public partial class S2C_GGSYmsg : S2C_BASE<S2C_GGSYmsg>
+//{
+//    public S2C_GGSYmsg() : base(NetMsgDefine.GGSYmsg) { }
+//    [SteamMember(1)]
+//    public uint type;
+//    [SteamMember(2)]
+//    public Dictionary<int, string> data;
+//}
+
+
+///// <summary>
+///// 服务端 返回连接 事件
+///// </summary>
+//[LGF.Serializable.SteamContract]
+//public partial class S2C_GGSYEvent : S2C_BASE<S2C_GGSYEvent>
+//{
+//    public S2C_GGSYEvent() : base(NetMsgDefine.GGSYEvent) { }
+//    [SteamMember(1)]
+//    public uint type;
+//    [SteamMember(2)]
+//    public Dictionary<int, string> data;
+//}
+
 
 
 /// <summary>
 /// 客户端连接  并传递客户端信息
 /// </summary>
 [LGF.Serializable.SteamContract]
-public partial class C2S_Connect : CMD_BASE<C2S_Connect>
+public partial class C2S_Login : C2S_BASE<C2S_Login>
 {
-    public C2S_Connect() : base(NetMsgDefine.C2S_Connect) { }
+    public C2S_Login() : base(NetMsgDefine.Login) { }
     [SteamMember(1)]
-    public string name; //自己的名称
-    [SteamMember(2)]
-    public string uuid; //自己的唯一iD
+    public string name; //名称
 }
 
 /// <summary>
 /// 服务端 返回连接 信息  
 /// </summary>
 [LGF.Serializable.SteamContract]
-public partial class S2C_Connect : S2C_BASE<S2C_Connect>
+public partial class S2C_Login : S2C_BASE<S2C_Login>
 {
-    public S2C_Connect() : base(NetMsgDefine.S2C_Connect) { }
-
-    [LGF.Serializable.SteamMember(2)]
-    public uint uid;     //返回给客户端一个唯一id
+    public S2C_Login() : base(NetMsgDefine.Login) { }
+    [SteamMember(1)]
+    public uint uid;    //返回uid
 }
 
 
@@ -188,7 +206,7 @@ public partial class S2C_Connect : S2C_BASE<S2C_Connect>
 [LGF.Serializable.SteamContract]
 public partial class C2S_HeartBeat : C2S_BASE<C2S_HeartBeat>
 {
-    public C2S_HeartBeat() : base(NetMsgDefine.C2S_HeartBeat) { }
+    public C2S_HeartBeat() : base(NetMsgDefine.HeartBeat) { }
 }
 
 /// <summary>
@@ -197,7 +215,7 @@ public partial class C2S_HeartBeat : C2S_BASE<C2S_HeartBeat>
 [LGF.Serializable.SteamContract]
 public partial class S2C_HeartBeat : S2C_BASE<S2C_HeartBeat>
 {
-    public S2C_HeartBeat() : base(NetMsgDefine.S2C_HeartBeat) { }
+    public S2C_HeartBeat() : base(NetMsgDefine.HeartBeat) { }
 }
 
 
@@ -216,7 +234,7 @@ public partial class S2C_HeartBeat : S2C_BASE<S2C_HeartBeat>
 [LGF.Serializable.SteamContract]
 public partial class C2S_ChatMsg : C2S_BASE<C2S_ChatMsg>
 {
-    public C2S_ChatMsg() : base(NetMsgDefine.C2S_ChatMsg) { }
+    public C2S_ChatMsg() : base(NetMsgDefine.ChatMsg) { }
 
     [LGF.Serializable.SteamMember(1)]
     public ChatType type;    //
@@ -231,7 +249,7 @@ public partial class C2S_ChatMsg : C2S_BASE<C2S_ChatMsg>
 [LGF.Serializable.SteamContract]
 public partial class S2C_ChatMsg : S2C_BASE<S2C_ChatMsg>
 {
-    public S2C_ChatMsg() : base(NetMsgDefine.S2C_ChatMsg) { }
+    public S2C_ChatMsg() : base(NetMsgDefine.ChatMsg) { }
     [LGF.Serializable.SteamMember(1)]
     public ChatType type;    //
 
@@ -248,6 +266,8 @@ public partial class S2C_ChatMsg : S2C_BASE<S2C_ChatMsg>
 
 
 
+
+
 #region Room
 
 /// <summary>
@@ -256,7 +276,7 @@ public partial class S2C_ChatMsg : S2C_BASE<S2C_ChatMsg>
 [LGF.Serializable.SteamContract]
 public partial class C2S_CreateRoom : C2S_BASE<C2S_CreateRoom>
 {
-    public C2S_CreateRoom() : base(NetMsgDefine.C2S_CreateRoom) { }
+    public C2S_CreateRoom() : base(NetMsgDefine.CreateRoom) { }
 
     [LGF.Serializable.SteamMember(1)]
     public string name; //房间名字  暂时没写这个取名
@@ -270,7 +290,7 @@ public partial class C2S_CreateRoom : C2S_BASE<C2S_CreateRoom>
 [LGF.Serializable.SteamContract]
 public partial class S2C_CreateRoom : S2C_BASE<S2C_CreateRoom>
 {
-    public S2C_CreateRoom() : base(NetMsgDefine.S2C_CreateRoom) { }
+    public S2C_CreateRoom() : base(NetMsgDefine.CreateRoom) { }
     [LGF.Serializable.SteamMember(1)]
     public uint roomID;    //房间的ID
 
@@ -285,7 +305,7 @@ public partial class S2C_CreateRoom : S2C_BASE<S2C_CreateRoom>
 [LGF.Serializable.SteamContract]
 public partial class C2S_GetAllTheRooms : C2S_BASE<C2S_GetAllTheRooms>
 {
-    public C2S_GetAllTheRooms() : base(NetMsgDefine.C2S_GetAllTheRooms) { }
+    public C2S_GetAllTheRooms() : base(NetMsgDefine.GetAllTheRooms) { }
 }
 
 
@@ -312,7 +332,7 @@ public partial class CMD_SimpleRoomInfo : CMD_BASE2<CMD_SimpleRoomInfo>
 [LGF.Serializable.SteamContract]
 public partial class S2C_GetAllTheRooms : S2C_BASE<S2C_GetAllTheRooms>
 {
-    public S2C_GetAllTheRooms() : base(NetMsgDefine.S2C_GetAllTheRooms) { }
+    public S2C_GetAllTheRooms() : base(NetMsgDefine.GetAllTheRooms) { }
 
     [SteamMember(1)]
     public List<CMD_SimpleRoomInfo> roomList;
@@ -322,18 +342,18 @@ public partial class S2C_GetAllTheRooms : S2C_BASE<S2C_GetAllTheRooms>
 
 
 
-///// <summary>
-///// 进入房间
-///// </summary>
-//[LGF.Serializable.SteamContract]
-//public partial class C2S_JionRoom : C2S_BASE<C2S_JionRoom>
-//{
-//    public C2S_JionRoom() : base(NetMsgDefine.C2S_JionRoom) { }
-//    [LGF.Serializable.SteamMember(1)]
-//    public int roomID;    //房间的ID
-//    [LGF.Serializable.SteamMember(2)]
-//    public string name; //房间名字
-//}
+/// <summary>
+/// 进入房间
+/// </summary>
+[LGF.Serializable.SteamContract]
+public partial class C2S_JionRoom : C2S_BASE<C2S_JionRoom>
+{
+    public C2S_JionRoom() : base(NetMsgDefine.JionRoom) { }
+    [LGF.Serializable.SteamMember(1)]
+    public int roomID;    //房间的ID
+    [LGF.Serializable.SteamMember(2)]
+    public string name; //房间名字
+}
 
 
 
@@ -343,7 +363,7 @@ public partial class S2C_GetAllTheRooms : S2C_BASE<S2C_GetAllTheRooms>
 [LGF.Serializable.SteamContract]
 public partial class S2C_JionRoom : S2C_BASE<S2C_JionRoom>
 {
-    public S2C_JionRoom() : base(NetMsgDefine.S2C_JionRoom) { }
+    public S2C_JionRoom() : base(NetMsgDefine.JionRoom) { }
     [LGF.Serializable.SteamMember(1)]
     public int roomID;    //房间的ID
 
@@ -365,7 +385,7 @@ public partial class S2C_JionRoom : S2C_BASE<S2C_JionRoom>
 [LGF.Serializable.SteamContract]
 public partial class C2S_InformRoomChange : C2S_BASE<C2S_InformRoomChange>
 {
-    public C2S_InformRoomChange() : base(NetMsgDefine.C2S_InformRoomChange) { }
+    public C2S_InformRoomChange() : base(NetMsgDefine.InformRoomChange) { }
 
     /// <summary>
     /// 操作
@@ -389,7 +409,7 @@ public partial class C2S_InformRoomChange : C2S_BASE<C2S_InformRoomChange>
 [LGF.Serializable.SteamContract]
 public partial class S2C_InformRoomChange : S2C_BASE<S2C_InformRoomChange>
 {
-    public S2C_InformRoomChange() : base(NetMsgDefine.S2C_InformRoomChange) { }
+    public S2C_InformRoomChange() : base(NetMsgDefine.InformRoomChange) { }
 
     /// <summary>
     /// 操作
@@ -411,7 +431,7 @@ public partial class S2C_InformRoomChange : S2C_BASE<S2C_InformRoomChange>
 [LGF.Serializable.SteamContract]
 public partial class S2C_SyncRoomInfo : S2C_BASE<S2C_SyncRoomInfo>
 {
-    public S2C_SyncRoomInfo() : base(NetMsgDefine.S2C_SyncRoomInfo) { }
+    public S2C_SyncRoomInfo() : base(NetMsgDefine.SyncRoomInfo) { }
 
     [SteamMember(1)]
     public uint houseOwnerID;       //房主ID
@@ -464,3 +484,5 @@ public partial class CMD_UserInfo : CMD_BASE2<CMD_UserInfo>
 
 
 #endregion
+
+

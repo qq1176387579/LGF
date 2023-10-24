@@ -16,7 +16,7 @@ namespace LGF.Android
     /// </summary>
     public partial class AndroidMsgManager : MonoSingleton<AndroidMsgManager>
     {
-        public void Init()
+        public override void Init()
         {
             AndroidMsgCenter.Instance.Init();
             

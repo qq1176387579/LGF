@@ -19,6 +19,7 @@ namespace LGF
     {
         public override void OnAwake()
         {
+            gameObject.transform.SetParent(null);
             Common.DontDestroyOnLoad(this);   
         }
         

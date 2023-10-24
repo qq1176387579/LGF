@@ -23,8 +23,7 @@ public class GameEntry2 : GameEntry
     {
         base.OnDisable();
 
-        if (C_ModuleMgr.CheckInstance()) C_ModuleMgr.Instance.Close();
-        if (S_ModuleMgr.CheckInstance()) S_ModuleMgr.Instance.Close();
+        if (ModuleMgr.CheckInstance()) ModuleMgr.Instance.Close();
     }
 
 }

@@ -114,15 +114,16 @@ namespace LGF.Serializable
         {
             uint val = 0;
             stream.Position = 4;
-            try
-            {
-                val = read.ReadUInt32();
-            }
-            catch (Exception e)
-            {
-                e.DebugError();
-                return 0;  //非法操作
-            }
+            val = read.ReadUInt32();
+            //try
+            //{
+            //    val = read.ReadUInt32();
+            //}
+            //catch (Exception e)
+            //{
+            //    e.DebugError();
+            //    return 0;  //非法操作
+            //}
             Reset();
             return val;
         }
