@@ -37,12 +37,18 @@ public class ModuleMgr : SingletonBase<ModuleMgr>
         InitAllManager();
         InitAllModule();
 
+        //var LogFileName = DateTime.UtcNow.ToString().Split(' ')[0];
+        //LogFileName = LogFileName.Replace("-", "_");
+        //LogFileName = LogFileName.Replace(":", "_");
+        //LogFileName = LogFileName.Replace("/", "");
+        //this.DebugError($"ffffffffff  <{LogFileName}>");
     }
 
     void InitAllManager()
     {
         mainPlayerMgr = MainPlayerManager.Instance.Init(this);
         roomMgr = RoomManager.Instance.Init(this);
+        GameRequestMgr.Instance.Init(this);
     }
 
 
@@ -52,6 +58,7 @@ public class ModuleMgr : SingletonBase<ModuleMgr>
         CreationModule<LoginModule>();
         CreationModule<RoomModuble>();
         CreationModule<FrameSyncModule>();
+        CreationModule<GameRequestModule>();
     }
 
     void CreationModule<T>() where T : ModuleBase, new()
@@ -144,8 +151,9 @@ public class ModuleMgr : SingletonBase<ModuleMgr>
     void StartReConnect()
     {
         Task.Run(() => {
-            while (Client.IsDisposed || Client.IsDisconnection()) {
+            while (!Client.IsDisposed && Client.IsDisconnection()) {
                 Client.TryReConnect();
+                this.Debug($"{DateTime.UtcNow.ToString()}-{new DateTime(Client.checkTime)}");
                 Thread.Sleep(5000); //5s一次重连检查一次
             }
             ReConnectState = 2;

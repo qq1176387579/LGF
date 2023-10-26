@@ -132,10 +132,15 @@ namespace LGF.Server.Hotfix
                             break;
                         }
 
-                        //sLog.Debug("--test--OnRoomChange--");
-                        //return;
+                    if (player.roomid > 0) {
+                        info.ErrorCode = ErrCode.INVALID_OPT;   //非法操作 已经在房间内了
+                        break;
+                    }
 
-                        room.JoinPlayer(player);
+                    //sLog.Debug("--test--OnRoomChange--");
+                    //return;
+
+                    room.JoinPlayer(player);
                         room.SyncRoomInfoToPlayer(player);  //
                         return;
                     }

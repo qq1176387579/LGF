@@ -17,6 +17,7 @@ namespace LGF.Server.Hotfix
     public interface IHotfixSingletonBase
     {
         void Close();
+ 
     }
 
     public class HotfixSingletonBase<T, T1> : LGF.SingletonBase<T>, IHotfixSingletonBase where T : HotfixSingletonBase<T, T1>, new()

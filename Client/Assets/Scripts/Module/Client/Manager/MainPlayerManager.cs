@@ -15,16 +15,22 @@ using LGF.Log;
 /// </summary>
 public class MainPlayerManager : ModuleSingletonBase<MainPlayerManager>
 {
-    public uint uid;
+    uint _uid;
+    public uint uid { set { 
+            _uid = value;
+            this.DebugError($"mainPlayer new uid: {_uid}");
+        } get=> _uid; }
     public string name;
     public uint RoomID;
     public bool InRoom => RoomID > 0;
+    
     /// <summary>
     /// 联机模式下 这里发送
     /// 数据定时发送，
     /// </summary>
     C2S_FrameOpKey tmpFrameOpKey;   
     bool hasData = false;
+
     public override void Init()
     {
         base.Init();
@@ -87,11 +93,15 @@ public class MainPlayerManager : ModuleSingletonBase<MainPlayerManager>
             return; //没有数据 退出
         }
         //定时发送
+        hasData = false;
         tmpFrameOpKey.uid = uid;
+        if (uid == 0 || uid > 200) {
+            this.DebugError(uid);
+        }
         Send(tmpFrameOpKey);
         tmpFrameOpKey = C2S_FrameOpKey.Get();
 
-        hasData = false;
+       
     }
 
 

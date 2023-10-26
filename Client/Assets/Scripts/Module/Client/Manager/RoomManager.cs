@@ -13,7 +13,9 @@ public class RoomManager : ModuleSingletonBase<RoomManager>
 {
     List<CMD_SimpleRoomInfo> roomInfos; //临时的数据 后面回收  不要拿去用。
 
-    Dictionary<uint, CMD_UserRoomInfo> curRoomUserlist;
+    Dictionary<uint, CMD_UserRoomInfo> userDic;
+    List<CMD_UserRoomInfo> userList;
+    bool hasNewRoomUserData;
     public RoomStateEnum curState { get; protected set; }
 
     public uint houseOwnerID;
@@ -28,19 +30,21 @@ public class RoomManager : ModuleSingletonBase<RoomManager>
     public override void Init()
     {
         base.Init();
+        hasNewRoomUserData = true;
         roomInfos = new List<CMD_SimpleRoomInfo>();
-        curRoomUserlist = new Dictionary<uint, CMD_UserRoomInfo>();
+        userDic = new Dictionary<uint, CMD_UserRoomInfo>();
+        userList = new List<CMD_UserRoomInfo>();
         curState = RoomStateEnum.Create;
     }
 
 
     public void LoadRoomInfo(S2C_SyncRoomInfo msg)
     {
-        if (curRoomUserlist.Count > 0)
-            curRoomUserlist.ClearReleaseMember();
+        if (userDic.Count > 0)
+            userDic.ClearReleaseMember();
         foreach (var item in msg.infoList)
         {
-            curRoomUserlist.Add(item.useinfo.uid, item);
+            userDic.Add(item.useinfo.uid, item);
         }
 
         houseOwnerID = msg.houseOwnerID;
@@ -67,8 +71,7 @@ public class RoomManager : ModuleSingletonBase<RoomManager>
 
     public void ChangeReadyState(uint playerID, bool ready)
     {
-        if (!curRoomUserlist.TryGetValue(playerID, out var info))
-        {
+        if (!userDic.TryGetValue(playerID, out var info)) {
             sLog.Error("非法操作  没有该玩家------ playerID :" + playerID);
             return;
         }
@@ -79,19 +82,21 @@ public class RoomManager : ModuleSingletonBase<RoomManager>
 
     public void JoinRoom(S2C_InformRoomChange msg)
     {
-        curRoomUserlist.Add(msg.newUser.useinfo.uid, msg.newUser);    //加入
+        hasNewRoomUserData = true;
+        userDic.Add(msg.newUser.useinfo.uid, msg.newUser);    //加入
         msg.newUser = null;
         curState = RoomStateEnum.Create;
     }
 
     public void LeaveRoom(uint playerID)
     {
-        if (!curRoomUserlist.TryGetValue(playerID, out var info))
+        hasNewRoomUserData = true;
+        if (!userDic.TryGetValue(playerID, out var info))
         {
             sLog.Error("非法操作  没有该玩家------");
             return;
         }
-        curRoomUserlist.Remove(playerID);   //玩家离开
+        userDic.Remove(playerID);   //玩家离开
 
         info.Release();
         curState = RoomStateEnum.Create;
@@ -99,6 +104,7 @@ public class RoomManager : ModuleSingletonBase<RoomManager>
 
     public void OnCreateRoom(S2C_CreateRoom msg)
     {
+        hasNewRoomUserData = true;
         houseOwnerID = player.uid;
         //this.DebugError("player.uid" + player.uid);
         roomName = msg.roomName;
@@ -109,8 +115,8 @@ public class RoomManager : ModuleSingletonBase<RoomManager>
         player.RoomID = msg.roomID;
 
         //sLog.Debug(" player.RoomID : {0}", player.RoomID);
-        curRoomUserlist.ClearReleaseMember();
-        curRoomUserlist.Add(player.uid, info);
+        userDic.ClearReleaseMember();
+        userDic.Add(player.uid, info);
         curState = RoomStateEnum.Create;
     }
 
@@ -118,19 +124,40 @@ public class RoomManager : ModuleSingletonBase<RoomManager>
 
     public Dictionary<uint, CMD_UserRoomInfo> GetRoomUsersInfo()
     {
-        return curRoomUserlist;
+        return userDic;
     }
 
     public CMD_UserRoomInfo GetUserInfo(uint id)
     {
-        curRoomUserlist.TryGetValue(id, out var player);
+        userDic.TryGetValue(id, out var player);
         return player;
     }
+
+    /// <summary>
+    /// 帧同步流程的时候需要使用 list  不能使用dic
+    /// </summary>
+    /// <returns></returns>
+    public List<CMD_UserRoomInfo> GetAllUserInfoByList()
+    {
+        if (hasNewRoomUserData) {
+            hasNewRoomUserData = false;
+            userList.Clear();
+            foreach (var item in userDic) {
+                userList.Add(item.Value);
+            }
+            //排序
+            userList.Sort((a, b) => {
+                return a.useinfo.uid.CompareTo(b.useinfo.uid);
+            });
+        }
+        return userList;
+    }
+
 
 
     public Dictionary<uint, CMD_UserRoomInfo> GetAllUserInfo()
     {
-        return curRoomUserlist;
+        return userDic;
     }
 
 

@@ -214,6 +214,9 @@ namespace LGF.Net
 
         public virtual void Dispose()
         {
+            if (m_disposed) {
+                return;
+            }
             m_disposed = true;
             //严格按照执行顺序才能保证期
             m_kcpSocket.Dispose();

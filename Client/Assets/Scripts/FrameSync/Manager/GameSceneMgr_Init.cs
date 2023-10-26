@@ -25,6 +25,8 @@ public partial class GameSceneMgr
         InitPlayer();
 
         LogicInit();
+
+        InitOther();
     }
 
 
@@ -103,27 +105,33 @@ public partial class GameSceneMgr
             //player1.logicUnit.testuid = mainPlayer.uid;
             players.Add(player1.logicUnit);
             playerUnits.Add(player1.logicUnit.playerid, player1.logicUnit);
+            CameraFollow.Instance.CameraFollowOb = player1.transform;
         }
         else
         {
             sLog.OpenMsgInfo = false;
-            var allUserInfo = RoomManager.Instance.GetAllUserInfo();
+            var allUserInfo = RoomManager.Instance.GetAllUserInfo();    //帧同步不能用这个Dic 来处理 因为字典是无序的 所以这里出问题
             int count = 0;
-            foreach (var user in allUserInfo)
+            List<CMD_UserRoomInfo> info = RoomManager.Instance.GetAllUserInfoByList();
+
+            foreach (var user in info)
             {
                 count++;
                 var go = GameObject.Instantiate<GameObject>(gop);
                 TestPlayer1 player1 = go.GetComponent<TestPlayer1>();
                 player1.Init();
  
-                player1.logicUnit.playerid = user.Value.useinfo.uid;
-                player1.logicUnit.testuid = user.Value.useinfo.uid.ToString();
+                player1.logicUnit.playerid = user.useinfo.uid;
+                player1.logicUnit.testuid = user.useinfo.uid.ToString();
                 sLog.Error("-----InitPlayer---" + player1.logicUnit.playerid);
 
                 players.Add(player1.logicUnit);
                 playerUnits.Add(player1.logicUnit.playerid, player1.logicUnit);
 
                 player1.SetPos(new Vector3(count - 1, 0, count - 1));   //暂时先这样写
+                if (mainPlayer.uid == player1.logicUnit.playerid) {
+                    CameraFollow.Instance.CameraFollowOb = player1.transform;
+                }
             }
 
             players.Sort((a1, a2) =>

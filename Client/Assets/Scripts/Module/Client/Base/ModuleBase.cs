@@ -30,10 +30,10 @@ public class ModuleBase
     /// <typeparam name="T"></typeparam>
     /// <param name="type"></param>
     /// <param name="action"></param>
-    protected void RegisterClientMsg<T>(System.Action<T> action) where T : S2C_BASE<T>, new()
+    protected void RegisterClientMsg<T>(System.Action<T> action, bool isAutoRecycleData = true) where T : S2C_BASE<T>, new()
     {
         T tmp = new T();    //临时生成
-        netMsgHandlingMgr.RegisterClientMsg(tmp.msgType, action);
+        netMsgHandlingMgr.RegisterClientMsg(tmp.msgType, action, isAutoRecycleData);
     }
 
     public void Init(ModuleMgr _ModuleMgr)

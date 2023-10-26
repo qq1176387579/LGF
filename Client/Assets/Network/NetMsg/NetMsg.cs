@@ -134,45 +134,61 @@ public partial class S2C_BASE<T> : CMD_BASE<T> where T : S2C_BASE<T>, new()
 
 
 
+
+
+/// <summary>
+/// 并传递客户端信息
+/// </summary>
+[LGF.Serializable.SteamContract]
+public partial class C2S_GameMsg : C2S_BASE<C2S_GameMsg>
+{
+    public C2S_GameMsg() : base(NetMsgDefine.GameMsg) { }
+    [SteamMember(1)]
+    public uint type;
+    [SteamMember(2)]
+    public string data;
+}
+
+
+/// <summary>
+/// 服务端 返回连接 信息  
+/// </summary>
+[LGF.Serializable.SteamContract]
+public partial class S2C_GameMsg : S2C_BASE<S2C_GameMsg>
+{
+    public S2C_GameMsg() : base(NetMsgDefine.GameMsg) { }
+    [SteamMember(1)]
+    public uint type;
+    [SteamMember(2)]
+    public string data;
+}
+
+
+/// <summary>
+/// 服务端 返回连接 事件
+/// </summary>
+[LGF.Serializable.SteamContract]
+public partial class S2C_GameEvent : S2C_BASE<S2C_GameEvent>
+{
+    public S2C_GameEvent() : base(NetMsgDefine.GameEvent) { }
+    [SteamMember(1)]
+    public uint type;
+    [SteamMember(2)]
+    public string data;
+}
+
+
 ///// <summary>
 ///// 并传递客户端信息
 ///// </summary>
 //[LGF.Serializable.SteamContract]
-//public partial class C2S_GGSYmsg : C2S_BASE<C2S_GGSYmsg>
+//public partial class C2S_GameCInfo : C2S_BASE<C2S_GameCInfo>
 //{
-//    public C2S_GGSYmsg() : base(NetMsgDefine.GGSYmsg) { }
+//    public C2S_GameCInfo() : base(NetMsgDefine.GameCInfo) { }
 //    [SteamMember(1)]
 //    public uint type;
 //    [SteamMember(2)]
-//    public Dictionary<int, string> data; 
-//}
-
-
-///// <summary>
-///// 服务端 返回连接 信息  
-///// </summary>
-//[LGF.Serializable.SteamContract]
-//public partial class S2C_GGSYmsg : S2C_BASE<S2C_GGSYmsg>
-//{
-//    public S2C_GGSYmsg() : base(NetMsgDefine.GGSYmsg) { }
-//    [SteamMember(1)]
-//    public uint type;
-//    [SteamMember(2)]
-//    public Dictionary<int, string> data;
-//}
-
-
-///// <summary>
-///// 服务端 返回连接 事件
-///// </summary>
-//[LGF.Serializable.SteamContract]
-//public partial class S2C_GGSYEvent : S2C_BASE<S2C_GGSYEvent>
-//{
-//    public S2C_GGSYEvent() : base(NetMsgDefine.GGSYEvent) { }
-//    [SteamMember(1)]
-//    public uint type;
-//    [SteamMember(2)]
-//    public Dictionary<int, string> data;
+//    public string data;
 //}
 
 

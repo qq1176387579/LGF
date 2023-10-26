@@ -18,20 +18,25 @@ using LGF.Log;
 
 namespace LGF
 {
+    public class EventManager : EventManagerBase<EventManager, GameEventType>
+    {
+        
+    }
 
     /// <summary>
     /// 后面优化下  改为int执行  事件不暴露
     /// </summary>
-    public class EventManager : SingletonBase<EventManager>
+    public class EventManagerBase<T,T1> : SingletonBase<T> where T : EventManagerBase<T, T1>, new() 
+        where T1 : Enum
     {
         //自已私有的字典 管理所有的事件
-        private Dictionary<GameEventType, List<Delegate>> m_eventDic = new Dictionary<GameEventType, List<Delegate>>();
+        private Dictionary<T1, List<Delegate>> m_eventDic = new Dictionary<T1, List<Delegate>>();
         /// <summary>
         /// 判断字典里面是否包含了某一类事件
         /// </summary>
-        /// <param name="GameEventType"></param>
+        /// <param name="T1"></param>
         /// <returns></returns>
-        public bool CheckEvent(GameEventType evtType)
+        public bool CheckEvent(T1 evtType)
         {
             bool isContanis = false;
             //如果字典不包含该类型 表明是第一次添加该事件
@@ -46,7 +51,7 @@ namespace LGF
         /// </summary>
         /// <param name="eType"></param>
         /// <param name="ac"></param>
-        public void AddListener(GameEventType eType, System.Action ac)
+        public void AddListener(T1 eType, System.Action ac)
         {
             //如果已经包含了 不是第一次添加
             if (CheckEvent(eType))
@@ -63,7 +68,7 @@ namespace LGF
             }
         }
 
-        public void AddListener<T>(GameEventType eType, System.Action<T> ac)
+        public void AddListener<T>(T1 eType, System.Action<T> ac)
         {
             //如果已经包含了 不是第一次添加
             if (CheckEvent(eType))
@@ -80,7 +85,7 @@ namespace LGF
             }
         }
 
-        public void AddListener<T, K>(GameEventType eType, System.Action<T, K> ac)
+        public void AddListener<T, K>(T1 eType, System.Action<T, K> ac)
         {
             //如果已经包含了 不是第一次添加
             if (CheckEvent(eType))
@@ -97,7 +102,7 @@ namespace LGF
             }
         }
 
-        public void AddListener<T, K, M>(GameEventType eType, System.Action<T, K, M> ac)
+        public void AddListener<T, K, M>(T1 eType, System.Action<T, K, M> ac)
         {
             //如果已经包含了 不是第一次添加
             if (CheckEvent(eType))
@@ -114,7 +119,7 @@ namespace LGF
             }
         }
 
-        public void AddListener<T, K, M, K1>(GameEventType eType, System.Action<T, K, M, K1> ac)
+        public void AddListener<T, K, M, K1>(T1 eType, System.Action<T, K, M, K1> ac)
         {
             //如果已经包含了 不是第一次添加
             if (CheckEvent(eType))
@@ -136,7 +141,7 @@ namespace LGF
         /// 移除某一个事件中所有的监听者
         /// </summary>
         /// <param name="eType"></param>
-        public bool RemoveAllListerner(GameEventType eType)
+        public bool RemoveAllListerner(T1 eType)
         {
             bool isSucessed = false;
             if (CheckEvent(eType))
@@ -158,7 +163,7 @@ namespace LGF
         /// <param name="eType"></param>
         /// <param name="ac"></param>
         /// <returns></returns>
-        public bool RemoveListerner(GameEventType eType, System.Action ac)
+        public bool RemoveListerner(T1 eType, System.Action ac)
         {
             bool isSucessed = false;
             if (CheckEvent(eType))
@@ -192,7 +197,7 @@ namespace LGF
         /// <param name="eType"></param>
         /// <param name="ac"></param>
         /// <returns></returns>
-        public bool RemoveListerner<T>(GameEventType eType, System.Action<T> ac)
+        public bool RemoveListerner<T>(T1 eType, System.Action<T> ac)
         {
             bool isSucessed = false;
             if (CheckEvent(eType))
@@ -225,7 +230,7 @@ namespace LGF
             return isSucessed;
         }
 
-        public bool RemoveListerner<T, K>(GameEventType eType, System.Action<T, K> ac)
+        public bool RemoveListerner<T, K>(T1 eType, System.Action<T, K> ac)
         {
             bool isSucessed = false;
             if (CheckEvent(eType))
@@ -252,7 +257,7 @@ namespace LGF
             return isSucessed;
         }
 
-        public bool RemoveListerner<T, K, M>(GameEventType eType, System.Action<T, K, M> ac)
+        public bool RemoveListerner<T, K, M>(T1 eType, System.Action<T, K, M> ac)
         {
             bool isSucessed = false;
             if (CheckEvent(eType))
@@ -279,7 +284,7 @@ namespace LGF
             return isSucessed;
         }
 
-        public bool RemoveListerner<T, K, M, K1>(GameEventType eType, System.Action<T, K, M, K1> ac)
+        public bool RemoveListerner<T, K, M, K1>(T1 eType, System.Action<T, K, M, K1> ac)
         {
             bool isSucessed = false;
             if (CheckEvent(eType))
@@ -307,12 +312,12 @@ namespace LGF
         }
 
 
-        private bool CheckDicKey(GameEventType eType)
+        private bool CheckDicKey(T1 eType)
         {
             return !m_eventDic.ContainsKey(eType);
         }
 
-        public void BroadCastEvent(GameEventType eType)
+        public void BroadCastEvent(T1 eType)
         {
             if (CheckDicKey(eType))
                 return;
@@ -331,7 +336,7 @@ namespace LGF
             }
         }
 
-        public void BroadCastEvent<T>(GameEventType eType, T arg)
+        public void BroadCastEvent<T>(T1 eType, T arg)
         {
             if (CheckDicKey(eType))
                 return;
@@ -350,7 +355,7 @@ namespace LGF
             }
         }
 
-        public void BroadCastSingle<T>(GameEventType eType, System.Action<T> uAc, T arg)
+        public void BroadCastSingle<T>(T1 eType, System.Action<T> uAc, T arg)
         {
             //不包含此类型 直接开除
             if (CheckDicKey(eType))
@@ -373,7 +378,7 @@ namespace LGF
             }
         }
 
-        public void BroadCastEvent<T, M>(GameEventType eType, T arg1, M arg2)
+        public void BroadCastEvent<T, M>(T1 eType, T arg1, M arg2)
         {
             if (CheckDicKey(eType))
                 return;
@@ -392,7 +397,7 @@ namespace LGF
             }
         }
 
-        public void BroadCastEvent<T, M, K>(GameEventType eType, T arg1, M arg2, K arg3)
+        public void BroadCastEvent<T, M, K>(T1 eType, T arg1, M arg2, K arg3)
         {
             if (CheckDicKey(eType))
                 return;
@@ -411,7 +416,7 @@ namespace LGF
             }
         }
 
-        public void BroadCastEvent<T, M, K, K1>(GameEventType eType, T arg1, M arg2, K arg3, K1 arg4)
+        public void BroadCastEvent<T, M, K, K1>(T1 eType, T arg1, M arg2, K arg3, K1 arg4)
         {
             if (CheckDicKey(eType))
                 return;

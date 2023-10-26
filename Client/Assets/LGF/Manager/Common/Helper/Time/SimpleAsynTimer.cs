@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using LGF;
 using LGF.Log;
+using System;
 
 namespace LGF.Timers
 {
@@ -37,15 +38,21 @@ namespace LGF.Timers
                 isdelay = true; //初始化
                 while (!m_disposed)
                 {
-                    ulong lastTime = m_timekeeping;
-                    m_timekeeping = (ulong)m_stopWatch.ElapsedMilliseconds;
-                    int time = (int)(m_timekeeping - lastTime);
-                    time = time >= m_interval ? 0 : (int)m_interval - time;
-                    Thread.Sleep(time);
-                    //Task.Delay(time);   //严格时间
-                    isdelay = false;    //延迟中
-                    if (m_disposed) return;    
-                    OnRun();
+                    try {
+                        ulong lastTime = m_timekeeping;
+                        m_timekeeping = (ulong)m_stopWatch.ElapsedMilliseconds;
+                        int time = (int)(m_timekeeping - lastTime);
+                        time = time >= m_interval ? 0 : (int)m_interval - time;
+                        Thread.Sleep(time);
+                        //Task.Delay(time);   //严格时间
+                        isdelay = false;    //延迟中
+                        if (m_disposed) return;
+                        OnRun();
+                    }
+                    catch (Exception e) {
+                        e.DebugError();
+                        throw;
+                    }
                 }
             });
             

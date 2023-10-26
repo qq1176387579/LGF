@@ -60,6 +60,7 @@ namespace LGF.Server.Hotfix
             sLog.Debug("删除房间 {0}", room.id);
             roomList.Remove(room.id);   //删除房间
             room.Release();
+            HotfixEventMgr.Instance.BroadCastEvent(HotfixEventType.DelRoom, room.id);
         }
 
         public Dictionary<uint, Room> GetAllRoom()

@@ -16,7 +16,7 @@ namespace LGF.Log
 
     public static class sLog
     {
-
+        internal const int addhours = 8;
         public static bool isSave = false;
 
 #if NOT_UNITY
@@ -39,7 +39,7 @@ namespace LGF.Log
             if (OpenStackTrace) Console.WriteLine(new StackTrace().ToString());
 
 #else
-            UnityEngine.Debug.LogFormat(format, args);
+            UnityEngine.Debug.LogFormat($"{DateTime.UtcNow.AddHours(addhours)}: {format}", args);
 #endif
             if (isSave) 
                 DebugExtension.DebugUtils.LogToFile(string.Format(format, args));
@@ -62,7 +62,7 @@ namespace LGF.Log
             Console.WriteLine(message.ToString());
             if (OpenStackTrace) Console.WriteLine(new StackTrace().ToString());
 #else
-            UnityEngine.Debug.Log(message);
+            UnityEngine.Debug.Log($"{DateTime.UtcNow.AddHours(addhours)}:{message}");
 #endif
             if (isSave)
                 DebugExtension.DebugUtils.LogToFile(message.ToString());
@@ -109,8 +109,11 @@ namespace LGF.Log
             //if (OpenStackTrace) 
             Console.WriteLine(new StackTrace().ToString());
 #else
-            UnityEngine.Debug.LogError(message);
-#endif 
+            UnityEngine.Debug.LogError($"{DateTime.UtcNow.AddHours(addhours)}:{message}");
+            //UnityEngine.Debug.LogError(message);
+#endif
+            if (isSave)
+                DebugExtension.DebugUtils.LogToFile(message.ToString(), true);
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
@@ -121,8 +124,10 @@ namespace LGF.Log
             Console.WriteLine(string.Format(format, args));
             if (OpenStackTrace) Console.WriteLine(new StackTrace().ToString());
 #else
-            UnityEngine.Debug.LogErrorFormat(format, args);
+            UnityEngine.Debug.LogErrorFormat($"{DateTime.UtcNow.AddHours(addhours)}: {format}", args);
 #endif
+            if (isSave)
+                DebugExtension.DebugUtils.LogToFile(string.Format($"{DateTime.UtcNow.AddHours(addhours)}: {format}", args));
         }
 
     }
@@ -365,17 +370,25 @@ namespace LGF.Log
             static StreamWriter LogFileWriter = null;
             static string LogFileName = null;
             static string LogFileDir = null;
+            static int day = 0;
 
             internal static void LogToFile(string message, bool EnableStack = false)
             {
+                int addhours = sLog.addhours;
+                var curtime = DateTime.UtcNow.AddHours(addhours);
+                if (day != curtime.Day) {
+                    day = curtime.Day;
+                    LogFileWriter = null;
+                }
+
                 //后面开线程  这里会阻塞线程的
-                if (LogFileWriter == null)
-                {
-                    //LogFileName = LogFileName.Replace("-", "_");
-                    //LogFileName = LogFileName.Replace(":", "_");
-                    //LogFileName = LogFileName.Replace(" ", "");
+                if (LogFileWriter == null) {
+                    LogFileName = curtime.ToString().Split(' ')[0];
+                    LogFileName = LogFileName.Replace("-", "_");
+                    LogFileName = LogFileName.Replace(":", "_");
+                    LogFileName = LogFileName.Replace("/", "");
                     //LogFileName += ".log";
-                    LogFileName = DateTime.UtcNow.Ticks + "__log.txt";
+                    LogFileName +=  "__log.txt";
                     if (string.IsNullOrEmpty(LogFileDir))
                     {
 #if NOT_UNITY
@@ -416,15 +429,18 @@ namespace LGF.Log
 
                 try
                 {
-                    LogFileWriter.WriteLine(message);
+                    //LogFileWriter.Write(.ToString());
+                    LogFileWriter.WriteLine($"{curtime} : {message}");
                     if (EnableStack) {
                         //LogFileWriter.WriteLine(StackTraceUtility.ExtractStackTrace());
                         LogFileWriter.WriteLine(new StackTrace().ToString());
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    throw;
                 }
+
             }
 
         }

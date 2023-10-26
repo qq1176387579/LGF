@@ -52,9 +52,9 @@ public class PlayWnd : MonoBehaviour {
     }
 
 
-    private Vector2 lastStickDir = Vector2.zero;
+    //private Vector2 lastStickDir = Vector2.zero;
     private void InputMoveKey(Vector2 dir) {
-        if(!dir.Equals(lastStickDir)) {
+        //if(!dir.Equals(lastStickDir)) {
             Vector3 dirVector3 = new Vector3(dir.x, 0, dir.y);
             dirVector3 = Quaternion.Euler(0, 45, 0) * dirVector3;   //在游戏中需要选择45度
             PEVector3 logicDir = PEVector3.zero;
@@ -64,19 +64,20 @@ public class PlayWnd : MonoBehaviour {
                 logicDir.z = (PEInt)dirVector3.z;
             }
 
-         
-            //{
-            //    //Debug.Log("--ff-"); 
-            //    //lastStickDir = dir;
-            //    LGF.EventManager.Instance.BroadCastEvent(LGF.GameEventType.Test, new Vector3(dir.x,0, dir.y));
-            //    //return;
-            //}
+        //{
+        //    //Debug.Log("--ff-"); 
+        //    //lastStickDir = dir;
+        //    LGF.EventManager.Instance.BroadCastEvent(LGF.GameEventType.Test, new Vector3(dir.x,0, dir.y));
+        //    //return;
+        //}
 
-            bool isSend = GameSceneMgr.Instance.SendMoveKey(logicDir);
-            if (isSend)
-            {
-                lastStickDir = dir;
-            }
-        }
+        GameSceneMgr.Instance.SendMoveKey(logicDir);
+
+        //bool isSend =
+        //if (isSend)
+        //{
+        //    //lastStickDir = dir;
+        //}
+        //}
     }
 }

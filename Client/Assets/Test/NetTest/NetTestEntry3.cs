@@ -10,12 +10,13 @@ using UnityEngine;
 using LGF;
 using LGF.Log;
 using System.Net;
+using System;
 
 public class NetTestEntry3 : GameEntry2
 {
-   
-    //public string name = "";
 
+    //public string name = "";
+    static DateTime _initialDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
     protected override void OnStart()
     {
         base.OnStart();
@@ -34,7 +35,14 @@ public class NetTestEntry3 : GameEntry2
         //Debug.LogFormat("{0}  {1}", strings1[0], strings2[0]);
 
 
+        var ts = DateTime.UtcNow.AddHours(8);
+        this.Debug($"ts : {ts}   DayOfWeek<{(int)ts.DayOfWeek}>  DayOfYear<{ts.DayOfYear}>" );
+
         Screen.sleepTimeout = SleepTimeout.NeverSleep;  //防止息屏
+
+        
+        string BasePath = Application.persistentDataPath + "/FrameData/";
+
     }
 
   

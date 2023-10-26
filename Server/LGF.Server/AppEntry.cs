@@ -51,6 +51,7 @@ namespace LGF.Server
         static void sendMsg()
         {
             Console.InputEncoding = System.Text.Encoding.Unicode;
+            sLog.isSave = true;
             while (true)
             {
                 string msg = Console.ReadLine();
@@ -59,6 +60,14 @@ namespace LGF.Server
                 {
                     HotfixHelper.ReLoadHotfix();
                     //HotfixHelper.LoadHotfixAssembly();
+                }
+
+                if (msg == "openlog") {
+                    KcpSocket.OpenLog = true;
+                }
+
+                if (msg == "closelog") {
+                    KcpSocket.OpenLog = false;
                 }
 
                 if (kcpAgent1 == null)

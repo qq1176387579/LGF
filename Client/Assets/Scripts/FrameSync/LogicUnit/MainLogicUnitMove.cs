@@ -13,7 +13,7 @@ using PEPhysx;
 
 public class Configs
 {
-    public const float ClientLogicFrameDeltaSec = 0.066f;
+    public const float ClientLogicFrameDeltaSec = 0.066f;//服务器帧率
 }
 
 public partial class MainLogicUnit
@@ -49,7 +49,7 @@ public partial class MainLogicUnit
 
     void TickMove()
     {
-        
+
         PEVector3 moveDir = InputDir;
         //暂时先这样  后面去看资料  我记得客户端要比服务端 快1倍的帧率
         collider.mPos += moveDir * LogicMoveSpeed * (PEInt)Configs.ClientLogicFrameDeltaSec;
@@ -75,7 +75,7 @@ public partial class MainLogicUnit
             LogicPos = collider.mPos + adj; //当前位置加上矫正值
         }
         collider.mPos = LogicPos;
-
+        
         //sLog.Debug("{0} ", GameSceneMgr.Instance.CurFrame);
         //sLog.Debug("{0} ", testuid);
         //sLog.Debug("{0} ", LogicPos);

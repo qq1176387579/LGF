@@ -70,6 +70,9 @@ public enum NetMsgDefine
     RoomtFinishType,  //type = 1 标识开始场景加载  2房间玩家全部加载完成 
     RoomProgress,
 
+    GameCInfo,        //游戏中客户端发送给的信息.
+    GameMsg,          //游戏消息处理 客户端请求并响应
+    GameEvent,        //游戏服务器通知客户端的事件 
 }
 
 

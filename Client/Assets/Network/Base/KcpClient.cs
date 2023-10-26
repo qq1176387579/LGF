@@ -36,7 +36,7 @@ namespace LGF.Net
         KcpClientRecvHelper recvHelper;
         public bool IsTryConnecting;  //连接中
         int connectCount;
-        long checkTime;     //时间 用来检测心跳
+        public long checkTime;     //时间 用来检测心跳
 
 
 

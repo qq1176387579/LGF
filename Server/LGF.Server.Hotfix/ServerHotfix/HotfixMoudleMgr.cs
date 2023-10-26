@@ -40,6 +40,7 @@ namespace LGF.Server.Hotfix
         {
             playerMgr = PlayerManager.Instance.Init(this);
             roomMgr = RoomManager.Instance.Init(this);
+            HotfixEventMgr.Instance.Init(this);
         }
 
 
@@ -49,7 +50,8 @@ namespace LGF.Server.Hotfix
             CreationModule<RoomModule>();
             CreationModule<LoginModule>();
             CreationModule<FrameSyncMoudule>();
-            
+            CreationModule<GameResponseModule>();
+
         }
 
 

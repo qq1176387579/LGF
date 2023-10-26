@@ -30,6 +30,7 @@ public class TestGMSystem : SimpleMonoSingleton<TestGMSystem>
     private Rect labelRect = new Rect(30, 30, 100, 30);
     private Rect labelRect2 = new Rect(30, 70, 100, 30);
     private Rect labelRect3 = new Rect(30, 100, 100, 30);
+    private Rect labelRect4 = new Rect(30, 130, 100, 30);
     private float _Interval = 0.5f;
     private int _FrameCount = 0;
     private float _TimeCount = 0;
@@ -64,8 +65,14 @@ public class TestGMSystem : SimpleMonoSingleton<TestGMSystem>
                 Reporter.Instance.DoShow();
             }
         }
-       
-      
+
+        if (GUI.Button(labelRect4, "sockLog")) {
+            LGF.Net.KcpSocket.OpenLog = !LGF.Net.KcpSocket.OpenLog;
+            //Debug.Log("---fff--");
+            // Reporter.Instance.DoShow();
+        }
+
+
     }
 
 }

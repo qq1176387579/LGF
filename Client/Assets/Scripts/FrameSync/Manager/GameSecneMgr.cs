@@ -17,7 +17,7 @@ using UnityEngine;
 /// </summary>
 public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
 {
-    bool isNative = true;
+
     MainPlayerManager _mainPlayer;
     MainPlayerManager mainPlayer {
         get {
@@ -25,9 +25,13 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
             return _mainPlayer;
         } 
     }
-
+    #region isNative
+    bool isNative = true;
     public uint _keyid = 0;
-    public uint Keyid { get => ++_keyid; } 
+    public uint Keyid { get => ++_keyid; }
+    #endregion
+
+
     List<PlayerUnit> players = new List<PlayerUnit>();
     /// <summary>
     ///  帧同步里面可以用Dict的，只是你不要用它来保存需要遍历的元素。
@@ -40,6 +44,11 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
 
     MapRoot mapRoot;
     EnvColliders logocEnv;
+
+    void InitOther()
+    {
+        //LGFEntry.RegisterOnFixedUpdate(OnFixedUpdate);
+    }
 
     void NativeInit()
     {
@@ -69,7 +78,10 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
         for (int i = 0; i < players.Count; i++)
         {
             players[i].LogicTick();
+
         }
+
+      
     }
 
 
@@ -89,6 +101,9 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
     public ulong CurFrame { get; private set; }
     public void OnServerLogicFrame(S2C_FrameOpKey msg)
     {
+        if (CurFrame + 1 != msg.curFrame) {
+            this.DebugError($" {CurFrame}->{msg.curFrame} 跳帧了 少接收一帧");
+        }
         CurFrame = msg.curFrame;
         var opkey = msg.allOpkey;
         if (opkey != null)
@@ -110,15 +125,22 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
             }
         }
       
-
         LogicTick();
+
+        CheckCharacterPositionRequest.Instance.DefaultRequest(players, CurFrame);
     }
+
+
+
 
     void OnFixedUpdate()
     {
-        allkey.curFrame++;
-        OnServerLogicFrame(allkey);
-        allkey.allOpkey.ClearReleaseMember();
+        if (isNative) {
+            allkey.curFrame++;
+            OnServerLogicFrame(allkey);
+            allkey.allOpkey.ClearReleaseMember();
+        }
+
     }
 
     #endregion

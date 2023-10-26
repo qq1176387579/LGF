@@ -43,6 +43,7 @@ namespace LGF.Server
 
             loadFinishCount = 0;
             reallyCount = 0;
+            curFrame = 0;
         }
 
 

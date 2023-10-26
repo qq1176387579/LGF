@@ -55,6 +55,7 @@
     <!--版权配置-->
     <Copyright>Copyright (c) 2019 云却</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <!--许可证文件配置-->
   <ItemGroup>

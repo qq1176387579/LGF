@@ -51,6 +51,11 @@ namespace LGF.Server.Hotfix
                 return;
             }
 
+            if (msg.uid != session.useid) {
+                sLog.Error(" 非法id playerID : msg.uid<{0}>-player.uid<{1}>", msg.uid, player.uid);
+                msg.uid = player.uid;
+            }
+         
             player.room.AddFrameOpKey(msg);
         }
 

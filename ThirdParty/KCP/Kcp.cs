@@ -24,9 +24,9 @@ namespace System.Net.Sockets.Kcp
         {
             callbackHandle = callback;
             this.rentable = rentable;
-        }      
+        }
 
-
+        public System.Action<string> Log;
         //extension 重构和新增加的部分============================================
 
         IRentable rentable;
@@ -67,24 +67,30 @@ namespace System.Net.Sockets.Kcp
             }
 
             var peekSize = -1;
-            var seq = rcv_queue[0];
+            lock (rcv_queueLock) {  //修复bug
 
-            if (seq.frg == 0)
-            {
-                peekSize = (int)seq.len;
-            }
+                if (rcv_queue.Count == 0) {
+                    ///没有可用包
+                    return -1;
+                }
 
-            if (rcv_queue.Count < seq.frg + 1)
-            {
-                ///没有足够的包
-                return -1;
-            }
+                var seq = rcv_queue[0];
 
-            lock (rcv_queueLock)
-            {
+                if (seq.frg == 0)
+                {
+                    peekSize = (int)seq.len;
+                }
+
+                if (rcv_queue.Count < seq.frg + 1)
+                {
+                    ///没有足够的包
+                    return -1;
+                }
+
+
                 uint length = 0;
 
-                foreach (var item in rcv_queue)
+                foreach (var item in rcv_queue) 
                 {
                     length += item.len;
                     if (item.frg == 0)
@@ -129,7 +135,7 @@ namespace System.Net.Sockets.Kcp
                 return -1;
             }
 
-            var peekSize = PeekSize();
+            var peekSize = PeekSize();  //修复bug
             if (peekSize < 0)
             {
                 return -2;
@@ -154,17 +160,15 @@ namespace System.Net.Sockets.Kcp
         int UncheckRecv(Span<byte> buffer)
         {
             var recover = false;
-            if (rcv_queue.Count >= rcv_wnd)
-            {
-                recover = true;
-            }
-
-            #region merge fragment.
-            /// merge fragment.
-
             var recvLength = 0;
-            lock (rcv_queueLock)
-            {
+            #region merge fragment.
+            lock (rcv_queueLock) {  //修复bug
+
+                if (rcv_queue.Count >= rcv_wnd) {
+                    recover = true;
+                }
+
+                /// merge fragment.
                 var count = 0;
                 foreach (var seg in rcv_queue)
                 {
@@ -210,40 +214,49 @@ namespace System.Net.Sockets.Kcp
         public int PeekSize()
         {
 
-            if (rcv_queue.Count == 0)
-            {
-                ///没有可用包
-                return -1;
-            }
-
-            var seq = rcv_queue[0];
-
-            if (seq.frg == 0)
-            {
-                return (int)seq.len;
-            }
-
-            if (rcv_queue.Count < seq.frg + 1)
-            {
-                ///没有足够的包
-                return -1;
-            }
-
-            lock (rcv_queueLock)
-            {
-                uint length = 0;
-
-                foreach (var item in rcv_queue)
-                {
-                    length += item.len;
-                    if (item.frg == 0)
+            int t = 0;
+            try {
+                t = 1;
+                lock (rcv_queueLock) {  //在进行操作前需要先判断锁 不然出问题  修复bug
+                    if (rcv_queue.Count == 0)
                     {
-                        break;
+                        ///没有可用包
+                        return -1;
                     }
+                    t = 2;
+                    var seq = rcv_queue[0];
+                    t = 3;
+                    if (seq.frg == 0)
+                    {
+                        return (int)seq.len;
+                    }
+                    t = 4;
+                    if (rcv_queue.Count < seq.frg + 1)
+                    {
+                        ///没有足够的包
+                        return -1;
+                    }
+                    t = 4;
+             
+                    uint length = 0;
+                    t = 5;
+                    foreach (var item in rcv_queue) {
+                        length += item.len;
+                        if (item.frg == 0) {
+                            break;
+                        }
+                    }
+                    t = 6;
+                    return (int)length;
                 }
-
-                return (int)length;
             }
+            catch (Exception e) {
+                Log($"t: <{t}>  {e.ToString()} ");
+                throw;
+            }
+
+
+            return -1;
         }
 
         /// <summary>

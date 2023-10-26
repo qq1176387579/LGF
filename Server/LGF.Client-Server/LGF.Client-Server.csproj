@@ -60,6 +60,11 @@
 	</ItemGroup>
 
 
+	<ItemGroup>
+	  <PackageReference Include="LitJson" Version="0.18.0" />
+	</ItemGroup>
+
+
 
 	
 	<ItemGroup>

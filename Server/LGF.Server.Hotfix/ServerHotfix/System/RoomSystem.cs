@@ -212,6 +212,7 @@ namespace LGF.Server.Hotfix
                 case RoomStateEnum.Playing:
                     if (curState == RoomStateEnum.Loading)
                     {
+                        self.curFrame = 0;
                         self.curState = stateEnum;
                         self.StartPlayingGame();
                         return true;

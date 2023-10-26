@@ -37,6 +37,11 @@ namespace LGF.Server.Hotfix
             return playerList;
         }
 
+        public Player GetPlayer(KcpSession session)
+        {
+            return GetPlayerByID(session.useid);
+        }
+
         public Player GetPlayerByID(uint uid)
         {
             if (!playerList.TryGetValue(uid, out Player player))

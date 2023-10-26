@@ -102,14 +102,14 @@ namespace LGF.Net
         /// 注册客户端消息
         /// 回调完成后会自动回收 数据
         /// </summary>
-        public void RegisterClientMsg<T>(NetMsgDefine type, System.Action<T> action) where T : S2C_BASE<T>, new()
+        public void RegisterClientMsg<T>(NetMsgDefine type, System.Action<T> action,bool isAutoRecycleData = true) where T : S2C_BASE<T>, new()
         {
             if (m_NetEvent.ContainsKey(type))
             {
                 sLog.Warning("客户端 重复注册 请检查一下 {0}", type);
                 return;
             }
-            m_NetEvent.Add(type, new NetMsgDelegateInfo() { evt = action, autoRecycle = true });
+            m_NetEvent.Add(type, new NetMsgDelegateInfo() { evt = action, autoRecycle = isAutoRecycleData });
         }
 
 

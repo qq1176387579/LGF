@@ -77,13 +77,14 @@ namespace LGF
 
         public void Release(T element)
         {
-            if (m_Stack.Count > 0 && ReferenceEquals(m_Stack.Peek(), element))
-                this.DebugError($"Internal error. Trying to destroy object that is already released to pool. type: {typeof(T)}");
+            //多线程的时候 这里校验需要加多线程 不然 m_Stack.Count 通过。 但是 m_Stack.Peek时候 m_Stack已经为空
+            //if (m_Stack.Count > 0 && ReferenceEquals(m_Stack.Peek(), element))
+            //    this.DebugError($"Internal error. Trying to destroy object that is already released to pool. type: {typeof(T)}");
             m_ActionOnRelease?.Invoke(element);
 
-            //自旋锁 
+            //自旋锁 0表示该方法未被使用
             while (Interlocked.Exchange(ref m_SpinLock, 1) != 0)  {   
-                Thread.SpinWait(1);//自旋锁等待
+                Thread.SpinWait(1);//自旋锁等待 有人在占用
             }
             m_Stack.Push(element);
             Interlocked.Exchange(ref m_SpinLock, 0);

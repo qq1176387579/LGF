@@ -25,5 +25,10 @@
 		</Compile>
 	</ItemGroup>
 	
+	<ItemGroup>
+		<Compile Include="..\..\Client\Assets\Scripts\Module\HotfixCommon\**\*.cs">
+			<Link>HotfixCommon\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
 
 </Project>

@@ -93,6 +93,9 @@ namespace LGF.Net
     /// </summary>
     public class KcpSocket 
     {
+
+        public static bool OpenLog = false;
+
         System.Net.Sockets.Socket m_Socket;
         IPEndPoint m_ipEndPoint;
         byte[] m_SendBuffer = new byte[NetConst.Socket_SendBufferSize];
@@ -105,7 +108,12 @@ namespace LGF.Net
         Timers.SimpleAsynTimer m_timer; //简单定时器
         public bool IsServer;   //是否是服务器
         int m_SendSpinLock = 0; //发送的自旋锁
-      
+        /// <summary>
+        /// 客户端专用 是否连接服务器
+        /// 用来处理已经连接到服务器 后又重新连接服务器 导致出现的问题
+        /// 服务器有时候会将 uid<20> 发送到curuid<22>中。  不知道咋出现的 
+        /// </summary>
+        bool IsConnect = false; 
         public bool IsDisposed => m_disposed;
 
 
@@ -113,6 +121,7 @@ namespace LGF.Net
         public Socket Sock => m_Socket;
         IKcpSocketOnRecv objRecv;
         uint CurUid = 0;
+        uint AutoUniqueUID = 0;
         /// <summary>
         /// 服务器代理  客户端使用
         /// </summary>
@@ -229,6 +238,9 @@ namespace LGF.Net
 
             foreach (var item in m_KcpAgents)
             {
+                if (m_disposed) {
+                    return;
+                }
                 if (item.Value.close)
                 {
                     m_delKcpAgent.Add(item.Value);
@@ -339,9 +351,16 @@ namespace LGF.Net
             uint uid = BitConverter.ToUInt32(m_RecvBuffer, 0);  //id
             if (uid == 0) { //连接成功
                 uid = BitConverter.ToUInt32(m_RecvBuffer, 4);
+              
                 if (uid >= NetConst.KcpConvInitialValue) {
+                    if (IsConnect) {
+                        this.DebugError($"非法请求。  当前已经连接到服务器了 无法重新连接 uid:<{uid}> CurUid:<{CurUid}>");
+                        return;
+                    }
+                    IsConnect = true;
                     //连接成功
                     CurUid = uid;
+                    this.Debug($"ClientOnRecv CurUid<{CurUid}>");
                     IPEndPoint tmpPoint = endPoint as IPEndPoint;
                     ulong AddressUid = ((ulong)tmpPoint.Address.GetHashCode() << 16 | (ushort)tmpPoint.Port);  //唯一key值
                     ServerAgent?.Close();   //关闭原来的代理开启新的   存在重连
@@ -366,7 +385,8 @@ namespace LGF.Net
                         objRecv.OnConnectEvent(ConnectEvent.Client_ReConnectDone, ServerAgent);
                     }
                     else {
-                        sLog.Error(">>>> 出错.....");
+                        sLog.Error($">>>> 出错..... uid:<{uid}>");
+                        //objRecv.OnConnectEvent(ConnectEvent.Client_Close, ServerAgent);
                     }
                 }
             }
@@ -378,8 +398,11 @@ namespace LGF.Net
                 else {
                     //和服务端异常1一样
                     //objRecv.OnConnectEvent(ConnectEvent.Client_Close, ServerAgent);//让他重启游戏
-                    ReBing();//重连试下？
-                    sLog.Error(" 出错.... ");
+                    //ReBing();//重连试下？
+                    
+					//修复kcpbug后这种情况没出现了
+                    sLog.Error($" 出错.... 不懂为啥接收到其他地址的数据!! 晚点看下服务器的写法为啥会发送对象<{m_Socket.LocalEndPoint}> CurUid<{CurUid}> uid<{uid}>");
+                    //objRecv.OnConnectEvent(ConnectEvent.Client_Close, ServerAgent);
                 }
 
             }
@@ -453,7 +476,7 @@ namespace LGF.Net
                     //没换ip地址
                     if (uid2 != uid) {
                         //异常  这种情况是 ip地址与端口号没有换掉 且原来的ip地址没回收  这时候用导致同一个端口号 不同的uid 出问题。
-                        this.DebugError("---------->> 异常1");
+                        this.Debug($"---------->> 异常1 uid2<{uid2}> uid<{uid}> hasAddress2Uid<{hasAddress2Uid}>  EndPoint<{tmpPoint.ToString()}>");
                     }
                     else {
                         //正常流程  
@@ -467,7 +490,7 @@ namespace LGF.Net
                     this.Debug($">>> 断线重连 <{uid}>");
                     var kcp = GetKcpAgent(uid);
                     if (kcp == null) {
-                        this.DebugError($"---------->> 客户端重新在服务器中已掉线  但是客户端还能继续请求。 发送客户端错误代码 uid<{uid}>");
+                        this.Debug($"---------->> 客户端重新在服务器中已掉线  但是客户端还能继续请求。 发送客户端错误代码 uid<{uid} {endPoint.ToString()}>");
                         //换ip地址(换wifi 换流量)  或者断网  需要重连
                         //id相同 没有下线 表示值断了一下 卡了一下 或者换了网络环境
                         //卡了的话 服务器会删除当前这个KcpAgent 和  Addressuid
@@ -476,6 +499,7 @@ namespace LGF.Net
                         ServerSendUID(NetConst.KcpAbnormal_1, endPoint);
                     }
                     else {
+                        this.Debug($"重连成功  uid:{kcp.uid}  endPoint:<{kcp.endPoint}> to <{endPoint}> ");
                         kcp.endPoint = endPoint;    //更换新的ip地址
 
                         lock (Address2Uid) {
@@ -496,18 +520,21 @@ namespace LGF.Net
 
         void ServerSendUID(uint uid, in EndPoint endPoint)
         {
-            StartSpinLock_Send();   //开启发送锁
-            m_SendBuffer[0] = 0;
-            m_SendBuffer[1] = 0;
-            m_SendBuffer[2] = 0;
-            m_SendBuffer[3] = 0;
-            Array.Copy(BitConverter.GetBytes(uid), 0, m_SendBuffer, 4, 4);
-            SockSend(m_SendBuffer, 8, endPoint);
-            EndSpinLock_Send();     //关闭发送锁
+            //StartSpinLock_Send();   //开启发送锁
+            lock (m_SendBuffer) {
+                m_SendBuffer[0] = 0;
+                m_SendBuffer[1] = 0;
+                m_SendBuffer[2] = 0;
+                m_SendBuffer[3] = 0;
+                Array.Copy(BitConverter.GetBytes(uid), 0, m_SendBuffer, 4, 4);
+                SockSend(m_SendBuffer, 8, endPoint);
+            }
+
+            //EndSpinLock_Send();     //关闭发送锁
         }
 
         #endregion
-        //获得或者添加代理
+        //获得或者添加代理 改脚本报过一次错 但是不知道哪个位置导致的
         public KcpAgent GetOrAddKcpAgent(uint uid, in EndPoint endPoint,ulong AddressUid, bool lockKcpAgents = true)
         {
             KcpAgent kcpAgent = GetKcpAgent(uid, lockKcpAgents);
@@ -624,7 +651,8 @@ namespace LGF.Net
         //}
 
         /// <summary>
-        /// 开始自旋锁 发送的
+        /// 开始自旋锁 发送的  没有必要
+        /// 因为有IO操作 所以不在不需要用自旋锁
         /// </summary>
         private void StartSpinLock_Send()
         {
@@ -691,16 +719,16 @@ namespace LGF.Net
           
             lock (m_KcpAgents) {
                 while (true) {
-                    ++CurUid;
-                    if (CurUid == uint.MaxValue || CurUid < NetConst.KcpConvInitialValue) {
-                        CurUid = NetConst.KcpConvInitialValue;
+                    ++AutoUniqueUID;
+                    if (AutoUniqueUID == uint.MaxValue || AutoUniqueUID < NetConst.KcpConvInitialValue) {
+                        AutoUniqueUID = NetConst.KcpConvInitialValue;
                     }
-                    if (!m_KcpAgents.ContainsKey(CurUid)) {
+                    if (!m_KcpAgents.ContainsKey(AutoUniqueUID)) {
                         break;
                     }
                 }
             }
-            return CurUid;
+            return AutoUniqueUID;
         }
 
 
@@ -720,8 +748,8 @@ namespace LGF.Net
             /// 服务器和客户端同时换 不修改其他部分
             /// </summary>
             public EndPoint endPoint;
-            KcpSocket m_Socket; 
-            UnSafeSegManager.Kcp kcp;
+            KcpSocket m_Socket;
+            PoolSegManager.Kcp kcp;
             //内部提供一个缓冲流 LGF
 
             internal KcpAgent Bing(KcpSocket socket, uint conv_, ulong AddressUid_, EndPoint endPoint_)
@@ -729,10 +757,11 @@ namespace LGF.Net
                 AddressUid = AddressUid_;
                 uid = conv_;
                 m_Socket = socket;
-                kcp = new UnSafeSegManager.Kcp(conv_, this);  //conv 与 uid 共用一个
+                kcp = new PoolSegManager.Kcp(conv_, this);  //conv 与 uid 共用一个
                 kcp.NoDelay(1, 15, 2, 1);
                 kcp.WndSize(256, 256);
                 endPoint = endPoint_;
+                kcp.Log = sLog.Error;
                 return this;
             }
 
@@ -742,6 +771,9 @@ namespace LGF.Net
             /// <returns></returns>
             public int Recv(byte[] buffer)  //外部可以直接调用
             {
+                if (kcp == null) {
+                    this.DebugError($"kcp is null uid<{uid}>  endPoint<{endPoint}>");
+                }
                 return kcp.Recv(buffer);
             }
 
@@ -754,6 +786,7 @@ namespace LGF.Net
             {
                 if (kcp == null) {
                     this.DebugError("-----44444--");
+                    return;
                 }
                 Span<byte> buffBytes = new Span<byte>(buffer, 0, length);
                 kcp.Send(buffBytes);
@@ -767,8 +800,12 @@ namespace LGF.Net
 
             internal void Input(int length)
             {
-                Span<byte> buffBytes = new Span<byte>(m_Socket.m_RecvBuffer, 0, length);
-                kcp.Input(buffBytes);
+                 Span<byte> buffBytes = new Span<byte>(m_Socket.m_RecvBuffer, 0, length);
+                int t = kcp.Input(buffBytes);
+                if (KcpSocket.OpenLog) {
+                    this.Debug($"uid<{uid}>> Input >> {length}  t:<{t}>");
+                }
+
             }
 
             internal void OnUpdate(in DateTime dateTime)
@@ -777,25 +814,40 @@ namespace LGF.Net
             }
 
 
-            void IKcpCallback.Output(IMemoryOwner<byte> buffer, int avalidLength)
+            public void Output(IMemoryOwner<byte> buffer, int avalidLength)
             {
-
                 //m_Socket.testReBing
-                m_Socket.StartSpinLock_Send();  //开启自旋锁
-                m_Socket.CheckBufferSize(avalidLength);
-                Span<byte> buffBytes = new Span<byte>(m_Socket.m_SendBuffer);
-                buffer.Memory.Span.Slice(0, avalidLength).CopyTo(buffBytes);
-                m_Socket.SockSend(m_Socket.m_SendBuffer, avalidLength, endPoint);
-                //this.Debug(">>  Output avalidLength{0}", avalidLength);
-                buffer.Dispose();
-                m_Socket.EndSpinLock_Send();    //关闭自旋锁
+                //m_Socket.StartSpinLock_Send();  //开启自旋锁
+                lock(m_Socket.m_SendBuffer) {
+                    m_Socket.CheckBufferSize(avalidLength);
+                    Span<byte> buffBytes = new Span<byte>(m_Socket.m_SendBuffer);
+                    buffer.Memory.Span.Slice(0, avalidLength).CopyTo(buffBytes);
+                    //测试版本打开  正式版本关闭改打印
+                    uint _uid = BitConverter.ToUInt32(m_Socket.m_SendBuffer, 0);  //id
+                    if (uid != _uid) {
+                        this.DebugError($"出错！！！！！curkcp:<{uid}> to<{_uid}> kcp.uid<{kcp.conv}>");
+                    }
+                    m_Socket.SockSend(m_Socket.m_SendBuffer, avalidLength, endPoint);
+                    if (KcpSocket.OpenLog) {
+                        this.Debug($"uid <{uid}>  Output avalidLength{avalidLength}");
+                    }
+                    buffer.Dispose();
+                }
+             
+                //m_Socket.EndSpinLock_Send();    //关闭自旋锁
 
             }
 
 
             public void Dispose()
             {
-                //this.DebugError("------Dispose");
+                if (m_Socket.IsServer) {
+                    this.Debug($"------Dispose {uid}");
+                }
+                else {
+                    this.DebugError("------Dispose");
+                }
+
                 kcp.Dispose();
                 m_Socket = null;
                 endPoint = null;
