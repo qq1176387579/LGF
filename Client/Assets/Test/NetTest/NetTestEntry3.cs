@@ -19,6 +19,8 @@ public class NetTestEntry3 : GameEntry2
     static DateTime _initialDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
     protected override void OnStart()
     {
+        
+
         base.OnStart();
         Application.targetFrameRate = 60;   //锁帧
         //如果是单机模式 需要该初始化地方
@@ -42,6 +44,8 @@ public class NetTestEntry3 : GameEntry2
 
         
         string BasePath = Application.persistentDataPath + "/FrameData/";
+
+        FrameDataMgr.Instance.Init();
 
     }
 

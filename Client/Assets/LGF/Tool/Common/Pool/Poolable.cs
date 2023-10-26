@@ -41,7 +41,7 @@ namespace LGF
             _this.OnGet();
         }
 
-        public void Release()
+        public virtual void Release()
         {
             if (!IsRelease())
             {

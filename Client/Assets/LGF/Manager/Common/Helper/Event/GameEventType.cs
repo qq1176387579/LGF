@@ -53,6 +53,9 @@ namespace LGF
         ClientEvent_StartLoadingScene,  //开始游戏
         ClientEvent_RoomProgress,       //房间进度
         ClientEvent_StartPlay,          //
+        ClientEvent_OnServerLogicFrame,
+        ClientEvent_GameSceneInitData,
+        ClientEvent_StartPlayback,      //开始回放
         #endregion
 
 

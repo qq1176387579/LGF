@@ -11,12 +11,27 @@ using LGF.Log;
 using PEMath;
 using PEPhysx;
 using UnityEngine;
+using LGF.Serializable;
+
+/// <summary>
+/// 游戏场景初始数据
+/// </summary>
+[LGF.Serializable.SteamContract]
+public partial class GameSceneInitData : CMD_BASE2<GameSceneInitData>
+{
+    [SteamMember(0)]
+    public uint mainPlayerID;
+
+    [SteamMember(1)]
+    public List<CMD_UserRoomInfo> allUserInfo;
+}
 
 /// <summary>
 /// 游戏场景管理器
 /// </summary>
 public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
 {
+    GameSceneInitData sceneInitData;
 
     MainPlayerManager _mainPlayer;
     MainPlayerManager mainPlayer {
@@ -25,6 +40,10 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
             return _mainPlayer;
         } 
     }
+    #region Playback
+    bool isPlayback = false;
+    #endregion
+
     #region isNative
     bool isNative = true;
     public uint _keyid = 0;
@@ -50,18 +69,7 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
         //LGFEntry.RegisterOnFixedUpdate(OnFixedUpdate);
     }
 
-    void NativeInit()
-    {
-        isNative = !ModuleMgr.CheckInstance();    //判断是否有开启 客户端服务
-        
-        if (isNative)   //单机模式
-        {
-            MonoManager.Instance.AddFixedUpdateListener(OnFixedUpdate);
-            allkey = new S2C_FrameOpKey();
-            allkey.allOpkey = new List<C2S_FrameOpKey>();
-        }
-    }
-
+   
 
     public void LogicInit()
     {
@@ -126,8 +134,13 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
         }
       
         LogicTick();
+        if (isPlayback) {
+            return;
+        }
 
         CheckCharacterPositionRequest.Instance.DefaultRequest(players, CurFrame);
+        EventManager.Instance.BroadCastEvent(GameEventType.ClientEvent_OnServerLogicFrame, msg);
+
     }
 
 
@@ -135,6 +148,9 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
 
     void OnFixedUpdate()
     {
+        if (isPlayback)
+            return;
+
         if (isNative) {
             allkey.curFrame++;
             OnServerLogicFrame(allkey);
@@ -160,6 +176,10 @@ public partial class GameSceneMgr : SingletonBase<GameSceneMgr>
     /// <returns></returns>
     public bool SendMoveKey(in PEVector3 logicDir)
     {
+        if (isPlayback) {
+            return false;
+        }
+
         if (!isNative)
         {
             //后面可以优化  客户端的逻辑帧的时候 发送

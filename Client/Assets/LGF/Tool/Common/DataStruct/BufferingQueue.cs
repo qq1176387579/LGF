@@ -127,6 +127,16 @@ namespace LGF.DataStruct
             return queue[lastidx];
         }
 
+
+        /// <summary>
+        /// 是否有需要清理的数据
+        /// </summary>
+        /// <returns></returns>
+        public bool hasNeedClear()
+        {
+            return needClear;
+        }
+
         public void Clear()
         {
             if (!needClear)

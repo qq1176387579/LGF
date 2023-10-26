@@ -4,22 +4,45 @@
 /// 功能描述:  
 ****************************************************/
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using LGF;
 using LGF.Log;
+using LGF.Serializable;
 using PEMath;
 using PEPhysx;
 using UnityEngine;
 
+
+
+
+
 public partial class GameSceneMgr
 {
+
+    protected override void OnNew()
+    {
+        base.OnNew();
+        EventManager.Instance.AddListener<GameSceneInitData>(GameEventType.ClientEvent_StartPlayback, OnStartPlayback);
+
+
+    }
+
+    private void OnStartPlayback(GameSceneInitData data)
+    {
+        isPlayback = true;
+        sceneInitData = data;
+        Init();
+    }
 
     public override void Init()
     {
         if (!EventCenter.CheckInstance()) EventCenter.Instance.Init();  //TestPlayer1 依赖这个
         
         NativeInit();
+        InitData();
+
 
         InitEnv();
         InitPlayer();
@@ -28,6 +51,52 @@ public partial class GameSceneMgr
 
         InitOther();
     }
+
+    ///// <summary>
+    ///// 如果是回放
+    ///// </summary>
+    ///// <param name="s"></param>
+    ///// <returns></returns>
+    //public void InitPlayback()
+    //{
+    //    isPlayback = true;
+    //}
+
+
+
+
+    void InitData()
+    {
+        if (isNative) {
+            return;
+        }
+        if (isPlayback)  {
+            return;
+        }
+        sceneInitData = new GameSceneInitData();
+        sceneInitData.allUserInfo = RoomManager.Instance.GetAllUserInfoByList();
+        sceneInitData.mainPlayerID = mainPlayer.uid;
+        //isPlayback = false;
+
+        EventManager.Instance.BroadCastEvent<GameSceneInitData>(GameEventType.ClientEvent_GameSceneInitData, sceneInitData);
+    }
+
+
+
+    #region NativeInit
+    void NativeInit()
+    {
+        
+        isNative = !ModuleMgr.CheckInstance();    //判断是否有开启 客户端服务
+
+        if (isNative && !isPlayback)   //单机模式
+        {
+            MonoManager.Instance.AddFixedUpdateListener(OnFixedUpdate);
+            allkey = new S2C_FrameOpKey();
+            allkey.allOpkey = new List<C2S_FrameOpKey>();
+        }
+    }
+    #endregion
 
 
     #region InitEnv
@@ -96,7 +165,7 @@ public partial class GameSceneMgr
     void InitPlayer()
     {
         var gop = Resources.Load<GameObject>("ResChars/Arthur");
-        if (isNative)
+        if (isNative && !isPlayback)
         {
             var go = GameObject.Instantiate<GameObject>(gop);
             TestPlayer1 player1 = go.GetComponent<TestPlayer1>();
@@ -112,7 +181,7 @@ public partial class GameSceneMgr
             sLog.OpenMsgInfo = false;
             var allUserInfo = RoomManager.Instance.GetAllUserInfo();    //帧同步不能用这个Dic 来处理 因为字典是无序的 所以这里出问题
             int count = 0;
-            List<CMD_UserRoomInfo> info = RoomManager.Instance.GetAllUserInfoByList();
+            List<CMD_UserRoomInfo> info = sceneInitData.allUserInfo;
 
             foreach (var user in info)
             {
@@ -129,7 +198,7 @@ public partial class GameSceneMgr
                 playerUnits.Add(player1.logicUnit.playerid, player1.logicUnit);
 
                 player1.SetPos(new Vector3(count - 1, 0, count - 1));   //暂时先这样写
-                if (mainPlayer.uid == player1.logicUnit.playerid) {
+                if (sceneInitData.mainPlayerID == player1.logicUnit.playerid) {
                     CameraFollow.Instance.CameraFollowOb = player1.transform;
                 }
             }

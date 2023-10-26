@@ -91,6 +91,24 @@ public partial class S2C_FrameOpKey : S2C_BASE<S2C_FrameOpKey>
 
     [SteamMember(2)]
     public List<C2S_FrameOpKey> allOpkey;
+
+
+
+    public void SetCanRelease(bool f)
+    {
+        canRelease = f;
+    }
+    /// <summary>
+    /// 托管回收
+    /// </summary>
+    bool canRelease = false;
+    public override void Release()
+    {
+        if (!canRelease) {
+            return;
+        }
+        base.Release();
+    }
 }
 
 

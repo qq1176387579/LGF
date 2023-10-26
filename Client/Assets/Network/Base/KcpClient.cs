@@ -326,9 +326,15 @@ namespace LGF.Net
         }
 
 
+        public override void Dispose()
+        {
+            base.Dispose();
+            m_SendStream.Close();
+        }
+
     }
 
-
+    
 
 }
 

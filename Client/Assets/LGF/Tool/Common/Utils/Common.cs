@@ -64,7 +64,7 @@ namespace LGF.Util
         /// </summary>
         /// <param name="timestamp">Unix 时间戳</param>
         /// <returns>需要转换的时间</returns>
-        public static DateTime UnixTimeToDateTime(long timestamp)
+        public static DateTime ToDateTime(this long timestamp)
         {
             if (timestamp < 0)
                 throw new ArgumentOutOfRangeException("timestamp is out of range");
@@ -78,7 +78,7 @@ namespace LGF.Util
         /// </summary>
         /// <param name="dateTime">需要转换的时间</param>
         /// <returns>Unix 时间戳</returns>
-        public static long DateTimeToUnixTime(DateTime dateTime)
+        public static long ToUnixTime(this DateTime dateTime)
         {
             return Convert.ToInt64((dateTime - _initialDateTime).TotalSeconds) - EIGHT_HOURS_TO_SEC;
         }

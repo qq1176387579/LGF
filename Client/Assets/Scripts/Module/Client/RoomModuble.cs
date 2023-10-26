@@ -239,6 +239,7 @@ public class RoomModuble : ModuleBase
     void StartPlayingGame()
     {
         sLog.Debug("--StartPlayingGame-2");
+        //开始游戏
         roomMgr.ChangeState(RoomStateEnum.Playing);
         EventManager.Instance.BroadCastEvent(GameEventType.ClientEvent_StartPlay); //用于显示
     }

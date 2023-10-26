@@ -27,7 +27,7 @@ public class CameraFollow : SimpleMonoSingleton<CameraFollow>
             return;
         }
 
-        transform.position = CameraFollowOb.transform.position;
+        transform.position = Vector3.Lerp(transform.position, CameraFollowOb.transform.position, 0.1f);
 
 
     }

@@ -194,6 +194,7 @@ namespace LGF.Editor
                 writeString.Append(blankSpace);
                 readString.Append(blankSpace);
                 //var FieldTypeName = GetTypeName(m.fieldInfo.FieldType);
+                //Debug.Log($"Write_MemberType: <{ Write_MemberType(m.fieldInfo.FieldType)}>");
                 writeString.Append(WriteContext.Replace("<Write_MemberType>", Write_MemberType(m.fieldInfo.FieldType)).Replace("<MemberName>", m.name)).Append("\r\n");
                 readString.Append(ReadContext.Replace("<Read_MemberType>", Read_MemberType(m.fieldInfo.FieldType)).Replace("<MemberName>", m.name)).Append("\r\n");
                 CheckRecycle(recycleString, m, ref recycleCount);

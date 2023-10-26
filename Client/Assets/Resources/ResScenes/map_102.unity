@@ -253,6 +253,8 @@ MonoBehaviour:
   redTower: {fileID: 2096855556}
   blueCrystal: {fileID: 552688979}
   redCrystal: {fileID: 859086009}
+  IsPlayback: 1
+  path: C:/Users/tttt/AppData/LocalLow/defaultcompany/myframework/FrameData/32/1698312933.byte
 --- !u!4 &241098699
 Transform:
   m_ObjectHideFlags: 0

@@ -42,6 +42,28 @@ namespace LGF.Serializable
             Clear();
         }
 
+        /// <summary>
+        /// 检查大小 如果不够扩容
+        /// </summary>
+        /// <param name="size"></param>
+        public void CheckSize(int size)
+        {
+            if (stream.GetBuffer().Length >= size) {
+                return;
+            }
+
+            long tmpPos = Position;
+            Position = Lenght;
+            stream.Seek(Position, SeekOrigin.Begin);
+            int count1 = size;
+            while (count1 > 0) {
+                stream.Write(tmpByts, 0, count1 > tmpBytsCount ? tmpBytsCount : count1);
+                count1 -= tmpBytsCount;
+            }
+            Position = tmpPos;
+            stream.Seek(Position, SeekOrigin.Begin);    //还原
+        }
+
 
         public byte[] GetBuffer()
         {
@@ -54,7 +76,7 @@ namespace LGF.Serializable
             Lenght = 0;
         }
 
-        public int Position { get => (int)stream.Position; set => stream.Position = value; } 
+        public long Position { get => stream.Position; set => stream.Position = value; } 
 
         public void OnStackBegin()
         {
@@ -73,7 +95,7 @@ namespace LGF.Serializable
             stack--;
             if (stack == 0)
             {
-                Lenght = Position;
+                Lenght = (int)Position;
                 stream.Seek(0, SeekOrigin.Begin);
             }
                 
@@ -126,6 +148,13 @@ namespace LGF.Serializable
             //}
             Reset();
             return val;
+        }
+
+        public void Close()
+        {
+            stream.Close();
+            writer.Close();
+            read.Close();
         }
 
     }

@@ -10,11 +10,62 @@ using System.Collections.Generic;
 using LGF;
 using LGF.Log;
 
-public class FrameSyncModule : ModuleBase
+
+
+/// <summary>
+/// 帧同步管理
+/// </summary>
+public class FrameSyncMgr : LGF.SingletonBase<FrameSyncMgr>
 {
     ulong CurFrame = 1; //服务器初始帧是1开始
-    
+    public bool IsPlayback = false;
     Dictionary<ulong, S2C_FrameOpKey> framesList = new Dictionary<ulong, S2C_FrameOpKey>();
+
+    public int DicCount => framesList.Count;
+
+    public void GameInit()
+    {
+        CurFrame = 1;
+
+        foreach (var item in framesList) {
+            item.Value.Release();
+        }
+        framesList.Clear();
+    }
+
+    public void OnFixedUpdate()
+    {
+        if (framesList.TryGetValue(CurFrame, out var val)) {
+            framesList.Remove(CurFrame);    //减少原来的
+            CurFrame++;
+            GameSceneMgr.Instance.OnServerLogicFrame(val);
+            val.Release();
+        }
+    }
+
+    public void AddFrame(S2C_FrameOpKey msg)
+    {
+        framesList.Add(msg.curFrame, msg);
+
+        if (IsPlayback) {
+            return;
+        }
+
+        if (msg.curFrame != CurFrame) {
+            this.Debug($" {CurFrame}->{msg.curFrame} 跳帧了 少接收一帧");
+            if (msg.curFrame - CurFrame > 10) {
+                this.Debug($" {CurFrame}->{msg.curFrame} 跳帧了 延迟波动");
+            }
+        }
+    }
+
+}
+
+
+
+public class FrameSyncModule : ModuleBase
+{
+    
     
     protected override void OnInit()
     {
@@ -33,12 +84,7 @@ public class FrameSyncModule : ModuleBase
     /// </summary>
     private void OnFixedUpdate()
     {
-        if (framesList.TryGetValue(CurFrame,out var val)) {
-            framesList.Remove(CurFrame);    //减少原来的
-            CurFrame++;
-            GameSceneMgr.Instance.OnServerLogicFrame(val);
-            val.Release();
-        }
+        FrameSyncMgr.Instance.OnFixedUpdate();
     }
 
     /// <summary>
@@ -47,15 +93,8 @@ public class FrameSyncModule : ModuleBase
     /// <param name="msg"></param>
     void OnServerLogicFrame(S2C_FrameOpKey msg)
     {
-        if (msg.curFrame != CurFrame) {
-            this.Debug($" {CurFrame}->{msg.curFrame} 跳帧了 少接收一帧");
-            if (msg.curFrame - CurFrame > 10) {
-                this.Debug($" {CurFrame}->{msg.curFrame} 跳帧了 延迟波动");
-            }
-        }
 
-
-        framesList.Add(msg.curFrame, msg);
+        FrameSyncMgr.Instance.AddFrame(msg);
 
         //感觉不能在这里执行。  
         //可能因为网络问题一下子出现很多帧
