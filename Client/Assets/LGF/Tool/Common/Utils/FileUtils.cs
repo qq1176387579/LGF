@@ -15,6 +15,10 @@ namespace LGF.Util
     public class FileUtils
     {
 
+        //File.WriteAllText(GameSavePath, JsonMapper.ToJson(db)); 覆盖写入
+        //  var dbstr = File.ReadAllText(GameSavePath);  全部写入  但是需要判断文件是否存在
+
+
         /// <summary>
         /// 获取目录名
         /// </summary>

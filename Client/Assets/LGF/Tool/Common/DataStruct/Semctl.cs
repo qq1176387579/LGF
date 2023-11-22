@@ -7,9 +7,48 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LGF.Log;
 
 namespace LGF.DataStruct
 {
+    public class SemctlCount
+    {
+        public int Count { get => count; }
+        public string name;
+        int count = 0;
+        System.Action beginAc, endAc;
+
+        //public SemctlCount() { }
+        public SemctlCount(System.Action beginAc_, System.Action endAc_) => Register(beginAc_, endAc_);
+
+
+        public void Register(System.Action beginAc_, System.Action endAc_)
+        {
+            beginAc = beginAc_;
+            endAc = endAc_;
+        }
+
+        public void Begin()
+        {
+            if (count == 0) {
+                beginAc?.Invoke();
+            }
+            count++;
+            this.Debug($"<{name}> Begin <{count}>");
+        }
+
+        public void End()
+        {
+            count--;
+            this.Debug($"<{name}> End <{count}>");
+            if (count == 0) {
+                endAc?.Invoke();
+            }
+        }
+    }
+
+
+
     public class SemctlBool
     {
         public bool Flag { get => flag; }

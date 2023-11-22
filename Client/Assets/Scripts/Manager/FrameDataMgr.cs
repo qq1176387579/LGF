@@ -225,7 +225,10 @@ public class FrameDataMgr : SingletonBase<FrameDataMgr>
 
                     var tmp = S2C_FrameOpKey.Get(stream);
                     lock (queue) {
-                        FrameSyncMgr.Instance.AddFrame(tmp);
+                        //fs.Flush(); 流存储的时候是后写入读取的时候在前面 导致需要重新排序。
+                        //1 2 3  fs.Flush() 写入
+                        //读取出来的时候是 3 2 1 所以不能用原来的写法了
+                        FrameSyncMgr.Instance.AddFrame(tmp);   
                     }      
 
                 }

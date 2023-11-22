@@ -31,7 +31,7 @@ namespace LGF.Net
             {
                 count = -1 * count - 3;
                 //bytebuffer = (byte[])System.Array.CreateInstance(typeof(byte), SocketHelper.ceilpow2(count));
-                stream = new LStream(count);  //空间不够
+                stream.CheckSize(count);  //空间不够
                 count = kcp.Recv(bytebuffer);   //重新接收数据
             }
 
